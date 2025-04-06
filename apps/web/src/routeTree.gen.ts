@@ -15,6 +15,7 @@ import { Route as SignupImport } from './routes/signup'
 import { Route as NotesImport } from './routes/notes'
 import { Route as NewNotesImport } from './routes/new-notes'
 import { Route as LoginImport } from './routes/login'
+import { Route as ForgotPasswordImport } from './routes/forgot-password'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
 
@@ -41,6 +42,12 @@ const NewNotesRoute = NewNotesImport.update({
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ForgotPasswordRoute = ForgotPasswordImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -72,6 +79,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordImport
       parentRoute: typeof rootRoute
     }
     '/login': {
@@ -110,6 +124,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/new-notes': typeof NewNotesRoute
   '/notes': typeof NotesRoute
@@ -119,6 +134,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/new-notes': typeof NewNotesRoute
   '/notes': typeof NotesRoute
@@ -129,6 +145,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/new-notes': typeof NewNotesRoute
   '/notes': typeof NotesRoute
@@ -137,13 +154,28 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/new-notes' | '/notes' | '/signup'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/new-notes'
+    | '/notes'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/new-notes' | '/notes' | '/signup'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/new-notes'
+    | '/notes'
+    | '/signup'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/forgot-password'
     | '/login'
     | '/new-notes'
     | '/notes'
@@ -154,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   NewNotesRoute: typeof NewNotesRoute
   NotesRoute: typeof NotesRoute
@@ -163,6 +196,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   NewNotesRoute: NewNotesRoute,
   NotesRoute: NotesRoute,
@@ -181,6 +215,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/dashboard",
+        "/forgot-password",
         "/login",
         "/new-notes",
         "/notes",
@@ -192,6 +227,9 @@ export const routeTree = rootRoute
     },
     "/dashboard": {
       "filePath": "dashboard.tsx"
+    },
+    "/forgot-password": {
+      "filePath": "forgot-password.tsx"
     },
     "/login": {
       "filePath": "login.tsx"

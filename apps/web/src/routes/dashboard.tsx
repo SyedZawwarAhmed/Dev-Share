@@ -14,7 +14,12 @@ function RouteComponent() {
     <main className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-purple-800">DevShare</h1>
+          <h1
+            className="text-3xl font-bold text-purple-800 cursor-pointer"
+            onClick={() => (window.location.href = "/")}
+          >
+            DevShare
+          </h1>
           <p className="text-slate-600">
             Automate your developer learning posts
           </p>

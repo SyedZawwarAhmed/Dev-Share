@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function ScheduledPosts() {
-  const [activeTab, setActiveTab] = useState("upcoming");
+  const [, setActiveTab] = useState("upcoming");
 
   return (
     <Card>

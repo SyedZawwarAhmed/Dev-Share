@@ -2,18 +2,23 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRef } from "react";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const featuresRef = useRef<HTMLDivElement>(null);
   return (
     <div className="min-h-screen">
       {/* Header/Navigation */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => (window.location.href = "/")}
+          >
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">
               DevShare
             </h1>
@@ -51,11 +56,15 @@ function RouteComponent() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link to="#features">
-              <Button size="lg" variant="outline">
-                See Features
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() =>
+                featuresRef.current?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              See Features
+            </Button>
           </div>
 
           {/* Preview Image */}
@@ -71,7 +80,7 @@ function RouteComponent() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20">
+      <section ref={featuresRef} className="py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-16 bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">
             Supercharge Your Developer Branding
@@ -291,24 +300,29 @@ function RouteComponent() {
                 Share your developer journey, effortlessly.
               </p>
             </div>
-            <div className="flex gap-8">
-              <Link to="#" className="hover:text-white transition-colors">
-                About
-              </Link>
-              <Link to="#" className="hover:text-white transition-colors">
-                Features
-              </Link>
-              <Link to="#" className="hover:text-white transition-colors">
-                Pricing
-              </Link>
-              <Link to="#" className="hover:text-white transition-colors">
-                Contact
-              </Link>
+            <div className="text-center text-slate-400">
+              <p>
+                © {new Date().getFullYear()} DevShare. All rights reserved.
+              </p>
             </div>
+            {/* <div className="flex gap-8"> */}
+            {/*   <Link to='..' href="#" className="hover:text-white transition-colors"> */}
+            {/*     About */}
+            {/*   </Link> */}
+            {/*   <Link to="#" className="hover:text-white transition-colors"> */}
+            {/*     Features */}
+            {/*   </Link> */}
+            {/*   <Link to="#" className="hover:text-white transition-colors"> */}
+            {/*     Pricing */}
+            {/*   </Link> */}
+            {/*   <Link to="#" className="hover:text-white transition-colors"> */}
+            {/*     Contact */}
+            {/*   </Link> */}
+            {/* </div> */}
           </div>
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>© {new Date().getFullYear()} DevShare. All rights reserved.</p>
-          </div>
+          {/* <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400"> */}
+          {/*   <p>© {new Date().getFullYear()} DevShare. All rights reserved.</p> */}
+          {/* </div> */}
         </div>
       </footer>
     </div>
