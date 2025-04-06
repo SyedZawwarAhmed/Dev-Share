@@ -136,15 +136,15 @@ function RouteComponent() {
                   }
                   disabled={isLoading}
                 />
-                <Label htmlFor="terms" className="text-sm font-normal">
-                  I agree to the{" "}
-                  <Link
-                    to="/terms"
-                    className="text-purple-600 hover:text-purple-800"
-                  >
-                    terms and conditions
-                  </Link>
-                </Label>
+                {/* <Label htmlFor="terms" className="text-sm font-normal"> */}
+                {/*   I agree to the{" "} */}
+                {/*   <Link */}
+                {/*     // to="/terms" */}
+                {/*     className="text-purple-600 hover:text-purple-800" */}
+                {/*   > */}
+                {/*     terms and conditions */}
+                {/*   </Link> */}
+                {/* </Label> */}
               </div>
 
               <Button
