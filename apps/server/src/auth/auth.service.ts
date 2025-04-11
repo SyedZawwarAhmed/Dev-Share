@@ -1,15 +1,140 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { AuthProvider } from 'generated/prisma';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  googleLogin(req: { user: User }) {
-    if (!req.user) {
-      return 'No user from google';
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
+
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: username },
+    });
+    if (user && user.password) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (isPasswordValid) {
+        const { password, ...result } = user;
+        return result;
+      }
     }
+    return null;
+  }
+
+  async login(user) {
+    console.log(
+      '\n\n ---> apps/server/src/auth/auth.service.ts:28 -> user: ',
+      user,
+    );
+    const payload = { email: user.username, sub: user.id };
+    const token = this.jwtService.sign(payload);
+
+    // Create or update session
+    await this.prisma.session.create({
+      data: {
+        userId: user?.id,
+        sessionToken: token,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
+      },
+    });
 
     return {
-      message: 'User information from google',
-      user: req.user,
+      access_token: token,
+      user,
     };
+  }
+
+  async googleLogin(profile: any) {
+    const { email, given_name, family_name, picture } = profile._json;
+
+    // Find or create user
+    const user = await this.prisma.user.upsert({
+      where: { email },
+      create: {
+        email,
+        firstName: given_name,
+        lastName: family_name,
+        profileImage: picture,
+        isEmailVerified: true,
+        accounts: {
+          create: {
+            type: 'oauth',
+            provider: AuthProvider.GOOGLE,
+            providerAccountId: profile.id,
+          },
+        },
+      },
+      update: {
+        firstName: given_name,
+        lastName: family_name,
+        profileImage: picture,
+        accounts: {
+          upsert: {
+            where: {
+              provider_providerAccountId: {
+                provider: AuthProvider.GOOGLE,
+                providerAccountId: profile.id,
+              },
+            },
+            create: {
+              type: 'oauth',
+              provider: AuthProvider.GOOGLE,
+              providerAccountId: profile.id,
+            },
+            update: {},
+          },
+        },
+      },
+      include: {
+        accounts: true,
+      },
+    });
+
+    return this.login(user);
+  }
+
+  async signup(
+    email: string,
+    password: string,
+    firstName?: string,
+    lastName?: string,
+  ) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        accounts: {
+          create: {
+            type: 'email',
+            provider: AuthProvider.EMAIL,
+            providerAccountId: email,
+          },
+        },
+      },
+    });
+
+    // Create verification token
+    const token = this.jwtService.sign({ email }, { expiresIn: '24h' });
+
+    await this.prisma.verificationToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      },
+    });
+
+    // TODO: Send verification email
+
+    const { password: _, ...result } = user;
+    return result;
   }
 }
