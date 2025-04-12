@@ -56,13 +56,16 @@ function RouteComponent() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.VITE_API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: email, password }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: email, password }),
+        }
+      );
       if (!response.ok) {
         throw new Error("Invalid credentials");
       }
@@ -85,8 +88,12 @@ function RouteComponent() {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      window.location.href = `${process.env.VITE_API_URL}/auth/google`;
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     } catch (error) {
+      console.log(
+        "\n\n ---> apps/web/src/routes/login.tsx:89 -> error: ",
+        error
+      );
       toast("Google Login Error", {
         description: "Failed to initiate Google login. Please try again.",
       });
