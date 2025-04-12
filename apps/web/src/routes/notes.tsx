@@ -1,15 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  ArrowLeft,
   Calendar,
   Edit,
   FileText,
-  Link,
   MoreHorizontal,
   PlusCircle,
   Search,
@@ -147,16 +145,6 @@ function RouteComponent() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Link
-          to="/dashboard"
-          className="flex items-center text-purple-600 hover:text-purple-800"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
-        </Link>
-      </div>
-
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-purple-800">
