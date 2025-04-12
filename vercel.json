@@ -1,1 +1,0 @@
-{ "routes": [{ "src": "/apps/web/[^.]+", "dest": "/", "status": 200 }] }
