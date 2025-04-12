@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import type React from "react";
 
@@ -14,73 +14,118 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { z, ZodError } from "zod";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const Route = createFileRoute("/signup")({
   component: RouteComponent,
 });
 
+const signupSchema = z
+  .object({
+    firstName: z.string().min(3, "First name must be at least 3 characters"),
+    lastName: z.string().min(3, "Last name must be at least 3 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // path of error
+  });
+
 function RouteComponent() {
+  const navigate = useNavigate();
+  const { setUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [signupDetails, setSignupDetails] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const { firstName, lastName, email, password, confirmPassword } =
+    signupDetails;
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
+      setIsLoading(true);
 
-    if (!name || !email || !password) {
-      toast("Missing information", {
-        description: "Please fill in all required fields.",
+      const validatedData = signupSchema.parse({
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
       });
-      return;
-    }
 
-    if (!agreedToTerms) {
-      toast("Terms and conditions", {
-        description:
-          "You must agree to the terms and conditions to create an account.",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Simulate account creation
-    setTimeout(() => {
-      // Redirect to dashboard after successful signup
-      window.location.href = "/dashboard";
+      delete validatedData.confirmPassword;
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(validatedData),
+        }
+      );
+      const data = await response.json();
+      console.log(
+        "\n\n ---> apps/web/src/routes/signup.tsx:76 -> data: ",
+        data
+      );
+      setUser(data);
+      toast.success("Successfully logged in!");
+      navigate({ to: "/dashboard" });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errorMessage = error.errors[0]?.message || "Validation failed";
+        toast.error("Signup Error", {
+          description: errorMessage,
+          style: {
+            backgroundColor: "#FF0000",
+            color: "#FFFFFF",
+          },
+        });
+      } else {
+        toast.error("Signup Error", {
+          description: "An unexpected error occurred",
+          style: {
+            backgroundColor: "#FF0000",
+            color: "#FFFFFF",
+          },
+        });
+      }
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleGoogleSignup = () => {
-    setIsLoading(true);
-
-    // Simulate Google authentication
-    setTimeout(() => {
-      // Redirect to dashboard after successful signup
-      window.location.href = "/dashboard";
+  const handleGoogleSignup = async () => {
+    try {
+      setIsLoading(true);
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+    } catch (error) {
+      console.log(
+        "\n\n ---> apps/web/src/routes/login.tsx:89 -> error: ",
+        error
+      );
+      toast("Google Login Error", {
+        description: "Failed to initiate Google login. Please try again.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-purple-50 p-4">
       <div className="w-full max-w-md">
-        <div className="mb-6">
-          <Link
-            to="/"
-            className="flex items-center text-purple-600 hover:text-purple-800"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Home
-          </Link>
-        </div>
-
         <Card className="w-full">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
@@ -93,12 +138,32 @@ function RouteComponent() {
           <CardContent className="space-y-4">
             <form onSubmit={handleSignup} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <Input
-                  id="name"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  id="firstName"
+                  placeholder="Zawwar"
+                  value={firstName}
+                  onChange={(e) =>
+                    setSignupDetails({
+                      ...signupDetails,
+                      firstName: e.target.value,
+                    })
+                  }
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Ahmed"
+                  value={lastName}
+                  onChange={(e) =>
+                    setSignupDetails({
+                      ...signupDetails,
+                      lastName: e.target.value,
+                    })
+                  }
                   disabled={isLoading}
                 />
               </div>
@@ -109,7 +174,12 @@ function RouteComponent() {
                   type="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) =>
+                    setSignupDetails({
+                      ...signupDetails,
+                      email: e.target.value,
+                    })
+                  }
                   disabled={isLoading}
                 />
               </div>
@@ -119,7 +189,12 @@ function RouteComponent() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) =>
+                    setSignupDetails({
+                      ...signupDetails,
+                      password: e.target.value,
+                    })
+                  }
                   disabled={isLoading}
                 />
                 <p className="text-xs text-slate-500">
@@ -127,24 +202,20 @@ function RouteComponent() {
                 </p>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={agreedToTerms}
-                  onCheckedChange={(checked) =>
-                    setAgreedToTerms(checked as boolean)
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) =>
+                    setSignupDetails({
+                      ...signupDetails,
+                      confirmPassword: e.target.value,
+                    })
                   }
                   disabled={isLoading}
                 />
-                {/* <Label htmlFor="terms" className="text-sm font-normal"> */}
-                {/*   I agree to the{" "} */}
-                {/*   <Link */}
-                {/*     // to="/terms" */}
-                {/*     className="text-purple-600 hover:text-purple-800" */}
-                {/*   > */}
-                {/*     terms and conditions */}
-                {/*   </Link> */}
-                {/* </Label> */}
               </div>
 
               <Button

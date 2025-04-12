@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import type React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -34,14 +34,7 @@ function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const { isAuthenticated, setUser } = useAuthStore();
-
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    navigate({ to: "/dashboard" });
-    return null;
-  }
+  const { setUser } = useAuthStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +66,6 @@ function RouteComponent() {
       const userData = await response.json();
       setUser(userData.user);
       toast.success("Successfully logged in!");
-      navigate({ to: "/dashboard" });
     } catch (error) {
       console.error(
         "\n\n ---> apps/web/src/routes/login.tsx:72 -> error: ",
