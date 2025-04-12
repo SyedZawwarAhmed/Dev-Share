@@ -11,13 +11,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, HelpCircle, LogOut, Settings, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
 
 export default function AppHeader() {
   const { pathname } = useLocation();
   const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
 
   // Don't show header on auth pages
   if (
@@ -34,6 +35,7 @@ export default function AppHeader() {
     try {
       logout();
       toast("Successfully logged out!");
+      navigate({ to: "/login" });
     } catch (error) {
       console.error(
         "\n\n ---> apps/web/src/components/header.tsx:39 -> error: ",
