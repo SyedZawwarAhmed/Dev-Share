@@ -26,11 +26,11 @@ export class AuthService {
   }
 
   async login(user) {
-    console.log(
-      '\n\n ---> apps/server/src/auth/auth.service.ts:28 -> user: ',
-      user,
-    );
-    const payload = { email: user.username, sub: user.id };
+    const payload = {
+      username: user?.username,
+      email: user?.email,
+      sub: user.id,
+    };
     const token = this.jwtService.sign(payload);
 
     // Create or update session

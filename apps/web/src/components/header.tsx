@@ -11,10 +11,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, HelpCircle, LogOut, Settings, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { useAuthStore } from "@/stores/auth.store";
+import { toast } from "sonner";
 
 export default function AppHeader() {
   const { pathname } = useLocation();
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
 
   // Don't show header on auth pages
   if (
@@ -26,6 +30,20 @@ export default function AppHeader() {
   ) {
     return null;
   }
+
+  const handleLogout = async () => {
+    try {
+      logout();
+      toast("Successfully logged out!");
+      navigate({ to: "/login" });
+    } catch (error) {
+      console.error(
+        "\n\n ---> apps/web/src/components/header.tsx:39 -> error: ",
+        error
+      );
+      toast("Logout failed. Please try again.");
+    }
+  };
 
   return (
     <header className="border-b bg-white">
@@ -113,16 +131,21 @@ export default function AppHeader() {
                     src="/placeholder.svg?height=32&width=32"
                     alt="User"
                   />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback>
+                    {user?.firstName?.[0] ?? "U"}
+                    {user?.lastName?.[0]}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">John Doe</p>
+                  <p className="text-sm font-medium leading-none">
+                    {user?.firstName} {user?.lastName}
+                  </p>
                   <p className="text-xs leading-none text-slate-500">
-                    john.doe@example.com
+                    {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
@@ -138,7 +161,7 @@ export default function AppHeader() {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

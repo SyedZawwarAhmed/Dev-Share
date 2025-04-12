@@ -56,12 +56,45 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
   async googleAuthCallback(@Req() req, @Res() res: Response) {
-    const { access_token, user } = await this.authService.googleLogin(req.user);
+    try {
+      const { access_token, user } = await this.authService.googleLogin(
+        req.user,
+      );
 
-    // You might want to redirect to your frontend with the token
-    // res.redirect(
-    //   `${process.env.FRONTEND_URL}/auth/callback?token=${access_token}`,
-    // );
+      // Set token as an HTTP-only cookie
+      res.cookie('access_token', access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
+        sameSite: 'lax',
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      });
+
+      // Redirect to the frontend dashboard
+      const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
+
+      // Optionally add user info as query parameters
+      // Only add non-sensitive information
+      redirectUrl.searchParams.append(
+        'firstName',
+        encodeURIComponent(user?.firstName),
+      );
+      redirectUrl.searchParams.append(
+        'lastName',
+        encodeURIComponent(user?.lastName),
+      );
+      redirectUrl.searchParams.append('email', encodeURIComponent(user?.email));
+
+      // Redirect to the frontend
+      res.redirect(redirectUrl.toString());
+    } catch (error) {
+      // Handle any errors during the OAuth callback
+      console.error('Google OAuth callback error:', error);
+
+      // Redirect to login page with error
+      res.redirect(
+        `${process.env.FRONTEND_URL}/login?error=Authentication failed`,
+      );
+    }
   }
 
   @UseGuards(JwtOAuthGuard)
