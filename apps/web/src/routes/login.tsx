@@ -97,16 +97,6 @@ function RouteComponent() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-purple-50 p-4">
       <div className="w-full max-w-md">
-        <div className="mb-6">
-          <Link
-            to="/"
-            className="flex items-center text-purple-600 hover:text-purple-800"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Home
-          </Link>
-        </div>
-
         <Card className="w-full">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">

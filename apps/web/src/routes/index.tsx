@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRef } from "react";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { isAuthenticated } = useAuthStore();
   const featuresRef = useRef<HTMLDivElement>(null);
   return (
     <div className="min-h-screen">
@@ -23,16 +25,22 @@ function RouteComponent() {
               DevShare
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/login">
-              <Button variant="ghost">Login</Button>
+          {!isAuthenticated ? (
+            <div className="flex items-center gap-4">
+              <Link to="/login">
+                <Button variant="ghost">Login</Button>
+              </Link>
+              <Link to="/signup">
+                <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
+                  Sign Up Free
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <Link to="/dashboard">
+              <Button variant="ghost">Go to Dashboard</Button>
             </Link>
-            <Link to="/signup">
-              <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
-                Sign Up Free
-              </Button>
-            </Link>
-          </div>
+          )}
         </div>
       </header>
 
