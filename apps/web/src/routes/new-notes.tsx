@@ -7,13 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import { Label } from "@radix-ui/react-label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Linkedin, Loader2, Save, X, Wand2 } from "lucide-react";
+import { ArrowLeft, Linkedin, Loader2, Save, Wand2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -155,7 +155,7 @@ function RouteComponent() {
                       }
                     />
                     <Label htmlFor="twitter" className="text-sm font-normal">
-                      X (X)
+                      X (Twitter)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
