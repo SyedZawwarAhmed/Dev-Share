@@ -12,12 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@radix-ui/react-label";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Linkedin, Loader2, Save, Wand2, X } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Linkedin, Loader2, Save, Wand2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/new-notes")({
+export const Route = createFileRoute("/new-note")({
   component: RouteComponent,
 });
 
@@ -89,16 +89,6 @@ function RouteComponent() {
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-6">
-        <Link
-          to="/dashboard"
-          className="flex items-center text-purple-600 hover:text-purple-800"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
-        </Link>
-      </div>
-
       <h1 className="text-2xl font-bold text-purple-800 mb-6">
         Create New Learning Note
       </h1>

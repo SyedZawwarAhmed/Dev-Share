@@ -33,7 +33,7 @@ function RouteComponent() {
             Automate your developer learning posts
           </p>
         </div>
-        <Link to="/new-notes">
+        <Link to="/new-note">
           <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
             <PlusCircle className="mr-2 h-4 w-4" />
             New Learning Note
