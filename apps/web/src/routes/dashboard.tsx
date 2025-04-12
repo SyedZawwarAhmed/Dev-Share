@@ -2,14 +2,23 @@ import DashboardStats from "@/components/dashboard-stats";
 import ScheduledPosts from "@/components/scheduled-posts";
 import RecentNotes from "@/components/recent-notes";
 import { Button } from "@/components/ui/button";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PlusCircle } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  if (!isAuthenticated) {
+    navigate({ to: "/login" });
+    return null;
+  }
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">

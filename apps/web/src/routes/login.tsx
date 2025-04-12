@@ -1,7 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type React from "react";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,15 +14,34 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
+  beforeLoad: ({ location, search }) => {
+    console.log(
+      "\n\n ---> apps/web/src/routes/login.tsx:21 -> location: ",
+      location
+    );
+    // Handle the OAuth callback
+    if ("error" in search && typeof search.error === "string") {
+      toast.error(search.error);
+    }
+  },
 });
 
 function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { isAuthenticated, setUser } = useAuthStore();
+
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    navigate({ to: "/dashboard" });
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,23 +55,44 @@ function RouteComponent() {
 
     setIsLoading(true);
 
-    // Simulate authentication
-    setTimeout(() => {
-      // Redirect to dashboard after successful login
-      window.location.href = "/dashboard";
+    try {
+      const response = await fetch(`${process.env.VITE_API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: email, password }),
+      });
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
+
+      const userData = await response.json();
+      setUser(userData.user);
+      toast.success("Successfully logged in!");
+      navigate({ to: "/dashboard" });
+    } catch (error) {
+      console.error(
+        "\n\n ---> apps/web/src/routes/login.tsx:72 -> error: ",
+        error
+      );
+      toast.error("Login failed. Please check your credentials.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    setIsLoading(true);
-
-    // Simulate Google authentication
-    setTimeout(() => {
-      // Redirect to dashboard after successful login
-      window.location.href = "/dashboard";
+  const handleGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      window.location.href = `${process.env.VITE_API_URL}/auth/google`;
+    } catch (error) {
+      toast("Google Login Error", {
+        description: "Failed to initiate Google login. Please try again.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
