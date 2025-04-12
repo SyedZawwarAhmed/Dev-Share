@@ -45,7 +45,7 @@ export default function AppHeader() {
 
   return (
     <header className="border-b bg-white">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-7xl">
         <div className="flex items-center">
           <Link to="/dashboard" className="flex items-center">
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">

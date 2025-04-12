@@ -11,7 +11,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function RouteComponent() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1
