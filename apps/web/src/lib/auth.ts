@@ -1,11 +1,13 @@
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
+import { fetchApi } from "./fetch";
 
 export async function handleGoogleCallback(searchParams: URLSearchParams) {
   const { setUser, setError, setLoading } = useAuthStore.getState();
 
   try {
     setLoading(true);
+    const id = searchParams.get("id");
     const firstName = searchParams.get("firstName");
     const lastName = searchParams.get("lastName");
     const email = searchParams.get("email");
@@ -15,7 +17,7 @@ export async function handleGoogleCallback(searchParams: URLSearchParams) {
     }
 
     const user = {
-      id: crypto.randomUUID(), // This should come from your backend
+      id: decodeURIComponent(id ?? ""),
       firstName: decodeURIComponent(firstName ?? ""),
       lastName: decodeURIComponent(lastName ?? ""),
       email: decodeURIComponent(email),
@@ -39,7 +41,7 @@ export async function logout() {
   const { logout: clearAuth } = useAuthStore.getState();
 
   try {
-    const response = await fetch("/api/auth/logout", {
+    const response = await fetchApi("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });

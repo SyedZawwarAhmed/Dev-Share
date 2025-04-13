@@ -123,17 +123,13 @@ model Note {
   title     String
   content   String   @db.Text
   isPublic  Boolean  @default(false)
+  status    NoteStatus
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts  Post[]
-
-  // Metadata
-  tags     String[]
-  category String?
 }
 
 enum UserRole {
@@ -153,4 +149,10 @@ enum AuthProvider {
   GOOGLE
   GITHUB
   TWITTER
+}
+
+enum NoteStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
 }
