@@ -1,3 +1,4 @@
+import { addNote } from "@/api/note.service";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,9 +12,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuthStore } from "@/stores/auth.store";
 import { Label } from "@radix-ui/react-label";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Linkedin, Loader2, Save, Wand2, X } from "lucide-react";
+import { Linkedin, Loader2, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,11 +25,19 @@ export const Route = createFileRoute("/new-note")({
 });
 
 function RouteComponent() {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [title, setTitle] = useState("");
-  const [notes, setNotes] = useState("");
-  const [generatedPosts, setGeneratedPosts] = useState({
+  const { user } = useAuthStore();
+  console.log("\n\n ---> apps/web/src/routes/new-note.tsx:28 -> user: ", user);
+  const { mutate: saveDraft, isPending: isDraftSaving } = useMutation({
+    mutationFn: addNote,
+  });
+
+  const [note, setNote] = useState<CreateNotePayload>({
+    userId: "",
+    title: "",
+    content: "",
+    status: "DRAFT",
+  });
+  const [generatedPosts] = useState({
     linkedin: "",
     twitter: "",
     bluesky: "",
@@ -39,45 +50,53 @@ function RouteComponent() {
   });
 
   const handleGenerate = () => {
-    if (!title || !notes) {
-      toast("Missing information", {
-        description:
-          "Please provide both a title and notes before generating posts.",
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    // Simulate AI generation with platform-specific content
-    setTimeout(() => {
-      setGeneratedPosts({
-        linkedin:
-          "I recently explored React Server Components in Next.js and discovered significant performance benefits.\n\nKey advantages include:\n• Reduced client-side JavaScript\n• Automatic code splitting\n• Direct access to backend resources\n• Improved SEO\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Components into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
-        twitter:
-          "Just learned about React Server Components in Next.js! 🚀\n\nThey allow server-side rendering with smaller JS bundles and direct backend access.\n\nGame-changer for performance and DX!\n\n#webdev #reactjs #nextjs",
-        bluesky:
-          "TIL: React Server Components in Next.js are changing how we build web apps 💻\n\nThey let you render React components on the server, which means:\n- Less JavaScript sent to the browser\n- Better performance\n- Direct database/filesystem access\n\nThe coolest part? You can mix server and client components in the same app!\n\n#WebDev #React #NextJS",
-      });
-      setIsGenerating(false);
-    }, 2000);
+    // if (!title || !notes) {
+    //   toast("Missing information", {
+    //     description:
+    //       "Please provide both a title and notes before generating posts.",
+    //   });
+    //   return;
+    // }
+    // setIsGenerating(true);
+    // // Simulate AI generation with platform-specific content
+    // setTimeout(() => {
+    //   setGeneratedPosts({
+    //     linkedin:
+    //       "I recently explored React Server Components in Next.js and discovered significant performance benefits.\n\nKey advantages include:\n• Reduced client-side JavaScript\n• Automatic code splitting\n• Direct access to backend resources\n• Improved SEO\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Components into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
+    //     twitter:
+    //       "Just learned about React Server Components in Next.js! 🚀\n\nThey allow server-side rendering with smaller JS bundles and direct backend access.\n\nGame-changer for performance and DX!\n\n#webdev #reactjs #nextjs",
+    //     bluesky:
+    //       "TIL: React Server Components in Next.js are changing how we build web apps 💻\n\nThey let you render React components on the server, which means:\n- Less JavaScript sent to the browser\n- Better performance\n- Direct database/filesystem access\n\nThe coolest part? You can mix server and client components in the same app!\n\n#WebDev #React #NextJS",
+    //   });
+    //   setIsGenerating(false);
+    // }, 2000);
   };
 
-  const handleSaveDraft = () => {
-    if (!title) {
-      toast("Missing title", {
-        description: "Please provide a title for your note before saving.",
-      });
-      return;
-    }
+  const handleSaveDraft = async () => {
+    try {
+      if (!user) {
+        toast("Please login to save your note", {
+          description: "Please login to save your note.",
+        });
+        return;
+      }
+      if (!note.title) {
+        toast("Missing title", {
+          description: "Please provide a title for your note before saving.",
+        });
+        return;
+      }
 
-    setIsSaving(true);
-    // Simulate saving to database
-    setTimeout(() => {
+      saveDraft({ ...note, userId: user.id });
       toast("Draft saved", {
         description: "Your learning note has been saved as a draft.",
       });
-      setIsSaving(false);
-    }, 1000);
+    } catch (error) {
+      console.error(
+        "\n\n ---> apps/web/src/routes/new-note.tsx:96 -> error: ",
+        error
+      );
+    }
   };
 
   const handlePlatformChange = (platform: string, checked: boolean) => {
@@ -105,8 +124,8 @@ function RouteComponent() {
                 <Input
                   id="title"
                   placeholder="e.g., React Server Components"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={note.title}
+                  onChange={(e) => setNote({ ...note, title: e.target.value })}
                 />
               </div>
 
@@ -116,8 +135,10 @@ function RouteComponent() {
                   id="notes"
                   placeholder="Write your raw learning notes here..."
                   className="min-h-[200px]"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                  value={note.content}
+                  onChange={(e) =>
+                    setNote({ ...note, content: e.target.value })
+                  }
                 />
               </div>
 
@@ -169,9 +190,8 @@ function RouteComponent() {
               onClick={handleSaveDraft}
               variant="outline"
               className="flex-1"
-              disabled={isSaving}
             >
-              {isSaving ? (
+              {isDraftSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
@@ -186,19 +206,19 @@ function RouteComponent() {
             <Button
               onClick={handleGenerate}
               className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-              disabled={isGenerating}
+              // disabled={isGenerating}
             >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Generate Posts
-                </>
-              )}
+              {/* {isGenerating ? ( */}
+              {/*   <> */}
+              {/*     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
+              {/*     Generating... */}
+              {/*   </> */}
+              {/* ) : ( */}
+              {/*   <> */}
+              {/*     <Wand2 className="mr-2 h-4 w-4" /> */}
+              {/*     Generate Posts */}
+              {/*   </> */}
+              {/* )} */}
             </Button>
           </CardFooter>
         </Card>

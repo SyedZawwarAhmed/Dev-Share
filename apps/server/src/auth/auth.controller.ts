@@ -74,6 +74,7 @@ export class AuthController {
 
       // Optionally add user info as query parameters
       // Only add non-sensitive information
+      redirectUrl.searchParams.append('id', encodeURIComponent(user?.id));
       redirectUrl.searchParams.append(
         'firstName',
         encodeURIComponent(user?.firstName),

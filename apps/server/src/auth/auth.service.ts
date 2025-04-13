@@ -32,6 +32,11 @@ export class AuthService {
       sub: user.id,
     };
     const token = this.jwtService.sign(payload);
+    await this.prisma.session.deleteMany({
+      where: {
+        userId: user?.id,
+      },
+    });
 
     // Create or update session
     await this.prisma.session.create({
