@@ -105,7 +105,7 @@ function RouteComponent() {
       setIsLoading(true);
       window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     } catch (error) {
-      console.log(
+      console.error(
         "\n\n ---> apps/web/src/routes/login.tsx:89 -> error: ",
         error
       );

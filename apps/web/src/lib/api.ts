@@ -49,7 +49,6 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
-        console.log("\n\n ---> apps/web/src/lib/api.ts:51 -> error: ", error);
         if (error.response?.status === 401) {
           // Handle unauthorized access
           // You might want to redirect to login page
@@ -65,7 +64,8 @@ class ApiService {
    */
   private handleError(error: AxiosError): ApiError {
     const apiError: ApiError = new Error(
-      error.response?.data?.message || "An unexpected error occurred"
+      (error.response?.data as { message: string })?.message ||
+        "An unexpected error occurred"
     );
     apiError.status = error.response?.status;
     apiError.response = error.response;
@@ -170,6 +170,7 @@ class ApiService {
       await this.get("/auth/verify");
       return true;
     } catch (error) {
+      console.error("\n\n ---> apps/web/src/lib/api.ts:172 -> error: ", error);
       return false;
     }
   }

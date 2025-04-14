@@ -26,7 +26,6 @@ export const Route = createFileRoute("/new-note")({
 
 function RouteComponent() {
   const { user } = useAuthStore();
-  console.log("\n\n ---> apps/web/src/routes/new-note.tsx:28 -> user: ", user);
   const { mutate: saveDraft, isPending: isDraftSaving } = useMutation({
     mutationFn: addNote,
   });
