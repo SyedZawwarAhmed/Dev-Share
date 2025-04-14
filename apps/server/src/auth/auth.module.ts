@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { LocalStrategy } from './local/local.strategy';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GoogleModule } from './google/google.module';
+import { JwtStrategy } from './jwt/jwt.strategy';
 
 @Module({
   imports: [
@@ -14,18 +15,24 @@ import { GoogleModule } from './google/google.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>('JWT_SECRET') ?? '',
         signOptions: {
           expiresIn: '1d',
         },
       }),
       inject: [ConfigService],
     }),
-    JwtModule,
+    // JwtModule,
     GoogleModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, PrismaService],
+  providers: [
+    ConfigService,
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    PrismaService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
