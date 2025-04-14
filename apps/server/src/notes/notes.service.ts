@@ -1,17 +1,18 @@
-import { Injectable, UseGuards } from '@nestjs/common';
-import { JwtOAuthGuard } from 'src/auth/jwt/jwt.oauth.guard';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class NotesService {
   constructor(private prisma: PrismaService) {}
 
-  @UseGuards(JwtOAuthGuard)
-  getNotes() {
-    return this.prisma.note.findMany();
+  async getNotes(userId: string) {
+    return this.prisma.note.findMany({
+      where: {
+        userId,
+      },
+    });
   }
 
-  @UseGuards(JwtOAuthGuard)
   addNote(note) {
     const newNote = this.prisma.note.create({
       data: note,

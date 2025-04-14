@@ -134,7 +134,7 @@ function RouteComponent() {
 
       {isNotesLoading ? (
         <div className="text-center py-12 text-slate-500">
-          <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+          <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
           <h3 className="text-lg font-medium mb-2">Loading...</h3>
           <p>Please wait while we fetch your notes</p>
         </div>
