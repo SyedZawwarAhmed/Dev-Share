@@ -6,7 +6,7 @@ export const getNotes = async () => {
 };
 
 export const addNote = async (note: CreateNotePayload) => {
-  const data = await apiService.post<Note>("/notes", note);
+  const data = await apiService.post<Note>("/notes/add-note", note);
   return data.data;
 };
 
