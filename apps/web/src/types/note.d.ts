@@ -9,7 +9,6 @@ type Note = {
 };
 
 type CreateNotePayload = {
-  userId: string;
   title: string;
   content: string;
   status: "DRAFT" | "SCHEDULED" | "PUBLISHED";

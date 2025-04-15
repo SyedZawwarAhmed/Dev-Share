@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { JwtOAuthGuard } from 'src/auth/jwt/jwt.oauth.guard';
 
@@ -14,7 +14,7 @@ export class NotesController {
 
   @UseGuards(JwtOAuthGuard)
   @Post('add-note')
-  addNote(@Body() note) {
-    return this.notesService.addNote(note);
+  addNote(@Req() req) {
+    return this.notesService.addNote(req.user.id, req?.body);
   }
 }

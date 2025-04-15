@@ -31,7 +31,6 @@ function RouteComponent() {
   });
 
   const [note, setNote] = useState<CreateNotePayload>({
-    userId: "",
     title: "",
     content: "",
     status: "DRAFT",
@@ -86,7 +85,7 @@ function RouteComponent() {
         return;
       }
 
-      saveDraft({ ...note, userId: user.id });
+      saveDraft(note);
       toast("Draft saved", {
         description: "Your learning note has been saved as a draft.",
       });

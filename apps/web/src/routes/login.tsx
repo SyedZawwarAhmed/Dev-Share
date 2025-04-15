@@ -15,7 +15,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth.store";
-import { fetchApi } from "@/lib/fetch";
+import apiService from "@/lib/api";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
@@ -50,19 +50,12 @@ function RouteComponent() {
     setIsLoading(true);
 
     try {
-      const response = await fetchApi("/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: email, password }),
+      const { data } = await apiService.post<{ user: User }>("/auth/login", {
+        username: email,
+        password,
       });
-      if (!response.ok) {
-        throw new Error("Invalid credentials");
-      }
 
-      const userData = await response.json();
-      setUser(userData.user);
+      setUser(data.user);
       toast.success("Successfully logged in!");
     } catch (error) {
       console.error(
