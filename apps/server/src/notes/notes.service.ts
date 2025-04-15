@@ -13,9 +13,12 @@ export class NotesService {
     });
   }
 
-  addNote(note) {
+  addNote(userId: string, note) {
     const newNote = this.prisma.note.create({
-      data: note,
+      data: {
+        ...note,
+        userId: userId,
+      },
     });
     return newNote;
   }

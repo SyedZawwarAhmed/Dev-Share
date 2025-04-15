@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
-import { fetchApi } from "./fetch";
+import apiService from "./api";
 
 export async function handleGoogleCallback(searchParams: URLSearchParams) {
   const { setUser, setError, setLoading } = useAuthStore.getState();
@@ -39,23 +39,8 @@ export async function handleGoogleCallback(searchParams: URLSearchParams) {
 
 export async function logout() {
   const { logout: clearAuth } = useAuthStore.getState();
-
-  try {
-    const response = await fetchApi("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      throw new Error("Logout failed");
-    }
-
-    clearAuth();
-    toast.success("Successfully logged out!");
-    return true;
-  } catch (error) {
-    console.error("\n\n ---> apps/web/src/lib/auth.ts:52 -> error: ", error);
-    toast.error("Logout failed. Please try again.");
-    return false;
-  }
+  const data = await apiService.post("/api/auth/logout");
+  clearAuth();
+  toast.success("Successfully logged out!");
+  return data.data;
 }

@@ -18,7 +18,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z, ZodError } from "zod";
 import { useAuthStore } from "@/stores/auth.store";
-import { fetchApi } from "@/lib/fetch";
+import apiService from "@/lib/api";
 
 export const Route = createFileRoute("/signup")({
   component: RouteComponent,
@@ -65,15 +65,11 @@ function RouteComponent() {
       });
 
       delete validatedData.confirmPassword;
-      const response = await fetchApi("/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(validatedData),
-      });
-      const data = await response.json();
-      setUser(data);
+      const data = await apiService.post<{ user: User }>(
+        "/auth/signup",
+        validatedData
+      );
+      setUser(data.data.user);
       toast.success("Successfully logged in!");
       navigate({ to: "/dashboard" });
     } catch (error) {
