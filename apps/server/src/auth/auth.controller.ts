@@ -65,7 +65,7 @@ export class AuthController {
       res.cookie('access_token', access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
-        sameSite: 'lax',
+        sameSite: 'none',
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       });
 
