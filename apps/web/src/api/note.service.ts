@@ -1,5 +1,4 @@
 import apiService from "@/lib/api";
-import { fetchApi, getCookie } from "@/lib/fetch";
 
 export const getNotes = async () => {
   const data = await apiService.post<Note[]>("/notes");
@@ -7,56 +6,21 @@ export const getNotes = async () => {
 };
 
 export const addNote = async (note: CreateNotePayload) => {
-  const response = await fetchApi("/notes/add-note", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getCookie("access_token")}`,
-    },
-    body: JSON.stringify(note),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to add note");
-  }
-
-  return response.json();
+  const data = await apiService.post<Note>("/notes", note);
+  return data.data;
 };
 
 export const getNote = async (id: string) => {
-  const response = await fetchApi(`/notes/${id}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetchApi note");
-  }
-
-  return response.json();
+  const data = await apiService.get<Note>(`/notes/${id}`);
+  return data.data;
 };
 
 export const updateNote = async (id: string, note: Note) => {
-  const response = await fetchApi(`/notes/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(note),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update note");
-  }
-
-  return response.json();
+  const data = await apiService.put<Note>(`/notes/${id}`, note);
+  return data.data;
 };
 
 export const deleteNote = async (id: string) => {
-  const response = await fetchApi(`/notes/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete note");
-  }
-
-  return response.json();
+  const data = await apiService.delete<Note>(`/notes/${id}`);
+  return data.data;
 };
