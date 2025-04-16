@@ -1,11 +1,11 @@
 import apiService from "@/lib/api";
 
-export const getNotes = async () => {
+export const getNotesService = async () => {
   const data = await apiService.post<Note[]>("/notes");
   return data.data;
 };
 
-export const addNote = async (note: CreateNotePayload) => {
+export const addNoteService = async (note: CreateNotePayload) => {
   const data = await apiService.post<Note>("/notes/add-note", note);
   return data.data;
 };
@@ -20,7 +20,7 @@ export const updateNote = async (id: string, note: Note) => {
   return data.data;
 };
 
-export const deleteNote = async (id: string) => {
+export const deleteNoteService = async (id: string) => {
   const data = await apiService.delete<Note>(`/notes/${id}`);
   return data.data;
 };

@@ -1,4 +1,4 @@
-import { addNote } from "@/api/note.service";
+import { addNoteService } from "@/api/note.service";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/new-note")({
 function RouteComponent() {
   const { user } = useAuthStore();
   const { mutate: saveDraft, isPending: isDraftSaving } = useMutation({
-    mutationFn: addNote,
+    mutationFn: addNoteService,
   });
 
   const [note, setNote] = useState<CreateNotePayload>({
