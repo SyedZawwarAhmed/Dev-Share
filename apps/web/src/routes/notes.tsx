@@ -30,9 +30,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuery } from "@tanstack/react-query";
-import { getNotes } from "@/api/note.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteNoteService, getNotesService } from "@/api/note.service";
 import { formatDate } from "@/lib/date-time";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/notes")({
   component: RouteComponent,
@@ -42,10 +52,46 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  // Replace single dialog state with a map of dialog states
+  const [deleteDialogs, setDeleteDialogs] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const queryClient = useQueryClient();
+
   const { data: notes, isLoading: isNotesLoading } = useQuery({
     queryKey: ["notes"],
-    queryFn: getNotes,
+    queryFn: getNotesService,
   });
+
+  const { mutateAsync: deleteNote, isPending: isDeletingNote } = useMutation({
+    mutationFn: deleteNoteService,
+    onSuccess: () => {
+      toast.success("Note deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: (error) => {
+      console.error(
+        "\n\n ---> apps/web/src/routes/notes.tsx:100 -> error: ",
+        error
+      );
+      toast.error("Failed to delete note. Please try again.");
+    },
+    onSettled: (_, __, variables) => {
+      // Close the specific dialog that was opened for this note
+      setDeleteDialogs((prev) => ({
+        ...prev,
+        [variables]: false,
+      }));
+    },
+  });
+
+  // Function to handle opening/closing specific dialog
+  const handleDeleteDialog = (noteId: string, isOpen: boolean) => {
+    setDeleteDialogs((prev) => ({
+      ...prev,
+      [noteId]: isOpen,
+    }));
+  };
 
   // Filter and sort notes
   const filteredNotes = notes
@@ -200,55 +246,6 @@ function RouteComponent() {
                               <div className="flex items-center gap-2 text-xs text-slate-500">
                                 <Calendar className="h-3 w-3" />
                                 <span>{formatDate(note.createdAt)}</span>
-
-                                {/* {note.status === "SCHEDULED" && */}
-                                {/*   note.scheduledFor && ( */}
-                                {/*     <> */}
-                                {/*       <span>•</span> */}
-                                {/*       <span> */}
-                                {/*         Scheduled for{" "} */}
-                                {/*         {formatDate(note.scheduledFor)} */}
-                                {/*       </span> */}
-                                {/*     </> */}
-                                {/*   )} */}
-
-                                {/* {note.platforms.length > 0 && ( */}
-                                {/*   <> */}
-                                {/*     <span>•</span> */}
-                                {/*     <div className="flex items-center gap-1"> */}
-                                {/*       {note.platforms.includes("linkedin") && ( */}
-                                {/*         <svg */}
-                                {/*           className="h-3 w-3 text-blue-600" */}
-                                {/*           viewBox="0 0 24 24" */}
-                                {/*           fill="currentColor" */}
-                                {/*         > */}
-                                {/*           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /> */}
-                                {/*         </svg> */}
-                                {/*       )} */}
-                                {/*       {note.platforms.includes("twitter") && ( */}
-                                {/*         <svg */}
-                                {/*           className="h-3 w-3 text-sky-500" */}
-                                {/*           viewBox="0 0 24 24" */}
-                                {/*           fill="currentColor" */}
-                                {/*         > */}
-                                {/*           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /> */}
-                                {/*         </svg> */}
-                                {/*       )} */}
-                                {/*       {note.platforms.includes("bluesky") && ( */}
-                                {/*         <svg */}
-                                {/*           width="12" */}
-                                {/*           height="12" */}
-                                {/*           viewBox="0 0 16 16" */}
-                                {/*           fill="#0085FF" */}
-                                {/*           xmlns="http://www.w3.org/2000/svg" */}
-                                {/*           className="h-3 w-3" */}
-                                {/*         > */}
-                                {/*           <path d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z" /> */}
-                                {/*         </svg> */}
-                                {/*       )} */}
-                                {/*     </div> */}
-                                {/*   </> */}
-                                {/* )} */}
                               </div>
                             </div>
                           </div>
@@ -264,33 +261,65 @@ function RouteComponent() {
                                 Create Post
                               </Button>
                             )}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit Note
-                                </DropdownMenuItem>
-                                {note.status === "DRAFT" && (
+                            <Dialog
+                              open={deleteDialogs[note.id]}
+                              onOpenChange={(isOpen) =>
+                                handleDeleteDialog(note.id, isOpen)
+                              }
+                            >
+                              <DropdownMenu modal={false}>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
                                   <DropdownMenuItem>
-                                    <Wand2 className="h-4 w-4 mr-2" />
-                                    Generate Post
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit Note
                                   </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem className="text-red-600">
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete Note
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                                  {note.status === "DRAFT" && (
+                                    <DropdownMenuItem>
+                                      <Wand2 className="h-4 w-4 mr-2" />
+                                      Generate Post
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DialogTrigger asChild>
+                                    <DropdownMenuItem className="text-red-600">
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete Note
+                                    </DropdownMenuItem>
+                                  </DialogTrigger>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Are you absolutely sure?
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    This action cannot be undone. Are you sure
+                                    you want to delete this note?
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button
+                                    onClick={() => {
+                                      deleteNote(note.id);
+                                    }}
+                                    variant={"gradient"}
+                                    size={"lg"}
+                                    loading={isDeletingNote}
+                                  >
+                                    Confirm
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
                           </div>
                         </div>
                       </CardContent>
@@ -322,33 +351,61 @@ function RouteComponent() {
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium truncate">{note.title}</h3>
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Note
-                          </DropdownMenuItem>
-                          {note.status === "DRAFT" && (
+                      <Dialog
+                        open={deleteDialogs[note.id]}
+                        onOpenChange={(isOpen) =>
+                          handleDeleteDialog(note.id, isOpen)
+                        }
+                      >
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
                             <DropdownMenuItem>
-                              <Wand2 className="h-4 w-4 mr-2" />
-                              Generate Post
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Note
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Note
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            {note.status === "DRAFT" && (
+                              <DropdownMenuItem>
+                                <Wand2 className="h-4 w-4 mr-2" />
+                                Generate Post
+                              </DropdownMenuItem>
+                            )}
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem className="text-red-600">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Note
+                              </DropdownMenuItem>
+                            </DialogTrigger>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                              This action cannot be undone. Are you sure you
+                              want to delete this note?
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button
+                              onClick={() => deleteNote(note.id)}
+                              variant={"gradient"}
+                              size={"lg"}
+                              loading={isDeletingNote}
+                            >
+                              Confirm
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                     </div>
 
                     <div className="mb-3">
@@ -387,41 +444,6 @@ function RouteComponent() {
                         <Calendar className="h-3 w-3 mr-1" />
                         <span>{formatDate(note.createdAt)}</span>
                       </div>
-
-                      {/* {note.platforms.length > 0 && ( */}
-                      {/*   <div className="flex items-center gap-1"> */}
-                      {/*     {note.platforms.includes("linkedin") && ( */}
-                      {/*       <svg */}
-                      {/*         className="h-3 w-3 text-blue-600" */}
-                      {/*         viewBox="0 0 24 24" */}
-                      {/*         fill="currentColor" */}
-                      {/*       > */}
-                      {/*         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /> */}
-                      {/*       </svg> */}
-                      {/*     )} */}
-                      {/*     {note.platforms.includes("twitter") && ( */}
-                      {/*       <svg */}
-                      {/*         className="h-3 w-3 text-sky-500" */}
-                      {/*         viewBox="0 0 24 24" */}
-                      {/*         fill="currentColor" */}
-                      {/*       > */}
-                      {/*         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /> */}
-                      {/*       </svg> */}
-                      {/*     )} */}
-                      {/*     {note.platforms.includes("bluesky") && ( */}
-                      {/*       <svg */}
-                      {/*         width="12" */}
-                      {/*         height="12" */}
-                      {/*         viewBox="0 0 16 16" */}
-                      {/*         fill="#0085FF" */}
-                      {/*         xmlns="http://www.w3.org/2000/svg" */}
-                      {/*         className="h-3 w-3" */}
-                      {/*       > */}
-                      {/*         <path d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z" /> */}
-                      {/*       </svg> */}
-                      {/*     )} */}
-                      {/*   </div> */}
-                      {/* )} */}
                     </div>
                   </CardContent>
 

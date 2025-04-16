@@ -9,6 +9,7 @@ export class NotesService {
     return this.prisma.note.findMany({
       where: {
         userId,
+        isDeleted: false,
       },
     });
   }
@@ -21,5 +22,27 @@ export class NotesService {
       },
     });
     return newNote;
+  }
+
+  updateNote(userId: string, noteId: string, note) {
+    return this.prisma.note.update({
+      where: {
+        id: noteId,
+        userId,
+      },
+      data: note,
+    });
+  }
+
+  deleteNote(userId: string, noteId: string) {
+    return this.prisma.note.update({
+      where: {
+        id: noteId,
+        userId,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
   }
 }
