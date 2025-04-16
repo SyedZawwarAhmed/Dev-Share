@@ -52,7 +52,6 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  // Replace single dialog state with a map of dialog states
   const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
   }>({});
@@ -77,7 +76,6 @@ function RouteComponent() {
       toast.error("Failed to delete note. Please try again.");
     },
     onSettled: (_, __, variables) => {
-      // Close the specific dialog that was opened for this note
       setDeleteDialogs((prev) => ({
         ...prev,
         [variables]: false,
@@ -85,7 +83,6 @@ function RouteComponent() {
     },
   });
 
-  // Function to handle opening/closing specific dialog
   const handleDeleteDialog = (noteId: string, isOpen: boolean) => {
     setDeleteDialogs((prev) => ({
       ...prev,
@@ -93,22 +90,18 @@ function RouteComponent() {
     }));
   };
 
-  // Filter and sort notes
   const filteredNotes = notes
     ?.filter((note) => {
-      // Search filter
       const matchesSearch =
         note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         note.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Status filter
       const matchesStatus =
         statusFilter === "all" || note.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
-      // Sort by date
       if (sortBy === "newest") {
         return (
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
