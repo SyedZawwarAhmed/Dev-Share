@@ -35,7 +35,7 @@ function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useAuthStore();
+  const { setUser, setToken } = useAuthStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,12 +50,18 @@ function RouteComponent() {
     setIsLoading(true);
 
     try {
-      const { data } = await apiService.post<{ user: User }>("/auth/login", {
-        username: email,
-        password,
-      });
+      const { data } = await apiService.post<{ user: User; token: string }>(
+        "/auth/login",
+        {
+          username: email,
+          password,
+        }
+      );
+      console.log("\n\n ---> apps/web/src/routes/login.tsx:59 -> data: ", data);
 
       setUser(data.user);
+      setToken(data.token);
+
       toast.success("Successfully logged in!");
     } catch (error) {
       console.error(

@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 const initialState: AuthState = {
   user: null,
+  token: null,
   isLoading: false,
   isAuthenticated: false,
   error: null,
@@ -11,6 +12,7 @@ const initialState: AuthState = {
 export const useAuthStore = create<
   AuthState & {
     setUser: (user: User | null) => void;
+    setToken: (token: string | null) => void;
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     logout: () => void;
@@ -25,6 +27,7 @@ export const useAuthStore = create<
           isAuthenticated: !!user,
           error: null,
         }),
+      setToken: (token) => set({ token }),
       setLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
       logout: () => set(initialState),

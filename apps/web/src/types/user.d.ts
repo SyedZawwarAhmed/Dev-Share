@@ -8,6 +8,7 @@ type User = {
 
 type AuthState = {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;

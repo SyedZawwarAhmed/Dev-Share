@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth.store";
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -27,7 +28,6 @@ class ApiService {
     // Create axios instance with default config
     this.api = axios.create({
       baseURL: this.baseURL,
-      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
       },
@@ -36,8 +36,8 @@ class ApiService {
     // Request interceptor
     this.api.interceptors.request.use(
       (config) => {
-        // The HttpOnly cookie will be automatically included
-        // No manual token handling needed
+        const token = useAuthStore.getState().token;
+        if (token) config.headers.Authorization = `Bearer ${token}`;
         return config;
       },
       (error) => {

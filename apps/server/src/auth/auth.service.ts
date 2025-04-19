@@ -48,8 +48,8 @@ export class AuthService {
     });
 
     return {
-      access_token: token,
       user,
+      token,
     };
   }
 
@@ -140,6 +140,6 @@ export class AuthService {
     // TODO: Send verification email
 
     const { password: _, ...result } = user;
-    return result;
+    return { user: result, token };
   }
 }
