@@ -66,6 +66,7 @@ export class AuthController {
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
         sameSite: 'none',
+        domain: new URL(process.env.FRONTEND_URL).hostname,
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       });
 
