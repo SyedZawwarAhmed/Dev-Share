@@ -63,7 +63,7 @@ export class AuthController {
 
       // Set token as an HTTP-only cookie
       res.cookie('access_token', access_token, {
-        httpOnly: true,
+        // httpOnly: true,
         // secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
         sameSite: 'none',
         domain: new URL(process.env.FRONTEND_URL ?? '').hostname,
