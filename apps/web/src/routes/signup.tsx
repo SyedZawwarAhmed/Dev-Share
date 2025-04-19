@@ -39,7 +39,7 @@ const signupSchema = z
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { setUser } = useAuthStore();
+  const { setUser, setToken } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [signupDetails, setSignupDetails] = useState({
     firstName: "",
@@ -65,11 +65,13 @@ function RouteComponent() {
       });
 
       delete validatedData.confirmPassword;
-      const data = await apiService.post<{ user: User }>(
+      const { data } = await apiService.post<{ user: User; token: string }>(
         "/auth/signup",
         validatedData
       );
-      setUser(data.data.user);
+      setUser(data.user);
+      setToken(data.token);
+
       toast.success("Successfully logged in!");
       navigate({ to: "/dashboard" });
     } catch (error) {

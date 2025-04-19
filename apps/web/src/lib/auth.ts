@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import apiService from "./api";
 
 export async function handleGoogleCallback(searchParams: URLSearchParams) {
-  const { setUser, setError, setLoading } = useAuthStore.getState();
+  const { setUser, setToken, setError, setLoading } = useAuthStore.getState();
 
   try {
     setLoading(true);
@@ -11,8 +11,9 @@ export async function handleGoogleCallback(searchParams: URLSearchParams) {
     const firstName = searchParams.get("firstName");
     const lastName = searchParams.get("lastName");
     const email = searchParams.get("email");
+    const token = searchParams.get("token");
 
-    if (!firstName || !lastName || !email) {
+    if (!firstName || !lastName || !email || !token) {
       throw new Error("Missing user information");
     }
 
@@ -24,6 +25,7 @@ export async function handleGoogleCallback(searchParams: URLSearchParams) {
     };
 
     setUser(user);
+    setToken(decodeURIComponent(token));
     toast.success("Successfully logged in!");
     return true;
   } catch (error) {

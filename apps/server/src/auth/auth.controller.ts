@@ -57,18 +57,7 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   async googleAuthCallback(@Req() req, @Res() res: Response) {
     try {
-      const { access_token, user } = await this.authService.googleLogin(
-        req.user,
-      );
-
-      // Set token as an HTTP-only cookie
-      res.cookie('access_token', access_token, {
-        // httpOnly: true,
-        // secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
-        sameSite: 'none',
-        domain: new URL(process.env.FRONTEND_URL ?? '').hostname,
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      });
+      const { token, user } = await this.authService.googleLogin(req.user);
 
       // Redirect to the frontend dashboard
       const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
@@ -85,6 +74,7 @@ export class AuthController {
         encodeURIComponent(user?.lastName),
       );
       redirectUrl.searchParams.append('email', encodeURIComponent(user?.email));
+      redirectUrl.searchParams.append('token', encodeURIComponent(token));
 
       // Redirect to the frontend
       res.redirect(redirectUrl.toString());
