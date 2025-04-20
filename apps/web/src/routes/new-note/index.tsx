@@ -20,7 +20,7 @@ import { Linkedin, Loader2, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/new-note")({
+export const Route = createFileRoute("/new-note/")({
   component: RouteComponent,
 });
 

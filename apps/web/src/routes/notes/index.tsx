@@ -44,7 +44,7 @@ import {
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/notes")({
+export const Route = createFileRoute("/notes/")({
   component: RouteComponent,
 });
 

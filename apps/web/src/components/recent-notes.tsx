@@ -17,17 +17,19 @@ export default function RecentNotes() {
             <span className="font-medium text-sm">Next.js Server Actions</span>
             <Badge
               variant="outline"
-              className="ml-auto text-xs bg-amber-50 border-amber-200 text-amber-700"
+              className="ml-auto text-xs bg-blue-50 border-blue-200 text-blue-700"
             >
-              Draft
+              2 Posts
             </Badge>
           </div>
           <p className="text-xs text-slate-500 mb-2">Added 2 hours ago</p>
           <div className="flex justify-end">
-            <Button size="sm" variant="ghost" className="h-7 text-xs">
-              Create Post
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </Button>
+            <Link to={"/notes/$id/posts"} params={{ id: "1" }}>
+              <Button size="sm" variant="ghost" className="h-7 text-xs">
+                View Posts
+                <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -35,13 +37,21 @@ export default function RecentNotes() {
           <div className="flex items-center gap-2 mb-1">
             <FileText className="h-4 w-4 text-purple-600" />
             <span className="font-medium text-sm">React Optimistic UI</span>
+            <Badge
+              variant="outline"
+              className="ml-auto text-xs bg-blue-50 border-blue-200 text-blue-700"
+            >
+              2 Posts
+            </Badge>
           </div>
           <p className="text-xs text-slate-500 mb-2">Added yesterday</p>
           <div className="flex justify-end">
-            <Button size="sm" variant="ghost" className="h-7 text-xs">
-              Create Post
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </Button>
+            <Link to={"/notes/$id/posts"} params={{ id: "2" }}>
+              <Button size="sm" variant="ghost" className="h-7 text-xs">
+                View Posts
+                <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -58,10 +68,12 @@ export default function RecentNotes() {
           </div>
           <p className="text-xs text-slate-500 mb-2">Added 3 days ago</p>
           <div className="flex justify-end">
-            <Button size="sm" variant="ghost" className="h-7 text-xs">
-              Create Post
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </Button>
+            <Link to={"/notes/$id/create-posts"} params={{ id: "3" }}>
+              <Button size="sm" variant="ghost" className="h-7 text-xs">
+                Create Posts
+                <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
           </div>
         </div>
 

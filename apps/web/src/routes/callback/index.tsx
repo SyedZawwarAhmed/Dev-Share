@@ -2,7 +2,7 @@ import { handleGoogleCallback } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 
-export const Route = createFileRoute("/callback")({
+export const Route = createFileRoute("/callback/")({
   component: RouteComponent,
 });
 

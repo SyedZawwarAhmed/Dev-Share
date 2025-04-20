@@ -76,6 +76,18 @@ export default function AppHeader() {
                 Notes
               </Button>
             </Link>
+            <Link to="/posts" search={{ status: "" }}>
+              <Button
+                variant={
+                  pathname === "/posts" || pathname.startsWith("/posts/")
+                    ? "secondary"
+                    : "ghost"
+                }
+                size="sm"
+              >
+                Posts
+              </Button>
+            </Link>
           </nav>
         </div>
 
