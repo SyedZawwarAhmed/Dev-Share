@@ -11,64 +11,115 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as SignupImport } from './routes/signup'
-import { Route as NotesImport } from './routes/notes'
-import { Route as NewNoteImport } from './routes/new-note'
-import { Route as LoginImport } from './routes/login'
-import { Route as ForgotPasswordImport } from './routes/forgot-password'
-import { Route as DashboardImport } from './routes/dashboard'
-import { Route as CallbackImport } from './routes/callback'
 import { Route as IndexImport } from './routes/index'
+import { Route as SignupIndexImport } from './routes/signup/index'
+import { Route as PostsIndexImport } from './routes/posts/index'
+import { Route as NotesIndexImport } from './routes/notes/index'
+import { Route as NewNoteIndexImport } from './routes/new-note/index'
+import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as ForgotPasswordIndexImport } from './routes/forgot-password/index'
+import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as CallbackIndexImport } from './routes/callback/index'
+import { Route as PostsIdScheduleIndexImport } from './routes/posts/$id/schedule/index'
+import { Route as PostsIdEditIndexImport } from './routes/posts/$id/edit/index'
+import { Route as NotesIdPostsIndexImport } from './routes/notes/$id/posts/index'
+import { Route as NotesIdCreatePostsIndexImport } from './routes/notes/$id/create-posts/index'
+import { Route as NotesIdPostsPostIdScheduleIndexImport } from './routes/notes/$id/posts/$postId/schedule/index'
+import { Route as NotesIdPostsPostIdEditIndexImport } from './routes/notes/$id/posts/$postId/edit/index'
 
 // Create/Update Routes
-
-const SignupRoute = SignupImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const NotesRoute = NotesImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const NewNoteRoute = NewNoteImport.update({
-  id: '/new-note',
-  path: '/new-note',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LoginRoute = LoginImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ForgotPasswordRoute = ForgotPasswordImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DashboardRoute = DashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const CallbackRoute = CallbackImport.update({
-  id: '/callback',
-  path: '/callback',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
+
+const SignupIndexRoute = SignupIndexImport.update({
+  id: '/signup/',
+  path: '/signup/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PostsIndexRoute = PostsIndexImport.update({
+  id: '/posts/',
+  path: '/posts/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NotesIndexRoute = NotesIndexImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NewNoteIndexRoute = NewNoteIndexImport.update({
+  id: '/new-note/',
+  path: '/new-note/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginIndexRoute = LoginIndexImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ForgotPasswordIndexRoute = ForgotPasswordIndexImport.update({
+  id: '/forgot-password/',
+  path: '/forgot-password/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardIndexRoute = DashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CallbackIndexRoute = CallbackIndexImport.update({
+  id: '/callback/',
+  path: '/callback/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PostsIdScheduleIndexRoute = PostsIdScheduleIndexImport.update({
+  id: '/posts/$id/schedule/',
+  path: '/posts/$id/schedule/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PostsIdEditIndexRoute = PostsIdEditIndexImport.update({
+  id: '/posts/$id/edit/',
+  path: '/posts/$id/edit/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NotesIdPostsIndexRoute = NotesIdPostsIndexImport.update({
+  id: '/notes/$id/posts/',
+  path: '/notes/$id/posts/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NotesIdCreatePostsIndexRoute = NotesIdCreatePostsIndexImport.update({
+  id: '/notes/$id/create-posts/',
+  path: '/notes/$id/create-posts/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NotesIdPostsPostIdScheduleIndexRoute =
+  NotesIdPostsPostIdScheduleIndexImport.update({
+    id: '/notes/$id/posts/$postId/schedule/',
+    path: '/notes/$id/posts/$postId/schedule/',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const NotesIdPostsPostIdEditIndexRoute =
+  NotesIdPostsPostIdEditIndexImport.update({
+    id: '/notes/$id/posts/$postId/edit/',
+    path: '/notes/$id/posts/$postId/edit/',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -81,53 +132,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/callback': {
-      id: '/callback'
+    '/callback/': {
+      id: '/callback/'
       path: '/callback'
       fullPath: '/callback'
-      preLoaderRoute: typeof CallbackImport
+      preLoaderRoute: typeof CallbackIndexImport
       parentRoute: typeof rootRoute
     }
-    '/dashboard': {
-      id: '/dashboard'
+    '/dashboard/': {
+      id: '/dashboard/'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardImport
+      preLoaderRoute: typeof DashboardIndexImport
       parentRoute: typeof rootRoute
     }
-    '/forgot-password': {
-      id: '/forgot-password'
+    '/forgot-password/': {
+      id: '/forgot-password/'
       path: '/forgot-password'
       fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordImport
+      preLoaderRoute: typeof ForgotPasswordIndexImport
       parentRoute: typeof rootRoute
     }
-    '/login': {
-      id: '/login'
+    '/login/': {
+      id: '/login/'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
+      preLoaderRoute: typeof LoginIndexImport
       parentRoute: typeof rootRoute
     }
-    '/new-note': {
-      id: '/new-note'
+    '/new-note/': {
+      id: '/new-note/'
       path: '/new-note'
       fullPath: '/new-note'
-      preLoaderRoute: typeof NewNoteImport
+      preLoaderRoute: typeof NewNoteIndexImport
       parentRoute: typeof rootRoute
     }
-    '/notes': {
-      id: '/notes'
+    '/notes/': {
+      id: '/notes/'
       path: '/notes'
       fullPath: '/notes'
-      preLoaderRoute: typeof NotesImport
+      preLoaderRoute: typeof NotesIndexImport
       parentRoute: typeof rootRoute
     }
-    '/signup': {
-      id: '/signup'
+    '/posts/': {
+      id: '/posts/'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof PostsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/signup/': {
+      id: '/signup/'
       path: '/signup'
       fullPath: '/signup'
-      preLoaderRoute: typeof SignupImport
+      preLoaderRoute: typeof SignupIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/notes/$id/create-posts/': {
+      id: '/notes/$id/create-posts/'
+      path: '/notes/$id/create-posts'
+      fullPath: '/notes/$id/create-posts'
+      preLoaderRoute: typeof NotesIdCreatePostsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/notes/$id/posts/': {
+      id: '/notes/$id/posts/'
+      path: '/notes/$id/posts'
+      fullPath: '/notes/$id/posts'
+      preLoaderRoute: typeof NotesIdPostsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/posts/$id/edit/': {
+      id: '/posts/$id/edit/'
+      path: '/posts/$id/edit'
+      fullPath: '/posts/$id/edit'
+      preLoaderRoute: typeof PostsIdEditIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/posts/$id/schedule/': {
+      id: '/posts/$id/schedule/'
+      path: '/posts/$id/schedule'
+      fullPath: '/posts/$id/schedule'
+      preLoaderRoute: typeof PostsIdScheduleIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/notes/$id/posts/$postId/edit/': {
+      id: '/notes/$id/posts/$postId/edit/'
+      path: '/notes/$id/posts/$postId/edit'
+      fullPath: '/notes/$id/posts/$postId/edit'
+      preLoaderRoute: typeof NotesIdPostsPostIdEditIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/notes/$id/posts/$postId/schedule/': {
+      id: '/notes/$id/posts/$postId/schedule/'
+      path: '/notes/$id/posts/$postId/schedule'
+      fullPath: '/notes/$id/posts/$postId/schedule'
+      preLoaderRoute: typeof NotesIdPostsPostIdScheduleIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -137,36 +237,57 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/callback': typeof CallbackRoute
-  '/dashboard': typeof DashboardRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/new-note': typeof NewNoteRoute
-  '/notes': typeof NotesRoute
-  '/signup': typeof SignupRoute
+  '/callback': typeof CallbackIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/forgot-password': typeof ForgotPasswordIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/new-note': typeof NewNoteIndexRoute
+  '/notes': typeof NotesIndexRoute
+  '/posts': typeof PostsIndexRoute
+  '/signup': typeof SignupIndexRoute
+  '/notes/$id/create-posts': typeof NotesIdCreatePostsIndexRoute
+  '/notes/$id/posts': typeof NotesIdPostsIndexRoute
+  '/posts/$id/edit': typeof PostsIdEditIndexRoute
+  '/posts/$id/schedule': typeof PostsIdScheduleIndexRoute
+  '/notes/$id/posts/$postId/edit': typeof NotesIdPostsPostIdEditIndexRoute
+  '/notes/$id/posts/$postId/schedule': typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/callback': typeof CallbackRoute
-  '/dashboard': typeof DashboardRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/new-note': typeof NewNoteRoute
-  '/notes': typeof NotesRoute
-  '/signup': typeof SignupRoute
+  '/callback': typeof CallbackIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/forgot-password': typeof ForgotPasswordIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/new-note': typeof NewNoteIndexRoute
+  '/notes': typeof NotesIndexRoute
+  '/posts': typeof PostsIndexRoute
+  '/signup': typeof SignupIndexRoute
+  '/notes/$id/create-posts': typeof NotesIdCreatePostsIndexRoute
+  '/notes/$id/posts': typeof NotesIdPostsIndexRoute
+  '/posts/$id/edit': typeof PostsIdEditIndexRoute
+  '/posts/$id/schedule': typeof PostsIdScheduleIndexRoute
+  '/notes/$id/posts/$postId/edit': typeof NotesIdPostsPostIdEditIndexRoute
+  '/notes/$id/posts/$postId/schedule': typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/callback': typeof CallbackRoute
-  '/dashboard': typeof DashboardRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/new-note': typeof NewNoteRoute
-  '/notes': typeof NotesRoute
-  '/signup': typeof SignupRoute
+  '/callback/': typeof CallbackIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/forgot-password/': typeof ForgotPasswordIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/new-note/': typeof NewNoteIndexRoute
+  '/notes/': typeof NotesIndexRoute
+  '/posts/': typeof PostsIndexRoute
+  '/signup/': typeof SignupIndexRoute
+  '/notes/$id/create-posts/': typeof NotesIdCreatePostsIndexRoute
+  '/notes/$id/posts/': typeof NotesIdPostsIndexRoute
+  '/posts/$id/edit/': typeof PostsIdEditIndexRoute
+  '/posts/$id/schedule/': typeof PostsIdScheduleIndexRoute
+  '/notes/$id/posts/$postId/edit/': typeof NotesIdPostsPostIdEditIndexRoute
+  '/notes/$id/posts/$postId/schedule/': typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -179,7 +300,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/new-note'
     | '/notes'
+    | '/posts'
     | '/signup'
+    | '/notes/$id/create-posts'
+    | '/notes/$id/posts'
+    | '/posts/$id/edit'
+    | '/posts/$id/schedule'
+    | '/notes/$id/posts/$postId/edit'
+    | '/notes/$id/posts/$postId/schedule'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -189,40 +317,68 @@ export interface FileRouteTypes {
     | '/login'
     | '/new-note'
     | '/notes'
+    | '/posts'
     | '/signup'
+    | '/notes/$id/create-posts'
+    | '/notes/$id/posts'
+    | '/posts/$id/edit'
+    | '/posts/$id/schedule'
+    | '/notes/$id/posts/$postId/edit'
+    | '/notes/$id/posts/$postId/schedule'
   id:
     | '__root__'
     | '/'
-    | '/callback'
-    | '/dashboard'
-    | '/forgot-password'
-    | '/login'
-    | '/new-note'
-    | '/notes'
-    | '/signup'
+    | '/callback/'
+    | '/dashboard/'
+    | '/forgot-password/'
+    | '/login/'
+    | '/new-note/'
+    | '/notes/'
+    | '/posts/'
+    | '/signup/'
+    | '/notes/$id/create-posts/'
+    | '/notes/$id/posts/'
+    | '/posts/$id/edit/'
+    | '/posts/$id/schedule/'
+    | '/notes/$id/posts/$postId/edit/'
+    | '/notes/$id/posts/$postId/schedule/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CallbackRoute: typeof CallbackRoute
-  DashboardRoute: typeof DashboardRoute
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
-  LoginRoute: typeof LoginRoute
-  NewNoteRoute: typeof NewNoteRoute
-  NotesRoute: typeof NotesRoute
-  SignupRoute: typeof SignupRoute
+  CallbackIndexRoute: typeof CallbackIndexRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  ForgotPasswordIndexRoute: typeof ForgotPasswordIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  NewNoteIndexRoute: typeof NewNoteIndexRoute
+  NotesIndexRoute: typeof NotesIndexRoute
+  PostsIndexRoute: typeof PostsIndexRoute
+  SignupIndexRoute: typeof SignupIndexRoute
+  NotesIdCreatePostsIndexRoute: typeof NotesIdCreatePostsIndexRoute
+  NotesIdPostsIndexRoute: typeof NotesIdPostsIndexRoute
+  PostsIdEditIndexRoute: typeof PostsIdEditIndexRoute
+  PostsIdScheduleIndexRoute: typeof PostsIdScheduleIndexRoute
+  NotesIdPostsPostIdEditIndexRoute: typeof NotesIdPostsPostIdEditIndexRoute
+  NotesIdPostsPostIdScheduleIndexRoute: typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CallbackRoute: CallbackRoute,
-  DashboardRoute: DashboardRoute,
-  ForgotPasswordRoute: ForgotPasswordRoute,
-  LoginRoute: LoginRoute,
-  NewNoteRoute: NewNoteRoute,
-  NotesRoute: NotesRoute,
-  SignupRoute: SignupRoute,
+  CallbackIndexRoute: CallbackIndexRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  ForgotPasswordIndexRoute: ForgotPasswordIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  NewNoteIndexRoute: NewNoteIndexRoute,
+  NotesIndexRoute: NotesIndexRoute,
+  PostsIndexRoute: PostsIndexRoute,
+  SignupIndexRoute: SignupIndexRoute,
+  NotesIdCreatePostsIndexRoute: NotesIdCreatePostsIndexRoute,
+  NotesIdPostsIndexRoute: NotesIdPostsIndexRoute,
+  PostsIdEditIndexRoute: PostsIdEditIndexRoute,
+  PostsIdScheduleIndexRoute: PostsIdScheduleIndexRoute,
+  NotesIdPostsPostIdEditIndexRoute: NotesIdPostsPostIdEditIndexRoute,
+  NotesIdPostsPostIdScheduleIndexRoute: NotesIdPostsPostIdScheduleIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -236,38 +392,66 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/callback",
-        "/dashboard",
-        "/forgot-password",
-        "/login",
-        "/new-note",
-        "/notes",
-        "/signup"
+        "/callback/",
+        "/dashboard/",
+        "/forgot-password/",
+        "/login/",
+        "/new-note/",
+        "/notes/",
+        "/posts/",
+        "/signup/",
+        "/notes/$id/create-posts/",
+        "/notes/$id/posts/",
+        "/posts/$id/edit/",
+        "/posts/$id/schedule/",
+        "/notes/$id/posts/$postId/edit/",
+        "/notes/$id/posts/$postId/schedule/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/callback": {
-      "filePath": "callback.tsx"
+    "/callback/": {
+      "filePath": "callback/index.tsx"
     },
-    "/dashboard": {
-      "filePath": "dashboard.tsx"
+    "/dashboard/": {
+      "filePath": "dashboard/index.tsx"
     },
-    "/forgot-password": {
-      "filePath": "forgot-password.tsx"
+    "/forgot-password/": {
+      "filePath": "forgot-password/index.tsx"
     },
-    "/login": {
-      "filePath": "login.tsx"
+    "/login/": {
+      "filePath": "login/index.tsx"
     },
-    "/new-note": {
-      "filePath": "new-note.tsx"
+    "/new-note/": {
+      "filePath": "new-note/index.tsx"
     },
-    "/notes": {
-      "filePath": "notes.tsx"
+    "/notes/": {
+      "filePath": "notes/index.tsx"
     },
-    "/signup": {
-      "filePath": "signup.tsx"
+    "/posts/": {
+      "filePath": "posts/index.tsx"
+    },
+    "/signup/": {
+      "filePath": "signup/index.tsx"
+    },
+    "/notes/$id/create-posts/": {
+      "filePath": "notes/$id/create-posts/index.tsx"
+    },
+    "/notes/$id/posts/": {
+      "filePath": "notes/$id/posts/index.tsx"
+    },
+    "/posts/$id/edit/": {
+      "filePath": "posts/$id/edit/index.tsx"
+    },
+    "/posts/$id/schedule/": {
+      "filePath": "posts/$id/schedule/index.tsx"
+    },
+    "/notes/$id/posts/$postId/edit/": {
+      "filePath": "notes/$id/posts/$postId/edit/index.tsx"
+    },
+    "/notes/$id/posts/$postId/schedule/": {
+      "filePath": "notes/$id/posts/$postId/schedule/index.tsx"
     }
   }
 }

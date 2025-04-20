@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth.store";
 import apiService from "@/lib/api";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/login/")({
   component: RouteComponent,
   beforeLoad: ({ location, search }) => {
     console.log(

@@ -20,7 +20,7 @@ import { z, ZodError } from "zod";
 import { useAuthStore } from "@/stores/auth.store";
 import apiService from "@/lib/api";
 
-export const Route = createFileRoute("/signup")({
+export const Route = createFileRoute("/signup/")({
   component: RouteComponent,
 });
 

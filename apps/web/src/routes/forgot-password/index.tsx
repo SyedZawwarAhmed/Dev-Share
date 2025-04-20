@@ -17,7 +17,7 @@ import {
 import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/forgot-password")({
+export const Route = createFileRoute("/forgot-password/")({
   component: RouteComponent,
 });
 
