@@ -139,10 +139,7 @@ export default function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src="/placeholder.svg?height=32&width=32"
-                    alt="User"
-                  />
+                  <AvatarImage src={user?.image} alt="User" />
                   <AvatarFallback>
                     {user?.firstName?.[0] ?? "U"}
                     {user?.lastName?.[0]}

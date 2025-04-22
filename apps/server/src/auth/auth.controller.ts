@@ -63,7 +63,6 @@ export class AuthController {
       const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
 
       // Optionally add user info as query parameters
-      // Only add non-sensitive information
       redirectUrl.searchParams.append('id', encodeURIComponent(user?.id));
       redirectUrl.searchParams.append(
         'firstName',
@@ -75,6 +74,10 @@ export class AuthController {
       );
       redirectUrl.searchParams.append('email', encodeURIComponent(user?.email));
       redirectUrl.searchParams.append('token', encodeURIComponent(token));
+      redirectUrl.searchParams.append(
+        'image',
+        encodeURIComponent(user?.profileImage),
+      );
 
       // Redirect to the frontend
       res.redirect(redirectUrl.toString());

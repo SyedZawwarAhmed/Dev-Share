@@ -12,6 +12,7 @@ export async function handleGoogleCallback(searchParams: URLSearchParams) {
     const lastName = searchParams.get("lastName");
     const email = searchParams.get("email");
     const token = searchParams.get("token");
+    const image = searchParams.get("image");
 
     if (!firstName || !lastName || !email || !token) {
       throw new Error("Missing user information");
@@ -22,6 +23,7 @@ export async function handleGoogleCallback(searchParams: URLSearchParams) {
       firstName: decodeURIComponent(firstName ?? ""),
       lastName: decodeURIComponent(lastName ?? ""),
       email: decodeURIComponent(email),
+      image: decodeURIComponent(image ?? ""),
     };
 
     setUser(user);
