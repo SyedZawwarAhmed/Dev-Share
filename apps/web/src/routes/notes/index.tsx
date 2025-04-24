@@ -152,8 +152,7 @@ function RouteComponent() {
                 <SelectContent>
                   <SelectItem value="all">All Notes</SelectItem>
                   <SelectItem value="DRAFT">Drafts</SelectItem>
-                  <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                  <SelectItem value="PUBLISHED">Published</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -216,20 +215,21 @@ function RouteComponent() {
                                     Draft
                                   </Badge>
                                 )}
-                                {note.status === "SCHEDULED" && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs bg-emerald-50 border-emerald-200 text-emerald-700"
-                                  >
-                                    Scheduled
-                                  </Badge>
-                                )}
-                                {note.status === "PUBLISHED" && (
+                                {note.status === "ACTIVE" && (
                                   <Badge
                                     variant="outline"
                                     className="text-xs bg-blue-50 border-blue-200 text-blue-700"
                                   >
-                                    Published
+                                    Active
+                                  </Badge>
+                                )}
+                                {note?.postCount > 0 && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs bg-blue-50 border-blue-200 text-blue-700"
+                                  >
+                                    {note?.postCount}{" "}
+                                    {note?.postCount === 1 ? "Post" : "Posts"}
                                   </Badge>
                                 )}
                               </div>
@@ -244,15 +244,34 @@ function RouteComponent() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            {note.status === "DRAFT" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8"
+                            {note.postCount === 0 && (
+                              <Link
+                                to={`/notes/$id/create-posts`}
+                                params={{ id: note.id }}
                               >
-                                <Wand2 className="h-3 w-3 mr-1" />
-                                Create Post
-                              </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8"
+                                >
+                                  <Wand2 className="h-3 w-3 mr-1" />
+                                  Create Posts
+                                </Button>
+                              </Link>
+                            )}
+                            {note.postCount > 0 && (
+                              <Link
+                                to={`/notes/$id/posts`}
+                                params={{ id: note.id }}
+                              >
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8"
+                                >
+                                  View Posts
+                                </Button>
+                              </Link>
                             )}
                             <Dialog
                               open={deleteDialogs[note.id]}
@@ -275,11 +294,16 @@ function RouteComponent() {
                                     <Edit className="h-4 w-4 mr-2" />
                                     Edit Note
                                   </DropdownMenuItem>
-                                  {note.status === "DRAFT" && (
-                                    <DropdownMenuItem>
-                                      <Wand2 className="h-4 w-4 mr-2" />
-                                      Generate Post
-                                    </DropdownMenuItem>
+                                  {note.postCount === 0 && (
+                                    <Link
+                                      to={`/notes/$id/create-posts`}
+                                      params={{ id: note.id }}
+                                    >
+                                      <DropdownMenuItem>
+                                        <Wand2 className="h-4 w-4 mr-2" />
+                                        Create Posts
+                                      </DropdownMenuItem>
+                                    </Link>
                                   )}
                                   <DialogTrigger asChild>
                                     <DropdownMenuItem className="text-red-600">
@@ -365,11 +389,16 @@ function RouteComponent() {
                               <Edit className="h-4 w-4 mr-2" />
                               Edit Note
                             </DropdownMenuItem>
-                            {note.status === "DRAFT" && (
-                              <DropdownMenuItem>
-                                <Wand2 className="h-4 w-4 mr-2" />
-                                Generate Post
-                              </DropdownMenuItem>
+                            {note.postCount === 0 && (
+                              <Link
+                                to={`/notes/$id/create-posts`}
+                                params={{ id: note.id }}
+                              >
+                                <DropdownMenuItem>
+                                  <Wand2 className="h-4 w-4 mr-2" />
+                                  Create Posts
+                                </DropdownMenuItem>
+                              </Link>
                             )}
                             <DialogTrigger asChild>
                               <DropdownMenuItem className="text-red-600">
@@ -401,7 +430,7 @@ function RouteComponent() {
                       </Dialog>
                     </div>
 
-                    <div className="mb-3">
+                    <div className="mb-3 flex gap-2">
                       {note.status === "DRAFT" && (
                         <Badge
                           variant="outline"
@@ -410,20 +439,21 @@ function RouteComponent() {
                           Draft
                         </Badge>
                       )}
-                      {note.status === "SCHEDULED" && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-emerald-50 border-emerald-200 text-emerald-700"
-                        >
-                          Scheduled
-                        </Badge>
-                      )}
-                      {note.status === "PUBLISHED" && (
+                      {note.status === "ACTIVE" && (
                         <Badge
                           variant="outline"
                           className="text-xs bg-blue-50 border-blue-200 text-blue-700"
                         >
-                          Published
+                          Active
+                        </Badge>
+                      )}
+                      {note?.postCount > 0 && (
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-blue-50 border-blue-200 text-blue-700"
+                        >
+                          {note?.postCount}{" "}
+                          {note?.postCount === 1 ? "Post" : "Posts"}
                         </Badge>
                       )}
                     </div>
@@ -440,17 +470,23 @@ function RouteComponent() {
                     </div>
                   </CardContent>
 
-                  {note.status === "DRAFT" && (
-                    <div className="p-3 border-t">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full text-xs h-7"
-                      >
+                  {note.postCount === 0 && (
+                    <Link
+                      to={`/notes/$id/create-posts`}
+                      params={{ id: note.id }}
+                    >
+                      <Button size="sm" variant="outline" className="h-8">
                         <Wand2 className="h-3 w-3 mr-1" />
-                        Create Post
+                        Create Posts
                       </Button>
-                    </div>
+                    </Link>
+                  )}
+                  {note.postCount > 0 && (
+                    <Link to={`/notes/$id/posts`} params={{ id: note.id }}>
+                      <Button size="sm" variant="outline" className="h-8">
+                        View Posts
+                      </Button>
+                    </Link>
                   )}
                 </Card>
               ))}

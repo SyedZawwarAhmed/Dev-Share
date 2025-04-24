@@ -156,6 +156,5 @@ enum AuthProvider {
 
 enum NoteStatus {
   DRAFT
-  SCHEDULED
-  PUBLISHED
+  ACTIVE
 }

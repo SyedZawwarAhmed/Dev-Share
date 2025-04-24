@@ -3,7 +3,8 @@ type Note = {
   userId: string;
   title: string;
   content: string;
-  status: "DRAFT" | "SCHEDULED" | "PUBLISHED";
+  status: "DRAFT" | "ACTIVE";
+  postCount: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -11,5 +12,5 @@ type Note = {
 type CreateNotePayload = {
   title: string;
   content: string;
-  status: "DRAFT" | "SCHEDULED" | "PUBLISHED";
+  status: "DRAFT" | "ACTIVE";
 };
