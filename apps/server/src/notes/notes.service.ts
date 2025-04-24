@@ -6,12 +6,21 @@ export class NotesService {
   constructor(private prisma: PrismaService) {}
 
   async getNotes(userId: string) {
-    return this.prisma.note.findMany({
-      where: {
-        userId,
-        isDeleted: false,
-      },
-    });
+    return (
+      await this.prisma.note.findMany({
+        where: {
+          userId,
+          isDeleted: false,
+        },
+        include: {
+          _count: {
+            select: {
+              posts: true,
+            },
+          },
+        },
+      })
+    ).map((note) => ({ ...note, postCount: note._count.posts }));
   }
 
   addNote(userId: string, note) {
