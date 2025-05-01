@@ -23,6 +23,7 @@ import { Route as CallbackIndexImport } from './routes/callback/index'
 import { Route as PostsIdScheduleIndexImport } from './routes/posts/$id/schedule/index'
 import { Route as PostsIdEditIndexImport } from './routes/posts/$id/edit/index'
 import { Route as NotesIdPostsIndexImport } from './routes/notes/$id/posts/index'
+import { Route as NotesIdEditIndexImport } from './routes/notes/$id/edit/index'
 import { Route as NotesIdCreatePostsIndexImport } from './routes/notes/$id/create-posts/index'
 import { Route as NotesIdPostsPostIdScheduleIndexImport } from './routes/notes/$id/posts/$postId/schedule/index'
 import { Route as NotesIdPostsPostIdEditIndexImport } from './routes/notes/$id/posts/$postId/edit/index'
@@ -98,6 +99,12 @@ const PostsIdEditIndexRoute = PostsIdEditIndexImport.update({
 const NotesIdPostsIndexRoute = NotesIdPostsIndexImport.update({
   id: '/notes/$id/posts/',
   path: '/notes/$id/posts/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NotesIdEditIndexRoute = NotesIdEditIndexImport.update({
+  id: '/notes/$id/edit/',
+  path: '/notes/$id/edit/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -195,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesIdCreatePostsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/notes/$id/edit/': {
+      id: '/notes/$id/edit/'
+      path: '/notes/$id/edit'
+      fullPath: '/notes/$id/edit'
+      preLoaderRoute: typeof NotesIdEditIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/notes/$id/posts/': {
       id: '/notes/$id/posts/'
       path: '/notes/$id/posts'
@@ -246,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/posts': typeof PostsIndexRoute
   '/signup': typeof SignupIndexRoute
   '/notes/$id/create-posts': typeof NotesIdCreatePostsIndexRoute
+  '/notes/$id/edit': typeof NotesIdEditIndexRoute
   '/notes/$id/posts': typeof NotesIdPostsIndexRoute
   '/posts/$id/edit': typeof PostsIdEditIndexRoute
   '/posts/$id/schedule': typeof PostsIdScheduleIndexRoute
@@ -264,6 +279,7 @@ export interface FileRoutesByTo {
   '/posts': typeof PostsIndexRoute
   '/signup': typeof SignupIndexRoute
   '/notes/$id/create-posts': typeof NotesIdCreatePostsIndexRoute
+  '/notes/$id/edit': typeof NotesIdEditIndexRoute
   '/notes/$id/posts': typeof NotesIdPostsIndexRoute
   '/posts/$id/edit': typeof PostsIdEditIndexRoute
   '/posts/$id/schedule': typeof PostsIdScheduleIndexRoute
@@ -283,6 +299,7 @@ export interface FileRoutesById {
   '/posts/': typeof PostsIndexRoute
   '/signup/': typeof SignupIndexRoute
   '/notes/$id/create-posts/': typeof NotesIdCreatePostsIndexRoute
+  '/notes/$id/edit/': typeof NotesIdEditIndexRoute
   '/notes/$id/posts/': typeof NotesIdPostsIndexRoute
   '/posts/$id/edit/': typeof PostsIdEditIndexRoute
   '/posts/$id/schedule/': typeof PostsIdScheduleIndexRoute
@@ -303,6 +320,7 @@ export interface FileRouteTypes {
     | '/posts'
     | '/signup'
     | '/notes/$id/create-posts'
+    | '/notes/$id/edit'
     | '/notes/$id/posts'
     | '/posts/$id/edit'
     | '/posts/$id/schedule'
@@ -320,6 +338,7 @@ export interface FileRouteTypes {
     | '/posts'
     | '/signup'
     | '/notes/$id/create-posts'
+    | '/notes/$id/edit'
     | '/notes/$id/posts'
     | '/posts/$id/edit'
     | '/posts/$id/schedule'
@@ -337,6 +356,7 @@ export interface FileRouteTypes {
     | '/posts/'
     | '/signup/'
     | '/notes/$id/create-posts/'
+    | '/notes/$id/edit/'
     | '/notes/$id/posts/'
     | '/posts/$id/edit/'
     | '/posts/$id/schedule/'
@@ -356,6 +376,7 @@ export interface RootRouteChildren {
   PostsIndexRoute: typeof PostsIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
   NotesIdCreatePostsIndexRoute: typeof NotesIdCreatePostsIndexRoute
+  NotesIdEditIndexRoute: typeof NotesIdEditIndexRoute
   NotesIdPostsIndexRoute: typeof NotesIdPostsIndexRoute
   PostsIdEditIndexRoute: typeof PostsIdEditIndexRoute
   PostsIdScheduleIndexRoute: typeof PostsIdScheduleIndexRoute
@@ -374,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   PostsIndexRoute: PostsIndexRoute,
   SignupIndexRoute: SignupIndexRoute,
   NotesIdCreatePostsIndexRoute: NotesIdCreatePostsIndexRoute,
+  NotesIdEditIndexRoute: NotesIdEditIndexRoute,
   NotesIdPostsIndexRoute: NotesIdPostsIndexRoute,
   PostsIdEditIndexRoute: PostsIdEditIndexRoute,
   PostsIdScheduleIndexRoute: PostsIdScheduleIndexRoute,
@@ -401,6 +423,7 @@ export const routeTree = rootRoute
         "/posts/",
         "/signup/",
         "/notes/$id/create-posts/",
+        "/notes/$id/edit/",
         "/notes/$id/posts/",
         "/posts/$id/edit/",
         "/posts/$id/schedule/",
@@ -437,6 +460,9 @@ export const routeTree = rootRoute
     },
     "/notes/$id/create-posts/": {
       "filePath": "notes/$id/create-posts/index.tsx"
+    },
+    "/notes/$id/edit/": {
+      "filePath": "notes/$id/edit/index.tsx"
     },
     "/notes/$id/posts/": {
       "filePath": "notes/$id/posts/index.tsx"
