@@ -152,6 +152,7 @@ enum AuthProvider {
   GOOGLE
   GITHUB
   TWITTER
+  LINKEDIN
 }
 
 enum NoteStatus {
