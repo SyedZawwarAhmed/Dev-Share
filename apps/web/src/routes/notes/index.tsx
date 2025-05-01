@@ -290,10 +290,15 @@ function RouteComponent() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Note
-                                  </DropdownMenuItem>
+                                  <Link
+                                    to={`/notes/$id/edit`}
+                                    params={{ id: note.id }}
+                                  >
+                                    <DropdownMenuItem>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit Note
+                                    </DropdownMenuItem>
+                                  </Link>
                                   {note.postCount === 0 && (
                                     <Link
                                       to={`/notes/$id/create-posts`}
