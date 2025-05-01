@@ -1,176 +1,123 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ArrowLeft,
-  Calendar,
-  Edit,
-  MoreHorizontal,
-  PlusCircle,
-  Trash2,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Loader2, Save, Wand2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Linkedin, Twitter } from "lucide-react";
+
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/notes/$id/create-posts/")({
+  component: RouteComponent,
+});
 
 // Mock data for the note
 const mockNote = {
   id: 1,
   title: "Next.js Server Actions",
   content:
-    "Server Actions are a Next.js feature built on top of React Actions. They allow you to define async server functions that can be called directly from your components. This eliminates the need for API endpoints!",
+    "Server Actions are a Next.js feature built on top of React Actions. They allow you to define async server functions that can be called directly from your components. This eliminates the need for API endpoints!\n\nKey features:\n- No need for API routes\n- Progressive enhancement\n- Works with and without JavaScript\n- Form handling is much simpler\n- Built-in security against CSRF attacks\n\nExample usage:\n```tsx\n'use server'\n\nasync function submitForm(formData: FormData) {\n  // Server-side code here\n  const name = formData.get('name')\n  await saveToDatabase({ name })\n}\n```\n\nThis is a game-changer for building forms and mutations in Next.js applications.",
   createdAt: "2023-04-05T14:30:00Z",
   status: "active",
 };
 
-// Mock data for posts
-const mockPosts = [
-  {
-    id: 101,
-    noteId: 1,
-    platform: "linkedin",
-    content:
-      "I recently explored Next.js Server Actions and discovered significant performance benefits.\n\nKey advantages include:\n• No need for API routes\n• Progressive enhancement\n• Works with and without JavaScript\n• Simplified form handling\n• Built-in CSRF protection\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Actions into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
-    status: "scheduled",
-    scheduledFor: "2023-04-07T15:00:00Z",
-    createdAt: "2023-04-05T16:30:00Z",
-    updatedAt: "2023-04-05T16:45:00Z",
-  },
-  {
-    id: 102,
-    noteId: 1,
-    platform: "twitter",
-    content:
-      "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
-    status: "draft",
-    createdAt: "2023-04-05T16:30:00Z",
-    updatedAt: "2023-04-05T16:45:00Z",
-  },
-];
-
-export const Route = createFileRoute("/notes/$id/create-posts/")({
-  component: RouteComponent,
-});
-
 function RouteComponent() {
   const params = Route.useParams();
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("linkedin");
+  const [selectedPlatforms, setSelectedPlatforms] = useState({
+    linkedin: true,
+    twitter: true,
+    bluesky: false,
+  });
+  const [generatedPosts, setGeneratedPosts] = useState<{
+    [key: string]: {
+      content: string;
+      status: "draft" | "scheduled" | "published";
+    };
+  }>({
+    linkedin: { content: "", status: "draft" },
+    twitter: { content: "", status: "draft" },
+    bluesky: { content: "", status: "draft" },
+  });
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(date);
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    // Simulate AI generation with platform-specific content
+    setTimeout(() => {
+      setGeneratedPosts({
+        linkedin: {
+          content:
+            "I recently explored Next.js Server Actions and discovered significant performance benefits.\n\nKey advantages include:\n• No need for API routes\n• Progressive enhancement\n• Works with and without JavaScript\n• Simplified form handling\n• Built-in CSRF protection\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Actions into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
+          status: "draft",
+        },
+        twitter: {
+          content:
+            "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
+          status: "draft",
+        },
+        bluesky: {
+          content:
+            "TIL: Next.js Server Actions are changing how we build web apps 💻\n\nThey let you define async server functions that can be called directly from your components, which means:\n- No more API routes needed\n- Progressive enhancement built-in\n- Much simpler form handling\n\nThe coolest part? They work even without JavaScript enabled!\n\n#WebDev #React #NextJS",
+          status: "draft",
+        },
+      });
+      setIsGenerating(false);
+    }, 2000);
   };
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(date);
-  };
+  const handleSavePosts = () => {
+    // Validate that at least one platform is selected and has content
+    const hasContent = Object.keys(selectedPlatforms).some(
+      (platform) =>
+        selectedPlatforms[platform as keyof typeof selectedPlatforms] &&
+        generatedPosts[platform]?.content
+    );
 
-  const filteredPosts =
-    activeTab === "all"
-      ? mockPosts
-      : mockPosts.filter(
-          (post) => post.status === activeTab || post.platform === activeTab
-        );
-
-  const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case "linkedin":
-        return (
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Linkedin className="h-5 w-5 text-blue-600" />
-          </div>
-        );
-      case "twitter":
-        return (
-          <div className="p-2 bg-sky-100 rounded-lg">
-            <Twitter className="h-5 w-5 text-sky-500" />
-          </div>
-        );
-      case "bluesky":
-        return (
-          <div className="p-2 bg-indigo-100 rounded-lg">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-            >
-              <path
-                d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                fill="#0085FF"
-              />
-            </svg>
-          </div>
-        );
-      default:
-        return null;
+    if (!hasContent) {
+      toast("No content to save", {
+        description:
+          "Please generate content for at least one platform before saving.",
+      });
+      return;
     }
+
+    setIsSaving(true);
+    // Simulate saving posts
+    setTimeout(() => {
+      toast("Posts created", {
+        description: "Your posts have been saved successfully.",
+      });
+      setIsSaving(false);
+      // In a real app, redirect to the posts list
+      window.location.href = `/notes/${params.id}/posts`;
+    }, 1500);
   };
 
-  const getPlatformName = (platform: string) => {
-    switch (platform) {
-      case "linkedin":
-        return "LinkedIn";
-      case "twitter":
-        return "X (Twitter)";
-      case "bluesky":
-        return "Bluesky";
-      default:
-        return platform;
-    }
+  const handlePlatformChange = (platform: string, checked: boolean) => {
+    setSelectedPlatforms((prev) => ({
+      ...prev,
+      [platform]: checked,
+    }));
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "draft":
-        return (
-          <Badge
-            variant="outline"
-            className="text-xs bg-amber-50 border-amber-200 text-amber-700"
-          >
-            Draft
-          </Badge>
-        );
-      case "scheduled":
-        return (
-          <Badge
-            variant="outline"
-            className="text-xs bg-emerald-50 border-emerald-200 text-emerald-700"
-          >
-            Scheduled
-          </Badge>
-        );
-      case "published":
-        return (
-          <Badge
-            variant="outline"
-            className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-          >
-            Published
-          </Badge>
-        );
-      default:
-        return null;
-    }
+  const handlePostContentChange = (platform: string, content: string) => {
+    setGeneratedPosts((prev) => ({
+      ...prev,
+      [platform]: { ...prev[platform], content },
+    }));
   };
 
   return (
@@ -187,168 +134,256 @@ function RouteComponent() {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-purple-800">
-            Posts for: {mockNote.title}
-          </h1>
+          <h1 className="text-2xl font-bold text-purple-800">Create Posts</h1>
           <p className="text-slate-600">
-            Manage your social media posts for this note
+            Generate platform-specific posts from your note
           </p>
         </div>
-        <Link to={`/notes/$id/create-posts`} params={{ id: params.id }}>
-          <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create More Posts
-          </Button>
-        </Link>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Source Note</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="p-4 bg-slate-50 rounded-lg border">
-            <p>{mockNote.content}</p>
-            <div className="mt-2 text-sm text-slate-500">
-              Created on {formatDate(mockNote.createdAt)}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Tabs
-        defaultValue="all"
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="mb-8"
-      >
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">All Posts</TabsTrigger>
-          <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
-          <TabsTrigger value="twitter">X (Twitter)</TabsTrigger>
-          <TabsTrigger value="draft">Drafts</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-          <TabsTrigger value="published">Published</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="m-0">
-          <div className="space-y-4">
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
-                <Card
-                  key={post.id}
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start gap-3">
-                        {getPlatformIcon(post.platform)}
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-medium">
-                              {getPlatformName(post.platform)}
-                            </h3>
-                            {getStatusBadge(post.status)}
-                          </div>
-                          <p className="text-sm text-slate-600 whitespace-pre-line">
-                            {post.content}
-                          </p>
-                          <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
-                            <Calendar className="h-3 w-3" />
-                            <span>Created: {formatDate(post.createdAt)}</span>
-
-                            {post.status === "scheduled" &&
-                              post.scheduledFor && (
-                                <>
-                                  <span>•</span>
-                                  <span>
-                                    Scheduled for:{" "}
-                                    {formatDate(post.scheduledFor)} at{" "}
-                                    {formatTime(post.scheduledFor)}
-                                  </span>
-                                </>
-                              )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <Link
-                              to={"/notes/$id/posts/$postId/edit"}
-                              params={{
-                                id: params.id,
-                                postId: post.id.toString(),
-                              }}
-                            >
-                              <DropdownMenuItem>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit Post
-                              </DropdownMenuItem>
-                            </Link>
-                            {post.status === "draft" && (
-                              <Link
-                                to={"/notes/$id/posts/$postId/schedule"}
-                                params={{
-                                  id: params.id,
-                                  postId: post.id.toString(),
-                                }}
-                              >
-                                <DropdownMenuItem>
-                                  <Calendar className="h-4 w-4 mr-2" />
-                                  Schedule Post
-                                </DropdownMenuItem>
-                              </Link>
-                            )}
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Post
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center py-12 text-slate-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mx-auto mb-4 text-slate-300"
-                >
-                  <path d="M17.5 22h.5c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <path d="M4 12a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H4Z" />
-                  <path d="M8 18v-4" />
-                  <path d="M12 18v-4" />
-                  <path d="M4 14h8" />
-                </svg>
-                <h3 className="text-lg font-medium mb-2">No posts found</h3>
-                <p>No posts match your current filter</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Source Note */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Source Note: {mockNote.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 rounded-lg border">
+                <div className="whitespace-pre-line">{mockNote.content}</div>
               </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+
+              <div className="space-y-2">
+                <Label>Target Platforms</Label>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="linkedin"
+                      checked={selectedPlatforms.linkedin}
+                      onCheckedChange={(checked) =>
+                        handlePlatformChange("linkedin", checked as boolean)
+                      }
+                    />
+                    <Label htmlFor="linkedin" className="text-sm font-normal">
+                      LinkedIn
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="twitter"
+                      checked={selectedPlatforms.twitter}
+                      onCheckedChange={(checked) =>
+                        handlePlatformChange("twitter", checked as boolean)
+                      }
+                    />
+                    <Label htmlFor="twitter" className="text-sm font-normal">
+                      X (Twitter)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="bluesky"
+                      checked={selectedPlatforms.bluesky}
+                      onCheckedChange={(checked) =>
+                        handlePlatformChange("bluesky", checked as boolean)
+                      }
+                    />
+                    <Label htmlFor="bluesky" className="text-sm font-normal">
+                      Bluesky
+                    </Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button
+              onClick={handleGenerate}
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              disabled={
+                isGenerating || !Object.values(selectedPlatforms).some(Boolean)
+              }
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Generate Platform Posts
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Generated Posts */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Generated Posts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              defaultValue="linkedin"
+              value={activeTab}
+              onValueChange={setActiveTab}
+            >
+              <TabsList className="grid grid-cols-3 mb-4">
+                <TabsTrigger
+                  value="linkedin"
+                  className="flex items-center gap-1"
+                  disabled={!selectedPlatforms.linkedin}
+                >
+                  <Linkedin className="h-4 w-4" />
+                  LinkedIn
+                </TabsTrigger>
+                <TabsTrigger
+                  value="twitter"
+                  className="flex items-center gap-1"
+                  disabled={!selectedPlatforms.twitter}
+                >
+                  <Twitter className="h-4 w-4" />X
+                </TabsTrigger>
+                <TabsTrigger
+                  value="bluesky"
+                  className="flex items-center gap-1"
+                  disabled={!selectedPlatforms.bluesky}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                  >
+                    <path
+                      d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  Bluesky
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="linkedin" className="m-0">
+                <div className="space-y-4">
+                  <Badge
+                    variant="outline"
+                    className="mb-2 bg-blue-50 border-blue-200"
+                  >
+                    <Linkedin className="h-3 w-3 mr-1 text-blue-600" />
+                    LinkedIn Format
+                  </Badge>
+
+                  <Textarea
+                    placeholder="LinkedIn post content will appear here"
+                    className="min-h-[250px]"
+                    value={generatedPosts.linkedin?.content || ""}
+                    onChange={(e) =>
+                      handlePostContentChange("linkedin", e.target.value)
+                    }
+                    disabled={!selectedPlatforms.linkedin || isGenerating}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="twitter" className="m-0">
+                <div className="space-y-4">
+                  <Badge
+                    variant="outline"
+                    className="mb-2 bg-sky-50 border-sky-200"
+                  >
+                    <Twitter className="h-3 w-3 mr-1 text-sky-500" />X Format
+                  </Badge>
+
+                  <Textarea
+                    placeholder="Twitter post content will appear here"
+                    className="min-h-[250px]"
+                    value={generatedPosts.twitter?.content || ""}
+                    onChange={(e) =>
+                      handlePostContentChange("twitter", e.target.value)
+                    }
+                    disabled={!selectedPlatforms.twitter || isGenerating}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="bluesky" className="m-0">
+                <div className="space-y-4">
+                  <Badge
+                    variant="outline"
+                    className="mb-2 bg-indigo-50 border-indigo-200"
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3 mr-1"
+                    >
+                      <path
+                        d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
+                        fill="#0085FF"
+                      />
+                    </svg>
+                    Bluesky Format
+                  </Badge>
+
+                  <Textarea
+                    placeholder="Bluesky post content will appear here"
+                    className="min-h-[250px]"
+                    value={generatedPosts.bluesky?.content || ""}
+                    onChange={(e) =>
+                      handlePostContentChange("bluesky", e.target.value)
+                    }
+                    disabled={!selectedPlatforms.bluesky || isGenerating}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+          <CardFooter className="flex justify-between gap-4">
+            <Button
+              variant="outline"
+              onClick={handleGenerate}
+              disabled={
+                isGenerating || !Object.values(selectedPlatforms).some(Boolean)
+              }
+            >
+              Regenerate
+            </Button>
+            <Button
+              className="bg-purple-600 hover:bg-purple-700"
+              onClick={handleSavePosts}
+              disabled={
+                isSaving ||
+                !Object.keys(selectedPlatforms).some(
+                  (platform) =>
+                    selectedPlatforms[
+                      platform as keyof typeof selectedPlatforms
+                    ] && generatedPosts[platform]?.content
+                )
+              }
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Posts
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
     </main>
   );
 }
