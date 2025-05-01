@@ -17,23 +17,21 @@ import { Linkedin, Twitter } from "lucide-react";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { getNoteService } from "@/api/note.service";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
 });
 
-// Mock data for the note
-const mockNote = {
-  id: 1,
-  title: "Next.js Server Actions",
-  content:
-    "Server Actions are a Next.js feature built on top of React Actions. They allow you to define async server functions that can be called directly from your components. This eliminates the need for API endpoints!\n\nKey features:\n- No need for API routes\n- Progressive enhancement\n- Works with and without JavaScript\n- Form handling is much simpler\n- Built-in security against CSRF attacks\n\nExample usage:\n```tsx\n'use server'\n\nasync function submitForm(formData: FormData) {\n  // Server-side code here\n  const name = formData.get('name')\n  await saveToDatabase({ name })\n}\n```\n\nThis is a game-changer for building forms and mutations in Next.js applications.",
-  createdAt: "2023-04-05T14:30:00Z",
-  status: "active",
-};
-
 function RouteComponent() {
   const params = Route.useParams();
+
+  const { data: note } = useQuery({
+    queryKey: [`note-${params.id}`],
+    queryFn: async () => getNoteService(params.id),
+  });
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("linkedin");
@@ -145,53 +143,51 @@ function RouteComponent() {
         {/* Source Note */}
         <Card>
           <CardHeader>
-            <CardTitle>Source Note: {mockNote.title}</CardTitle>
+            <CardTitle>Source Note: {note?.title}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="p-4 bg-slate-50 rounded-lg border">
-                <div className="whitespace-pre-line">{mockNote.content}</div>
-              </div>
+          <CardContent className="flex-1 flex flex-col justify-between">
+            <div className="p-4 bg-slate-50 rounded-lg border">
+              <div className="whitespace-pre-line">{note?.content}</div>
+            </div>
 
-              <div className="space-y-2">
-                <Label>Target Platforms</Label>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="linkedin"
-                      checked={selectedPlatforms.linkedin}
-                      onCheckedChange={(checked) =>
-                        handlePlatformChange("linkedin", checked as boolean)
-                      }
-                    />
-                    <Label htmlFor="linkedin" className="text-sm font-normal">
-                      LinkedIn
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="twitter"
-                      checked={selectedPlatforms.twitter}
-                      onCheckedChange={(checked) =>
-                        handlePlatformChange("twitter", checked as boolean)
-                      }
-                    />
-                    <Label htmlFor="twitter" className="text-sm font-normal">
-                      X (Twitter)
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="bluesky"
-                      checked={selectedPlatforms.bluesky}
-                      onCheckedChange={(checked) =>
-                        handlePlatformChange("bluesky", checked as boolean)
-                      }
-                    />
-                    <Label htmlFor="bluesky" className="text-sm font-normal">
-                      Bluesky
-                    </Label>
-                  </div>
+            <div className="space-y-2">
+              <Label>Target Platforms</Label>
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="linkedin"
+                    checked={selectedPlatforms.linkedin}
+                    onCheckedChange={(checked) =>
+                      handlePlatformChange("linkedin", checked as boolean)
+                    }
+                  />
+                  <Label htmlFor="linkedin" className="text-sm font-normal">
+                    LinkedIn
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="twitter"
+                    checked={selectedPlatforms.twitter}
+                    onCheckedChange={(checked) =>
+                      handlePlatformChange("twitter", checked as boolean)
+                    }
+                  />
+                  <Label htmlFor="twitter" className="text-sm font-normal">
+                    X (Twitter)
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="bluesky"
+                    checked={selectedPlatforms.bluesky}
+                    onCheckedChange={(checked) =>
+                      handlePlatformChange("bluesky", checked as boolean)
+                    }
+                  />
+                  <Label htmlFor="bluesky" className="text-sm font-normal">
+                    Bluesky
+                  </Label>
                 </div>
               </div>
             </div>

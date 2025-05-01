@@ -33,6 +33,16 @@ export class NotesService {
     return newNote;
   }
 
+  getNoteById(userId: string, noteId: string) {
+    return this.prisma.note.findFirst({
+      where: {
+        id: noteId,
+        userId,
+        isDeleted: false,
+      },
+    });
+  }
+
   updateNote(userId: string, noteId: string, note) {
     return this.prisma.note.update({
       where: {
