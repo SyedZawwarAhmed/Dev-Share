@@ -1,4 +1,4 @@
-import { Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { JwtOAuthGuard } from 'src/auth/jwt/jwt.oauth.guard';
 
@@ -16,6 +16,12 @@ export class NotesController {
   @Post('add-note')
   addNote(@Req() req) {
     return this.notesService.addNote(req.user.id, req?.body);
+  }
+
+  @UseGuards(JwtOAuthGuard)
+  @Get(':id')
+  getNoteById(@Req() req) {
+    return this.notesService.getNoteById(req.user.id, req?.params?.id);
   }
 
   @UseGuards(JwtOAuthGuard)

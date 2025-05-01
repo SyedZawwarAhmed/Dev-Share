@@ -10,12 +10,12 @@ export const addNoteService = async (note: CreateNotePayload) => {
   return data.data;
 };
 
-export const getNote = async (id: string) => {
+export const getNoteService = async (id: string) => {
   const data = await apiService.get<Note>(`/notes/${id}`);
   return data.data;
 };
 
-export const updateNote = async (id: string, note: Note) => {
+export const updateNoteService = async (id: string, note: Note) => {
   const data = await apiService.put<Note>(`/notes/${id}`, note);
   return data.data;
 };
