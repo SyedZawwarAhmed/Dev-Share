@@ -8,6 +8,7 @@ import { LocalStrategy } from './local/local.strategy';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GoogleModule } from './google/google.module';
 import { JwtStrategy } from './jwt/jwt.strategy';
+import { LinkedinModule } from './linkedin/linkedin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { JwtStrategy } from './jwt/jwt.strategy';
     }),
     // JwtModule,
     GoogleModule,
+    LinkedinModule,
   ],
   controllers: [AuthController],
   providers: [

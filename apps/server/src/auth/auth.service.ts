@@ -102,6 +102,59 @@ export class AuthService {
     return this.login(user);
   }
 
+  async linkedinLogin(profile: any) {
+    const { email, firstName, lastName, profileImage, accessToken } = profile;
+
+    // Find or create user
+    const user = await this.prisma.user.upsert({
+      where: { email },
+      create: {
+        email,
+        firstName,
+        lastName,
+        profileImage,
+        isEmailVerified: true,
+        accounts: {
+          create: {
+            type: 'oauth',
+            provider: AuthProvider.LINKEDIN,
+            providerAccountId: email,
+            access_token: accessToken,
+          },
+        },
+      },
+      update: {
+        firstName,
+        lastName,
+        profileImage,
+        accounts: {
+          upsert: {
+            where: {
+              provider_providerAccountId: {
+                provider: AuthProvider.LINKEDIN,
+                providerAccountId: email,
+              },
+            },
+            create: {
+              type: 'oauth',
+              provider: AuthProvider.LINKEDIN,
+              providerAccountId: email,
+              access_token: accessToken,
+            },
+            update: {
+              access_token: accessToken,
+            },
+          },
+        },
+      },
+      include: {
+        accounts: true,
+      },
+    });
+
+    return this.login(user);
+  }
+
   async signup(
     email: string,
     password: string,
