@@ -133,11 +133,6 @@ export class AuthService {
       },
     });
 
-    console.log(
-      '\n\n ---> apps/server/src/auth/auth.service.ts:136 -> user: ',
-      user,
-    );
-
     return this.login(user);
   }
 
