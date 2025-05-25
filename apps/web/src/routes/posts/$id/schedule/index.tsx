@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import PlatformAuthModal from "@/components/platform-auth-modal";
 import { toast } from "sonner";
 
 // Mock data for the post
@@ -28,7 +29,7 @@ const mockPost = {
   id: 102,
   noteId: 1,
   noteTitle: "Next.js Server Actions",
-  platform: "twitter",
+  platform: "twitter" as const,
   content:
     "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
   status: "draft",
@@ -36,17 +37,37 @@ const mockPost = {
   updatedAt: "2023-04-05T16:45:00Z",
 };
 
+// Mock auth status - in real app this would come from your auth state
+const mockAuthStatus = {
+  linkedin: true,
+  twitter: false,
+  bluesky: false,
+};
+
 export const Route = createFileRoute("/posts/$id/schedule/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  // const params = Route.useParams();
   const [isScheduling, setIsScheduling] = useState(false);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [timeZone, setTimeZone] = useState("America/New_York");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    mockAuthStatus[mockPost.platform],
+  );
 
   const handleSchedule = () => {
+    // Check if user is authenticated for this platform
+    if (!isAuthenticated) {
+      // Store the current page URL for redirect after auth
+      localStorage.setItem("auth_redirect_url", window.location.href);
+      setShowAuthModal(true);
+      return;
+    }
+
     if (!date || !time) {
       toast("Missing information", {
         description: "Please select both a date and time for scheduling.",
@@ -64,6 +85,13 @@ function RouteComponent() {
       // In a real app, redirect back to the posts list
       window.location.href = "/posts";
     }, 1500);
+  };
+
+  const handleAuthComplete = () => {
+    setIsAuthenticated(true);
+    toast("Account connected", {
+      description: `Your ${mockPost.platform} account is now connected.`,
+    });
   };
 
   const getPlatformIcon = (platform: string) => {
@@ -134,6 +162,36 @@ function RouteComponent() {
         </div>
       </div>
 
+      {!isAuthenticated && (
+        <Card className="mb-6 border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-amber-100 rounded-lg">
+                <Calendar className="h-5 w-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-amber-800 mb-1">
+                  Authorization Required
+                </h3>
+                <p className="text-sm text-amber-700 mb-3">
+                  You need to connect your {mockPost.platform} account before
+                  you can schedule posts.
+                </p>
+                <Button
+                  onClick={() => setShowAuthModal(true)}
+                  size="sm"
+                  className="bg-amber-600 hover:bg-amber-700"
+                >
+                  Connect{" "}
+                  {mockPost.platform === "twitter" ? "X" : mockPost.platform}{" "}
+                  Account
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -169,6 +227,7 @@ function RouteComponent() {
                     min={today}
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
+                    disabled={!isAuthenticated}
                   />
                 </div>
               </div>
@@ -183,13 +242,18 @@ function RouteComponent() {
                     className="pl-10"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
+                    disabled={!isAuthenticated}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="timezone">Time Zone</Label>
-                <Select value={timeZone} onValueChange={setTimeZone}>
+                <Select
+                  value={timeZone}
+                  onValueChange={setTimeZone}
+                  disabled={!isAuthenticated}
+                >
                   <SelectTrigger id="timezone">
                     <SelectValue placeholder="Select time zone" />
                   </SelectTrigger>
@@ -229,13 +293,15 @@ function RouteComponent() {
             <Button
               onClick={handleSchedule}
               className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-              disabled={isScheduling || !date || !time}
+              disabled={isScheduling || (!isAuthenticated && !showAuthModal)}
             >
               {isScheduling ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Scheduling...
                 </>
+              ) : !isAuthenticated ? (
+                "Connect Account First"
               ) : (
                 <>
                   <Calendar className="mr-2 h-4 w-4" />
@@ -246,6 +312,13 @@ function RouteComponent() {
           </CardFooter>
         </Card>
       </div>
+
+      <PlatformAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        platform={mockPost.platform}
+        onAuthComplete={handleAuthComplete}
+      />
     </main>
   );
 }

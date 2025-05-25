@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { NotesModule } from './notes/notes.module';
 import { ConfigModule } from '@nestjs/config';
+import { GeminiModule } from './gemini/gemini.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     PrismaModule,
     NotesModule,
+    GeminiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

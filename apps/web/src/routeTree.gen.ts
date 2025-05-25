@@ -25,8 +25,6 @@ import { Route as PostsIdEditIndexImport } from './routes/posts/$id/edit/index'
 import { Route as NotesIdPostsIndexImport } from './routes/notes/$id/posts/index'
 import { Route as NotesIdEditIndexImport } from './routes/notes/$id/edit/index'
 import { Route as NotesIdCreatePostsIndexImport } from './routes/notes/$id/create-posts/index'
-import { Route as NotesIdPostsPostIdScheduleIndexImport } from './routes/notes/$id/posts/$postId/schedule/index'
-import { Route as NotesIdPostsPostIdEditIndexImport } from './routes/notes/$id/posts/$postId/edit/index'
 
 // Create/Update Routes
 
@@ -113,20 +111,6 @@ const NotesIdCreatePostsIndexRoute = NotesIdCreatePostsIndexImport.update({
   path: '/notes/$id/create-posts/',
   getParentRoute: () => rootRoute,
 } as any)
-
-const NotesIdPostsPostIdScheduleIndexRoute =
-  NotesIdPostsPostIdScheduleIndexImport.update({
-    id: '/notes/$id/posts/$postId/schedule/',
-    path: '/notes/$id/posts/$postId/schedule/',
-    getParentRoute: () => rootRoute,
-  } as any)
-
-const NotesIdPostsPostIdEditIndexRoute =
-  NotesIdPostsPostIdEditIndexImport.update({
-    id: '/notes/$id/posts/$postId/edit/',
-    path: '/notes/$id/posts/$postId/edit/',
-    getParentRoute: () => rootRoute,
-  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -230,20 +214,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsIdScheduleIndexImport
       parentRoute: typeof rootRoute
     }
-    '/notes/$id/posts/$postId/edit/': {
-      id: '/notes/$id/posts/$postId/edit/'
-      path: '/notes/$id/posts/$postId/edit'
-      fullPath: '/notes/$id/posts/$postId/edit'
-      preLoaderRoute: typeof NotesIdPostsPostIdEditIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/notes/$id/posts/$postId/schedule/': {
-      id: '/notes/$id/posts/$postId/schedule/'
-      path: '/notes/$id/posts/$postId/schedule'
-      fullPath: '/notes/$id/posts/$postId/schedule'
-      preLoaderRoute: typeof NotesIdPostsPostIdScheduleIndexImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -264,8 +234,6 @@ export interface FileRoutesByFullPath {
   '/notes/$id/posts': typeof NotesIdPostsIndexRoute
   '/posts/$id/edit': typeof PostsIdEditIndexRoute
   '/posts/$id/schedule': typeof PostsIdScheduleIndexRoute
-  '/notes/$id/posts/$postId/edit': typeof NotesIdPostsPostIdEditIndexRoute
-  '/notes/$id/posts/$postId/schedule': typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -283,8 +251,6 @@ export interface FileRoutesByTo {
   '/notes/$id/posts': typeof NotesIdPostsIndexRoute
   '/posts/$id/edit': typeof PostsIdEditIndexRoute
   '/posts/$id/schedule': typeof PostsIdScheduleIndexRoute
-  '/notes/$id/posts/$postId/edit': typeof NotesIdPostsPostIdEditIndexRoute
-  '/notes/$id/posts/$postId/schedule': typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 export interface FileRoutesById {
@@ -303,8 +269,6 @@ export interface FileRoutesById {
   '/notes/$id/posts/': typeof NotesIdPostsIndexRoute
   '/posts/$id/edit/': typeof PostsIdEditIndexRoute
   '/posts/$id/schedule/': typeof PostsIdScheduleIndexRoute
-  '/notes/$id/posts/$postId/edit/': typeof NotesIdPostsPostIdEditIndexRoute
-  '/notes/$id/posts/$postId/schedule/': typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -324,8 +288,6 @@ export interface FileRouteTypes {
     | '/notes/$id/posts'
     | '/posts/$id/edit'
     | '/posts/$id/schedule'
-    | '/notes/$id/posts/$postId/edit'
-    | '/notes/$id/posts/$postId/schedule'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -342,8 +304,6 @@ export interface FileRouteTypes {
     | '/notes/$id/posts'
     | '/posts/$id/edit'
     | '/posts/$id/schedule'
-    | '/notes/$id/posts/$postId/edit'
-    | '/notes/$id/posts/$postId/schedule'
   id:
     | '__root__'
     | '/'
@@ -360,8 +320,6 @@ export interface FileRouteTypes {
     | '/notes/$id/posts/'
     | '/posts/$id/edit/'
     | '/posts/$id/schedule/'
-    | '/notes/$id/posts/$postId/edit/'
-    | '/notes/$id/posts/$postId/schedule/'
   fileRoutesById: FileRoutesById
 }
 
@@ -380,8 +338,6 @@ export interface RootRouteChildren {
   NotesIdPostsIndexRoute: typeof NotesIdPostsIndexRoute
   PostsIdEditIndexRoute: typeof PostsIdEditIndexRoute
   PostsIdScheduleIndexRoute: typeof PostsIdScheduleIndexRoute
-  NotesIdPostsPostIdEditIndexRoute: typeof NotesIdPostsPostIdEditIndexRoute
-  NotesIdPostsPostIdScheduleIndexRoute: typeof NotesIdPostsPostIdScheduleIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -399,8 +355,6 @@ const rootRouteChildren: RootRouteChildren = {
   NotesIdPostsIndexRoute: NotesIdPostsIndexRoute,
   PostsIdEditIndexRoute: PostsIdEditIndexRoute,
   PostsIdScheduleIndexRoute: PostsIdScheduleIndexRoute,
-  NotesIdPostsPostIdEditIndexRoute: NotesIdPostsPostIdEditIndexRoute,
-  NotesIdPostsPostIdScheduleIndexRoute: NotesIdPostsPostIdScheduleIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -426,9 +380,7 @@ export const routeTree = rootRoute
         "/notes/$id/edit/",
         "/notes/$id/posts/",
         "/posts/$id/edit/",
-        "/posts/$id/schedule/",
-        "/notes/$id/posts/$postId/edit/",
-        "/notes/$id/posts/$postId/schedule/"
+        "/posts/$id/schedule/"
       ]
     },
     "/": {
@@ -472,12 +424,6 @@ export const routeTree = rootRoute
     },
     "/posts/$id/schedule/": {
       "filePath": "posts/$id/schedule/index.tsx"
-    },
-    "/notes/$id/posts/$postId/edit/": {
-      "filePath": "notes/$id/posts/$postId/edit/index.tsx"
-    },
-    "/notes/$id/posts/$postId/schedule/": {
-      "filePath": "notes/$id/posts/$postId/schedule/index.tsx"
     }
   }
 }

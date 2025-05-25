@@ -86,7 +86,7 @@ function RouteComponent() {
     activeTab === "all"
       ? mockPosts
       : mockPosts.filter(
-          (post) => post.status === activeTab || post.platform === activeTab
+          (post) => post.status === activeTab || post.platform === activeTab,
         );
 
   const getPlatformIcon = (platform: string) => {
@@ -290,10 +290,9 @@ function RouteComponent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <Link
-                              to={`/notes/$id/posts/$postId/edit`}
+                              to={`/posts/$id/edit`}
                               params={{
-                                id: params.id,
-                                postId: post.id.toString(),
+                                id: post.id.toString(),
                               }}
                             >
                               <DropdownMenuItem>
@@ -303,10 +302,9 @@ function RouteComponent() {
                             </Link>
                             {post.status === "draft" && (
                               <Link
-                                to={"/notes/$id/posts/$postId/schedule"}
+                                to={"/posts/$id/schedule"}
                                 params={{
-                                  id: params.id,
-                                  postId: post.id.toString(),
+                                  id: post.id.toString(),
                                 }}
                               >
                                 <DropdownMenuItem>

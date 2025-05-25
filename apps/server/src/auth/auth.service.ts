@@ -120,6 +120,7 @@ export class AuthService {
               type: 'oauth',
               provider: AuthProvider.LINKEDIN,
               providerAccountId: email,
+
               access_token: accessToken,
             },
             update: {
