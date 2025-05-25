@@ -17,8 +17,9 @@ import { Linkedin, Twitter } from "lucide-react";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
+import { generatePostsService } from "@/api/gemini.service";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
@@ -32,56 +33,45 @@ function RouteComponent() {
     queryFn: async () => getNoteService(params.id),
   });
 
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("linkedin");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
     linkedin: true,
-    twitter: true,
+    x: true,
     bluesky: false,
   });
-  const [generatedPosts, setGeneratedPosts] = useState<{
-    [key: string]: {
-      content: string;
-      status: "draft" | "scheduled" | "published";
-    };
-  }>({
-    linkedin: { content: "", status: "draft" },
-    twitter: { content: "", status: "draft" },
-    bluesky: { content: "", status: "draft" },
+  const [generatedPosts, setGeneratedPosts] = useState({
+    linkedin: { post_content: "" },
+    x: { post_content: "" },
+    bluesky: { post_content: "" },
   });
 
-  const handleGenerate = () => {
-    setIsGenerating(true);
-    // Simulate AI generation with platform-specific content
-    setTimeout(() => {
-      setGeneratedPosts({
-        linkedin: {
-          content:
-            "I recently explored Next.js Server Actions and discovered significant performance benefits.\n\nKey advantages include:\n• No need for API routes\n• Progressive enhancement\n• Works with and without JavaScript\n• Simplified form handling\n• Built-in CSRF protection\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Actions into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
-          status: "draft",
-        },
-        twitter: {
-          content:
-            "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
-          status: "draft",
-        },
-        bluesky: {
-          content:
-            "TIL: Next.js Server Actions are changing how we build web apps 💻\n\nThey let you define async server functions that can be called directly from your components, which means:\n- No more API routes needed\n- Progressive enhancement built-in\n- Much simpler form handling\n\nThe coolest part? They work even without JavaScript enabled!\n\n#WebDev #React #NextJS",
-          status: "draft",
-        },
+  const { mutateAsync: generatePosts, isPending: isGenerating } = useMutation({
+    mutationFn: generatePostsService,
+    onSuccess: (data) => {
+      setActiveTab(Object.keys(data)[0] as Platform);
+      setSelectedPlatforms({
+        linkedin: !!data?.linkedin?.post_content,
+        x: !!data?.x?.post_content,
+        bluesky: !!data?.bluesky?.post_content,
       });
-      setIsGenerating(false);
-    }, 2000);
-  };
+      setGeneratedPosts(data);
+    },
+    onError: (error) => {
+      console.log(
+        "\n\n ---> apps/web/src/routes/notes/$id/create-posts/index.tsx:69 -> error: ",
+        error,
+      );
+      toast.error("Failed to generate post. Please try again.");
+    },
+  });
 
   const handleSavePosts = () => {
     // Validate that at least one platform is selected and has content
     const hasContent = Object.keys(selectedPlatforms).some(
       (platform) =>
-        selectedPlatforms[platform as keyof typeof selectedPlatforms] &&
-        generatedPosts[platform]?.content
+        selectedPlatforms[platform as Platform] &&
+        generatedPosts[platform as Platform]?.post_content,
     );
 
     if (!hasContent) {
@@ -111,10 +101,10 @@ function RouteComponent() {
     }));
   };
 
-  const handlePostContentChange = (platform: string, content: string) => {
+  const handlePostContentChange = (platform: Platform, content: string) => {
     setGeneratedPosts((prev) => ({
       ...prev,
-      [platform]: { ...prev[platform], content },
+      [platform]: { ...prev[platform], post_content: content },
     }));
   };
 
@@ -167,13 +157,13 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="twitter"
-                    checked={selectedPlatforms.twitter}
+                    id="x"
+                    checked={selectedPlatforms.x}
                     onCheckedChange={(checked) =>
-                      handlePlatformChange("twitter", checked as boolean)
+                      handlePlatformChange("x", checked as boolean)
                     }
                   />
-                  <Label htmlFor="twitter" className="text-sm font-normal">
+                  <Label htmlFor="x" className="text-sm font-normal">
                     X (Twitter)
                   </Label>
                 </div>
@@ -194,7 +184,17 @@ function RouteComponent() {
           </CardContent>
           <CardFooter>
             <Button
-              onClick={handleGenerate}
+              onClick={() =>
+                generatePosts({
+                  content: note?.content ?? "",
+                  platforms: Object.keys(selectedPlatforms).filter(
+                    (platform) =>
+                      selectedPlatforms[
+                        platform as keyof typeof selectedPlatforms
+                      ],
+                  ) as ("linkedin" | "x" | "bluesky")[],
+                })
+              }
               className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
               disabled={
                 isGenerating || !Object.values(selectedPlatforms).some(Boolean)
@@ -236,9 +236,9 @@ function RouteComponent() {
                   LinkedIn
                 </TabsTrigger>
                 <TabsTrigger
-                  value="twitter"
+                  value="x"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.twitter}
+                  disabled={!selectedPlatforms.x}
                 >
                   <Twitter className="h-4 w-4" />X
                 </TabsTrigger>
@@ -277,7 +277,7 @@ function RouteComponent() {
                   <Textarea
                     placeholder="LinkedIn post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.linkedin?.content || ""}
+                    value={generatedPosts.linkedin?.post_content || ""}
                     onChange={(e) =>
                       handlePostContentChange("linkedin", e.target.value)
                     }
@@ -286,7 +286,7 @@ function RouteComponent() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="twitter" className="m-0">
+              <TabsContent value="x" className="m-0">
                 <div className="space-y-4">
                   <Badge
                     variant="outline"
@@ -296,13 +296,13 @@ function RouteComponent() {
                   </Badge>
 
                   <Textarea
-                    placeholder="Twitter post content will appear here"
+                    placeholder="X post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.twitter?.content || ""}
+                    value={generatedPosts.x?.post_content || ""}
                     onChange={(e) =>
-                      handlePostContentChange("twitter", e.target.value)
+                      handlePostContentChange("x", e.target.value)
                     }
-                    disabled={!selectedPlatforms.twitter || isGenerating}
+                    disabled={!selectedPlatforms.x || isGenerating}
                   />
                 </div>
               </TabsContent>
@@ -332,7 +332,7 @@ function RouteComponent() {
                   <Textarea
                     placeholder="Bluesky post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.bluesky?.content || ""}
+                    value={generatedPosts.bluesky?.post_content || ""}
                     onChange={(e) =>
                       handlePostContentChange("bluesky", e.target.value)
                     }
@@ -345,7 +345,17 @@ function RouteComponent() {
           <CardFooter className="flex justify-between gap-4">
             <Button
               variant="outline"
-              onClick={handleGenerate}
+              onClick={() =>
+                generatePosts({
+                  content: note?.content ?? "",
+                  platforms: Object.keys(selectedPlatforms).filter(
+                    (platform) =>
+                      selectedPlatforms[
+                        platform as keyof typeof selectedPlatforms
+                      ],
+                  ) as ("linkedin" | "x" | "bluesky")[],
+                })
+              }
               disabled={
                 isGenerating || !Object.values(selectedPlatforms).some(Boolean)
               }
@@ -359,9 +369,8 @@ function RouteComponent() {
                 isSaving ||
                 !Object.keys(selectedPlatforms).some(
                   (platform) =>
-                    selectedPlatforms[
-                      platform as keyof typeof selectedPlatforms
-                    ] && generatedPosts[platform]?.content
+                    selectedPlatforms[platform as Platform] &&
+                    generatedPosts[platform as Platform]?.post_content,
                 )
               }
             >

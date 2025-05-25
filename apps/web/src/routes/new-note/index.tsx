@@ -206,7 +206,7 @@ function RouteComponent() {
                       selectedPlatforms[
                         platform as keyof typeof selectedPlatforms
                       ],
-                  ) as ("Linkedin" | "X" | "Bluesky")[],
+                  ) as ("linkedin" | "x" | "bluesky")[],
                 })
               }
               className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
