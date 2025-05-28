@@ -71,7 +71,7 @@ function RouteComponent() {
     onError: (error) => {
       console.error(
         "\n\n ---> apps/web/src/routes/notes.tsx:100 -> error: ",
-        error
+        error,
       );
       toast.error("Failed to delete note. Please try again.");
     },

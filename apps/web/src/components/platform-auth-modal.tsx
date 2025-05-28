@@ -15,14 +15,14 @@ import { Linkedin, Twitter } from "lucide-react";
 interface PlatformAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  platform: "linkedin" | "twitter" | "bluesky";
+  platform: Platform;
   onAuthComplete: () => void;
 }
 
 // Mock auth status - in real app this would come from your auth state
 const mockAuthStatus = {
   linkedin: true,
-  twitter: false,
+  x: false,
   bluesky: false,
 };
 
@@ -44,7 +44,7 @@ export default function PlatformAuthModal({
         "Connect your LinkedIn account to share professional content with your network.",
       permissions: ["Post on your behalf", "Access basic profile information"],
     },
-    twitter: {
+    x: {
       name: "X (Twitter)",
       icon: <Twitter className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
@@ -88,7 +88,7 @@ export default function PlatformAuthModal({
     }, 1000);
   };
 
-  const getAuthUrl = (platform: string) => {
+  const getAuthUrl = (platform: Platform) => {
     // In a real app, these would be your actual OAuth URLs
     const baseUrl = window.location.origin;
     const redirectUri = `${baseUrl}/auth/callback/${platform}`;
@@ -96,7 +96,7 @@ export default function PlatformAuthModal({
     switch (platform) {
       case "linkedin":
         return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=w_member_social`;
-      case "twitter":
+      case "x":
         return `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.write%20users.read`;
       case "bluesky":
         return `${baseUrl}/auth/bluesky?redirect_uri=${encodeURIComponent(redirectUri)}`;

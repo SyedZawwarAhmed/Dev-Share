@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, Save, Wand2 } from "lucide-react";
+import { ArrowLeft, Loader2, Wand2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,6 +20,8 @@ import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
 import { generatePostsService } from "@/api/gemini.service";
+import SavePostsDropdown from "@/components/save-posts-dropdown";
+import ScheduleModal from "@/components/schedule-modal";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
@@ -33,6 +35,7 @@ function RouteComponent() {
     queryFn: async () => getNoteService(params.id),
   });
 
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("linkedin");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
@@ -66,8 +69,7 @@ function RouteComponent() {
     },
   });
 
-  const handleSavePosts = () => {
-    // Validate that at least one platform is selected and has content
+  const handleSaveDraft = () => {
     const hasContent = Object.keys(selectedPlatforms).some(
       (platform) =>
         selectedPlatforms[platform as Platform] &&
@@ -83,13 +85,11 @@ function RouteComponent() {
     }
 
     setIsSaving(true);
-    // Simulate saving posts
     setTimeout(() => {
-      toast("Posts created", {
+      toast("Posts saved as drafts", {
         description: "Your posts have been saved successfully.",
       });
       setIsSaving(false);
-      // In a real app, redirect to the posts list
       window.location.href = `/notes/${params.id}/posts`;
     }, 1500);
   };
@@ -107,6 +107,43 @@ function RouteComponent() {
       [platform]: { ...prev[platform], post_content: content },
     }));
   };
+
+  const handleSchedule = () => {
+    setShowScheduleModal(true);
+  };
+
+  const handleScheduleConfirm = (
+    date: string,
+    time: string,
+    timezone: string,
+  ) => {
+    setIsSaving(true);
+    setTimeout(() => {
+      toast("Posts scheduled", {
+        description: `Your posts have been scheduled for ${date} at ${time} (${timezone}).`,
+      });
+      setIsSaving(false);
+      setShowScheduleModal(false);
+      window.location.href = `/notes/${params.id}/posts`;
+    }, 1500);
+  };
+
+  const handlePostNow = () => {
+    setIsSaving(true);
+    setTimeout(() => {
+      toast("Posts published", {
+        description: "Your posts have been published successfully.",
+      });
+      setIsSaving(false);
+      window.location.href = `/notes/${params.id}/posts`;
+    }, 1500);
+  };
+
+  const hasContent = Object.keys(selectedPlatforms).some(
+    (platform) =>
+      selectedPlatforms[platform as Platform] &&
+      generatedPosts[platform as Platform]?.post_content,
+  );
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -362,33 +399,23 @@ function RouteComponent() {
             >
               Regenerate
             </Button>
-            <Button
-              className="bg-purple-600 hover:bg-purple-700"
-              onClick={handleSavePosts}
-              disabled={
-                isSaving ||
-                !Object.keys(selectedPlatforms).some(
-                  (platform) =>
-                    selectedPlatforms[platform as Platform] &&
-                    generatedPosts[platform as Platform]?.post_content,
-                )
-              }
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Posts
-                </>
-              )}
-            </Button>
+            <SavePostsDropdown
+              onSaveDraft={handleSaveDraft}
+              onSchedule={handleSchedule}
+              onPostNow={handlePostNow}
+              isLoading={isSaving}
+              selectedPlatforms={selectedPlatforms}
+              hasContent={hasContent}
+            />
           </CardFooter>
         </Card>
       </div>
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={handleScheduleConfirm}
+        isLoading={isSaving}
+      />
     </main>
   );
 }

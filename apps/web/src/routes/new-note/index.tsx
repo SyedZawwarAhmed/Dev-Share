@@ -1,5 +1,7 @@
 import { generatePostsService } from "@/api/gemini.service";
 import { addNoteService } from "@/api/note.service";
+import SavePostsDropdown from "@/components/save-posts-dropdown";
+import ScheduleModal from "@/components/schedule-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +44,10 @@ function RouteComponent() {
     x: true,
     bluesky: false,
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [title] = useState("");
+  const [notes] = useState("");
 
   const {
     data: generatedPosts,
@@ -99,6 +105,59 @@ function RouteComponent() {
       [platform]: checked,
     }));
   };
+
+  const handleSchedule = () => {
+    if (!title || !notes) {
+      toast("Missing information", {
+        description:
+          "Please provide both a title and notes before scheduling posts.",
+      });
+      return;
+    }
+
+    setShowScheduleModal(true);
+  };
+
+  const handleScheduleConfirm = (
+    date: string,
+    time: string,
+    timezone: string,
+  ) => {
+    setIsSaving(true);
+    setTimeout(() => {
+      toast("Note saved and posts scheduled", {
+        description: `Your note has been saved and posts scheduled for ${date} at ${time} (${timezone}).`,
+      });
+      setIsSaving(false);
+      setShowScheduleModal(false);
+      window.location.href = "/notes";
+    }, 1500);
+  };
+
+  const handlePostNow = () => {
+    if (!title || !notes) {
+      toast("Missing information", {
+        description: "Please provide both a title and notes before posting.",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    setTimeout(() => {
+      toast("Note saved and posts published", {
+        description:
+          "Your note has been saved and posts published successfully.",
+      });
+      setIsSaving(false);
+      window.location.href = "/notes";
+    }, 1500);
+  };
+
+  const hasContent = Object.keys(selectedPlatforms).some(
+    (platform) =>
+      selectedPlatforms[platform as Platform] &&
+      generatedPosts?.[platform as Platform],
+  );
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl">
@@ -361,17 +420,23 @@ function RouteComponent() {
             >
               Regenerate
             </Button>
-            <Button
-              className="bg-purple-600 hover:bg-purple-700"
-              disabled={
-                !generatedPosts?.[activeTab] || !selectedPlatforms?.[activeTab]
-              }
-            >
-              Schedule Post
-            </Button>
+            <SavePostsDropdown
+              onSaveDraft={handleSaveDraft}
+              onSchedule={handleSchedule}
+              onPostNow={handlePostNow}
+              isLoading={isSaving}
+              selectedPlatforms={selectedPlatforms}
+              hasContent={hasContent}
+            />
           </CardFooter>
         </Card>
       </div>
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={handleScheduleConfirm}
+        isLoading={isSaving}
+      />
     </main>
   );
 }
