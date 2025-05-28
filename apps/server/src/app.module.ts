@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { NotesModule } from './notes/notes.module';
 import { ConfigModule } from '@nestjs/config';
 import { GeminiModule } from './gemini/gemini.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { GeminiModule } from './gemini/gemini.module';
     PrismaModule,
     NotesModule,
     GeminiModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
