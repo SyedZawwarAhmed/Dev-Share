@@ -22,6 +22,7 @@ import { getNoteService } from "@/api/note.service";
 import { generatePostsService } from "@/api/gemini.service";
 import SavePostsDropdown from "@/components/save-posts-dropdown";
 import ScheduleModal from "@/components/schedule-modal";
+import { addPostService } from "@/api/post.service";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
@@ -36,7 +37,6 @@ function RouteComponent() {
   });
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("linkedin");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
     linkedin: true,
@@ -69,6 +69,23 @@ function RouteComponent() {
     },
   });
 
+  const { isPending: isSaving } = useMutation({
+    mutationFn: addPostService,
+    onSuccess: () => {
+      toast("Post created", {
+        description: "Your post has been created successfully.",
+      });
+      window.location.href = `/notes/${params.id}/posts`;
+    },
+    onError: (error) => {
+      console.log(
+        "\n\n ---> apps/web/src/routes/notes/$id/create-posts/index.tsx:69 -> error: ",
+        error,
+      );
+      toast.error("Failed to create post. Please try again.");
+    },
+  });
+
   const handleSaveDraft = () => {
     const hasContent = Object.keys(selectedPlatforms).some(
       (platform) =>
@@ -84,12 +101,10 @@ function RouteComponent() {
       return;
     }
 
-    setIsSaving(true);
     setTimeout(() => {
       toast("Posts saved as drafts", {
         description: "Your posts have been saved successfully.",
       });
-      setIsSaving(false);
       window.location.href = `/notes/${params.id}/posts`;
     }, 1500);
   };
@@ -117,24 +132,20 @@ function RouteComponent() {
     time: string,
     timezone: string,
   ) => {
-    setIsSaving(true);
     setTimeout(() => {
       toast("Posts scheduled", {
         description: `Your posts have been scheduled for ${date} at ${time} (${timezone}).`,
       });
-      setIsSaving(false);
       setShowScheduleModal(false);
       window.location.href = `/notes/${params.id}/posts`;
     }, 1500);
   };
 
   const handlePostNow = () => {
-    setIsSaving(true);
     setTimeout(() => {
       toast("Posts published", {
         description: "Your posts have been published successfully.",
       });
-      setIsSaving(false);
       window.location.href = `/notes/${params.id}/posts`;
     }, 1500);
   };
