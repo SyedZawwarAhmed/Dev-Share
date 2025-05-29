@@ -20,41 +20,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Linkedin, Twitter } from "lucide-react";
-
-// Mock data for the note
-const mockNote = {
-  id: 1,
-  title: "Next.js Server Actions",
-  content:
-    "Server Actions are a Next.js feature built on top of React Actions. They allow you to define async server functions that can be called directly from your components. This eliminates the need for API endpoints!",
-  createdAt: "2023-04-05T14:30:00Z",
-  status: "active",
-};
-
-// Mock data for posts
-const mockPosts = [
-  {
-    id: 101,
-    noteId: 1,
-    platform: "linkedin",
-    content:
-      "I recently explored Next.js Server Actions and discovered significant performance benefits.\n\nKey advantages include:\n• No need for API routes\n• Progressive enhancement\n• Works with and without JavaScript\n• Simplified form handling\n• Built-in CSRF protection\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Actions into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
-    status: "scheduled",
-    scheduledFor: "2023-04-07T15:00:00Z",
-    createdAt: "2023-04-05T16:30:00Z",
-    updatedAt: "2023-04-05T16:45:00Z",
-  },
-  {
-    id: 102,
-    noteId: 1,
-    platform: "twitter",
-    content:
-      "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
-    status: "draft",
-    createdAt: "2023-04-05T16:30:00Z",
-    updatedAt: "2023-04-05T16:45:00Z",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getNoteService } from "@/api/note.service";
+import { getPostsService } from "@/api/post.service";
 
 export const Route = createFileRoute("/notes/$id/posts/")({
   component: RouteComponent,
@@ -64,7 +32,18 @@ function RouteComponent() {
   const params = Route.useParams();
   const [activeTab, setActiveTab] = useState<string>("all");
 
-  const formatDate = (dateString: string) => {
+  const { data: note } = useQuery({
+    queryKey: [`note-${params.id}`],
+    queryFn: async () => getNoteService(params.id),
+  });
+
+  const { data: posts } = useQuery({
+    queryKey: ["posts"],
+    queryFn: getPostsService,
+  });
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -84,9 +63,15 @@ function RouteComponent() {
 
   const filteredPosts =
     activeTab === "all"
-      ? mockPosts
-      : mockPosts.filter(
-          (post) => post.status === activeTab || post.platform === activeTab,
+      ? posts
+      : posts?.filter(
+          (post) =>
+            (post.published
+              ? "published"
+              : post.scheduledFor
+                ? "scheduled"
+                : "draft") === activeTab ||
+            post.platform.toLowerCase() === activeTab.toLowerCase(),
         );
 
   const getPlatformIcon = (platform: string) => {
@@ -130,7 +115,7 @@ function RouteComponent() {
     switch (platform) {
       case "linkedin":
         return "LinkedIn";
-      case "twitter":
+      case "x":
         return "X (Twitter)";
       case "bluesky":
         return "Bluesky";
@@ -188,7 +173,7 @@ function RouteComponent() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-purple-800">
-            Posts for: {mockNote.title}
+            Posts for: {note?.title}
           </h1>
           <p className="text-slate-600">
             Manage your social media posts for this note
@@ -213,9 +198,9 @@ function RouteComponent() {
         </CardHeader>
         <CardContent>
           <div className="p-4 bg-slate-50 rounded-lg border">
-            <p>{mockNote.content}</p>
+            <p>{note?.content}</p>
             <div className="mt-2 text-sm text-slate-500">
-              Created on {formatDate(mockNote.createdAt)}
+              Created on {formatDate(note?.createdAt)}
             </div>
           </div>
         </CardContent>
@@ -238,8 +223,8 @@ function RouteComponent() {
 
         <TabsContent value={activeTab} className="m-0">
           <div className="space-y-4">
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
+            {(filteredPosts?.length ?? 0) > 0 ? (
+              filteredPosts?.map((post) => (
                 <Card
                   key={post.id}
                   className="hover:shadow-md transition-shadow"
@@ -253,7 +238,13 @@ function RouteComponent() {
                             <h3 className="font-medium">
                               {getPlatformName(post.platform)}
                             </h3>
-                            {getStatusBadge(post.status)}
+                            {getStatusBadge(
+                              post?.published
+                                ? "published"
+                                : post.scheduledFor
+                                  ? "scheduled"
+                                  : "draft",
+                            )}
                           </div>
                           <p className="text-sm text-slate-600 whitespace-pre-line">
                             {post.content}
@@ -262,17 +253,16 @@ function RouteComponent() {
                             <Calendar className="h-3 w-3" />
                             <span>Created: {formatDate(post.createdAt)}</span>
 
-                            {post.status === "scheduled" &&
-                              post.scheduledFor && (
-                                <>
-                                  <span>•</span>
-                                  <span>
-                                    Scheduled for:{" "}
-                                    {formatDate(post.scheduledFor)} at{" "}
-                                    {formatTime(post.scheduledFor)}
-                                  </span>
-                                </>
-                              )}
+                            {post.scheduledFor && (
+                              <>
+                                <span>•</span>
+                                <span>
+                                  Scheduled for:{" "}
+                                  {formatDate(post?.scheduledFor.toString())} at{" "}
+                                  {formatTime(post?.scheduledFor.toString())}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -300,7 +290,7 @@ function RouteComponent() {
                                 Edit Post
                               </DropdownMenuItem>
                             </Link>
-                            {post.status === "draft" && (
+                            {!post.published && !post.scheduledFor && (
                               <Link
                                 to={"/posts/$id/schedule"}
                                 params={{
