@@ -16,7 +16,7 @@ export class PostsService {
 
   addPost(userId: string, post) {
     const newPost = this.prisma.post.create({
-      data: post,
+      data: { ...post, platform: post.platform.toUpperCase(), userId },
     });
     return newPost;
   }

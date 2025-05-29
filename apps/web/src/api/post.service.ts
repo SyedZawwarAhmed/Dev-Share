@@ -1,12 +1,17 @@
 import apiService from "@/lib/api";
+import { createPostSchema } from "@/schemas/post.schema";
+import { z } from "zod";
 
 export const getPostsService = async () => {
   const data = await apiService.post<Post[]>("/posts");
   return data.data;
 };
 
-export const addPostService = async (post: CreatePostPayload) => {
-  const data = await apiService.post<Post>("/posts/add-post", post);
+export const addPostService = async (
+  post: z.infer<typeof createPostSchema>,
+) => {
+  const validatedPost = createPostSchema.parse(post);
+  const data = await apiService.post<Post>("/posts/add-post", validatedPost);
   return data.data;
 };
 

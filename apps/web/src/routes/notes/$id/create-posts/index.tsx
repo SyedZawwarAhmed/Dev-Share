@@ -23,6 +23,8 @@ import { generatePostsService } from "@/api/gemini.service";
 import SavePostsDropdown from "@/components/save-posts-dropdown";
 import ScheduleModal from "@/components/schedule-modal";
 import { addPostService } from "@/api/post.service";
+import { fromZodError } from "zod-validation-error";
+import { ZodError } from "zod";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
@@ -69,7 +71,7 @@ function RouteComponent() {
     },
   });
 
-  const { isPending: isSaving } = useMutation({
+  const { mutate: createPost, isPending: isSaving } = useMutation({
     mutationFn: addPostService,
     onSuccess: () => {
       toast("Post created", {
@@ -82,32 +84,36 @@ function RouteComponent() {
         "\n\n ---> apps/web/src/routes/notes/$id/create-posts/index.tsx:69 -> error: ",
         error,
       );
-      toast.error("Failed to create post. Please try again.");
+      if (error instanceof ZodError) {
+        toast.error(fromZodError(error).message);
+      } else {
+        toast.error(error.message);
+      }
     },
   });
 
-  const handleSaveDraft = () => {
-    const hasContent = Object.keys(selectedPlatforms).some(
-      (platform) =>
-        selectedPlatforms[platform as Platform] &&
-        generatedPosts[platform as Platform]?.post_content,
-    );
+  // const handleSaveDraft = () => {
+  //   const hasContent = Object.keys(selectedPlatforms).some(
+  //     (platform) =>
+  //       selectedPlatforms[platform as Platform] &&
+  //       generatedPosts[platform as Platform]?.post_content,
+  //   );
 
-    if (!hasContent) {
-      toast("No content to save", {
-        description:
-          "Please generate content for at least one platform before saving.",
-      });
-      return;
-    }
+  //   if (!hasContent) {
+  //     toast("No content to save", {
+  //       description:
+  //         "Please generate content for at least one platform before saving.",
+  //     });
+  //     return;
+  //   }
 
-    setTimeout(() => {
-      toast("Posts saved as drafts", {
-        description: "Your posts have been saved successfully.",
-      });
-      window.location.href = `/notes/${params.id}/posts`;
-    }, 1500);
-  };
+  //   setTimeout(() => {
+  //     toast("Posts saved as drafts", {
+  //       description: "Your posts have been saved successfully.",
+  //     });
+  //     window.location.href = `/notes/${params.id}/posts`;
+  //   }, 1500);
+  // };
 
   const handlePlatformChange = (platform: string, checked: boolean) => {
     setSelectedPlatforms((prev) => ({
@@ -410,14 +416,23 @@ function RouteComponent() {
             >
               Regenerate
             </Button>
-            <SavePostsDropdown
-              onSaveDraft={handleSaveDraft}
-              onSchedule={handleSchedule}
-              onPostNow={handlePostNow}
-              isLoading={isSaving}
-              selectedPlatforms={selectedPlatforms}
-              hasContent={hasContent}
-            />
+            {note?.id ? (
+              <SavePostsDropdown
+                onSaveDraft={() =>
+                  createPost({
+                    content: generatedPosts.linkedin?.post_content ?? "",
+                    platform: "linkedin",
+                    published: false,
+                    noteId: note?.id,
+                  })
+                }
+                onSchedule={handleSchedule}
+                onPostNow={handlePostNow}
+                isLoading={isSaving}
+                selectedPlatforms={selectedPlatforms}
+                hasContent={hasContent}
+              />
+            ) : null}
           </CardFooter>
         </Card>
       </div>
