@@ -39,4 +39,5 @@ type Post = {
   userId: string;
   noteId: string;
   status: "DRAFT" | "SCHEDULED" | "PUBLISHED";
+  note: Note;
 };

@@ -245,8 +245,7 @@ function RouteComponent() {
                               </h3>
                               {getStatusBadge(post?.status)}
                               <Badge variant="outline" className="text-xs">
-                                {post?.noteTitle}
-                                Hello
+                                {post?.note.title}
                               </Badge>
                             </div>
                             <p className="text-sm text-slate-600 line-clamp-3">
@@ -383,7 +382,7 @@ function RouteComponent() {
                             {getStatusBadge(post.status)}
                           </div>
                           <p className="text-xs text-slate-500 mt-1">
-                            {post?.noteTitle}
+                            {post?.note?.title}
                           </p>
                         </div>
                         <DropdownMenu>

@@ -11,6 +11,9 @@ export class PostsService {
         userId,
         isDeleted: false,
       },
+      include: {
+        note: true,
+      },
     });
   }
 
