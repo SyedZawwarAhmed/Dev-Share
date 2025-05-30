@@ -102,6 +102,7 @@ model Post {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   isDeleted    Boolean   @default(false)
+  status       PostStatus @default(DRAFT)
 
   // Metadata
   title    String?
@@ -158,4 +159,10 @@ enum AuthProvider {
 enum NoteStatus {
   DRAFT
   ACTIVE
+}
+
+enum PostStatus {
+  DRAFT 
+  PUBLISHED
+  SCHEDULED 
 }

@@ -8,7 +8,7 @@ export const getPostsService = async () => {
 };
 
 export const addPostService = async (
-  post: z.infer<typeof createPostSchema>,
+  post: z.infer<typeof createPostSchema>
 ) => {
   const validatedPost = createPostSchema.parse(post);
   const data = await apiService.post<Post>("/posts/add-post", validatedPost);

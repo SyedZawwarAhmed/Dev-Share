@@ -23,9 +23,9 @@ interface SavePostsDropdownProps {
 
 // Mock auth status - in real app this would come from your auth state
 const mockAuthStatus = {
-  linkedin: true,
-  x: false,
-  bluesky: false,
+  LINKEDIN: true,
+  X: false,
+  BLUESKY: false,
 };
 
 export default function SavePostsDropdown({
@@ -41,7 +41,7 @@ export default function SavePostsDropdown({
   const [pendingAction, setPendingAction] = useState<
     "schedule" | "post" | null
   >(null);
-  const [authPlatform, setAuthPlatform] = useState<Platform>("linkedin");
+  const [authPlatform, setAuthPlatform] = useState<Platform>("LINKEDIN");
 
   const checkAuthAndExecute = (action: "schedule" | "post") => {
     if (!hasContent) {
@@ -54,11 +54,11 @@ export default function SavePostsDropdown({
 
     // Check if any selected platform needs authentication
     const selectedPlatformKeys = Object.keys(selectedPlatforms).filter(
-      (platform) => selectedPlatforms[platform],
+      (platform) => selectedPlatforms[platform]
     ) as Array<keyof typeof mockAuthStatus>;
 
     const unauthenticatedPlatform = selectedPlatformKeys.find(
-      (platform) => !mockAuthStatus[platform],
+      (platform) => !mockAuthStatus[platform]
     );
 
     if (unauthenticatedPlatform) {

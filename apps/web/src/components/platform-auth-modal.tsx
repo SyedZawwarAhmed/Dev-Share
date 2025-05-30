@@ -21,9 +21,9 @@ interface PlatformAuthModalProps {
 
 // Mock auth status - in real app this would come from your auth state
 const mockAuthStatus = {
-  linkedin: true,
-  x: false,
-  bluesky: false,
+  LINKEDIN: true,
+  X: false,
+  BLUESKY: false,
 };
 
 export default function PlatformAuthModal({
@@ -36,7 +36,7 @@ export default function PlatformAuthModal({
   const isAuthenticated = mockAuthStatus[platform];
 
   const platformConfig = {
-    linkedin: {
+    LINKEDIN: {
       name: "LinkedIn",
       icon: <Linkedin className="h-6 w-6 text-blue-600" />,
       color: "bg-blue-50 border-blue-200",
@@ -44,7 +44,7 @@ export default function PlatformAuthModal({
         "Connect your LinkedIn account to share professional content with your network.",
       permissions: ["Post on your behalf", "Access basic profile information"],
     },
-    x: {
+    X: {
       name: "X (Twitter)",
       icon: <Twitter className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
@@ -55,7 +55,7 @@ export default function PlatformAuthModal({
         "Access basic profile information",
       ],
     },
-    bluesky: {
+    BLUESKY: {
       name: "Bluesky",
       icon: (
         <svg
@@ -94,11 +94,11 @@ export default function PlatformAuthModal({
     const redirectUri = `${baseUrl}/auth/callback/${platform}`;
 
     switch (platform) {
-      case "linkedin":
+      case "LINKEDIN":
         return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=w_member_social`;
-      case "x":
+      case "X":
         return `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.write%20users.read`;
-      case "bluesky":
+      case "BLUESKY":
         return `${baseUrl}/auth/bluesky?redirect_uri=${encodeURIComponent(redirectUri)}`;
       default:
         return "#";

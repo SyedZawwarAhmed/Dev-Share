@@ -1,4 +1,4 @@
-type Platform = "linkedin" | "x" | "bluesky";
+type Platform = "LINKEDIN" | "X" | "BLUESKY";
 
 type GeneratedPost = {
   post_content: string;
@@ -38,4 +38,5 @@ type Post = {
   shares?: number;
   userId: string;
   noteId: string;
+  status: "DRAFT" | "SCHEDULED" | "PUBLISHED";
 };

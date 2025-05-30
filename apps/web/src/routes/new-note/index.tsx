@@ -38,11 +38,11 @@ function RouteComponent() {
     content: "",
     status: "DRAFT",
   });
-  const [activeTab, setActiveTab] = useState<Platform>("linkedin");
+  const [activeTab, setActiveTab] = useState<Platform>("LINKEDIN");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
-    linkedin: true,
-    x: true,
-    bluesky: false,
+    LINKEDIN: true,
+    X: true,
+    BLUESKY: false,
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -58,15 +58,15 @@ function RouteComponent() {
     onSuccess: (data) => {
       setActiveTab(Object.keys(data)[0] as Platform);
       setSelectedPlatforms({
-        linkedin: !!data?.linkedin?.post_content,
-        x: !!data?.x?.post_content,
-        bluesky: !!data?.bluesky?.post_content,
+        LINKEDIN: !!data?.LINKEDIN?.post_content,
+        X: !!data?.X?.post_content,
+        BLUESKY: !!data?.BLUESKY?.post_content,
       });
     },
     onError: (error) => {
       console.log(
         "\n\n ---> apps/web/src/routes/new-note/index.tsx:56 -> error: ",
-        error,
+        error
       );
       toast.error("Failed to generate post. Please try again.");
     },
@@ -94,7 +94,7 @@ function RouteComponent() {
     } catch (error) {
       console.error(
         "\n\n ---> apps/web/src/routes/new-note.tsx:96 -> error: ",
-        error,
+        error
       );
     }
   };
@@ -121,7 +121,7 @@ function RouteComponent() {
   const handleScheduleConfirm = (
     date: string,
     time: string,
-    timezone: string,
+    timezone: string
   ) => {
     setIsSaving(true);
     setTimeout(() => {
@@ -156,7 +156,7 @@ function RouteComponent() {
   const hasContent = Object.keys(selectedPlatforms).some(
     (platform) =>
       selectedPlatforms[platform as Platform] &&
-      generatedPosts?.[platform as Platform],
+      generatedPosts?.[platform as Platform]
   );
 
   return (
@@ -201,7 +201,7 @@ function RouteComponent() {
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="linkedin"
-                      checked={selectedPlatforms.linkedin}
+                      checked={selectedPlatforms.LINKEDIN}
                       onCheckedChange={(checked) =>
                         handlePlatformChange("linkedin", checked as boolean)
                       }
@@ -213,7 +213,7 @@ function RouteComponent() {
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="x"
-                      checked={selectedPlatforms.x}
+                      checked={selectedPlatforms.X}
                       onCheckedChange={(checked) =>
                         handlePlatformChange("x", checked as boolean)
                       }
@@ -225,7 +225,7 @@ function RouteComponent() {
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="bluesky"
-                      checked={selectedPlatforms.bluesky}
+                      checked={selectedPlatforms.BLUESKY}
                       onCheckedChange={(checked) =>
                         handlePlatformChange("bluesky", checked as boolean)
                       }
@@ -264,8 +264,8 @@ function RouteComponent() {
                     (platform) =>
                       selectedPlatforms[
                         platform as keyof typeof selectedPlatforms
-                      ],
-                  ) as ("linkedin" | "x" | "bluesky")[],
+                      ]
+                  ) as Platform[],
                 })
               }
               className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
@@ -300,7 +300,7 @@ function RouteComponent() {
                 <TabsTrigger
                   value="linkedin"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.linkedin}
+                  disabled={!selectedPlatforms.LINKEDIN}
                 >
                   <Linkedin className="h-4 w-4" />
                   LinkedIn
@@ -308,14 +308,14 @@ function RouteComponent() {
                 <TabsTrigger
                   value="x"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.x}
+                  disabled={!selectedPlatforms.X}
                 >
                   <X className="h-4 w-4" />X
                 </TabsTrigger>
                 <TabsTrigger
                   value="bluesky"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.bluesky}
+                  disabled={!selectedPlatforms.BLUESKY}
                 >
                   <svg
                     width="16"
@@ -336,7 +336,7 @@ function RouteComponent() {
 
               <div className="border rounded-lg p-4 min-h-[300px] bg-slate-50">
                 <TabsContent value="linkedin" className="m-0">
-                  {generatedPosts?.linkedin ? (
+                  {generatedPosts?.LINKEDIN ? (
                     <div className="whitespace-pre-line">
                       <Badge
                         variant="outline"
@@ -346,7 +346,7 @@ function RouteComponent() {
                         LinkedIn Format
                       </Badge>
                       <div className="mt-2">
-                        {generatedPosts.linkedin.post_content}
+                        {generatedPosts.LINKEDIN.post_content}
                       </div>
                     </div>
                   ) : (
@@ -357,7 +357,7 @@ function RouteComponent() {
                 </TabsContent>
 
                 <TabsContent value="x" className="m-0">
-                  {generatedPosts?.x ? (
+                  {generatedPosts?.X ? (
                     <div className="whitespace-pre-line">
                       <Badge
                         variant="outline"
@@ -366,7 +366,7 @@ function RouteComponent() {
                         <X className="h-3 w-3 mr-1 text-sky-500" />X Format
                       </Badge>
                       <div className="mt-2">
-                        {generatedPosts?.x.post_content}
+                        {generatedPosts?.X.post_content}
                       </div>
                     </div>
                   ) : (
@@ -377,7 +377,7 @@ function RouteComponent() {
                 </TabsContent>
 
                 <TabsContent value="bluesky" className="m-0">
-                  {generatedPosts?.bluesky ? (
+                  {generatedPosts?.BLUESKY ? (
                     <div className="whitespace-pre-line">
                       <Badge
                         variant="outline"
@@ -399,7 +399,7 @@ function RouteComponent() {
                         Bluesky Format
                       </Badge>
                       <div className="mt-2">
-                        {generatedPosts?.bluesky.post_content}
+                        {generatedPosts?.BLUESKY.post_content}
                       </div>
                     </div>
                   ) : (

@@ -41,14 +41,14 @@ function RouteComponent() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [activeTab, setActiveTab] = useState("linkedin");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
-    linkedin: true,
-    x: true,
-    bluesky: false,
+    LINKEDIN: true,
+    X: true,
+    BLUESKY: false,
   });
   const [generatedPosts, setGeneratedPosts] = useState({
-    linkedin: { post_content: "" },
-    x: { post_content: "" },
-    bluesky: { post_content: "" },
+    LINKEDIN: { post_content: "" },
+    X: { post_content: "" },
+    BLUESKY: { post_content: "" },
   });
 
   const { mutateAsync: generatePosts, isPending: isGenerating } = useMutation({
@@ -56,16 +56,16 @@ function RouteComponent() {
     onSuccess: (data) => {
       setActiveTab(Object.keys(data)[0] as Platform);
       setSelectedPlatforms({
-        linkedin: !!data?.linkedin?.post_content,
-        x: !!data?.x?.post_content,
-        bluesky: !!data?.bluesky?.post_content,
+        LINKEDIN: !!data?.LINKEDIN?.post_content,
+        X: !!data?.X?.post_content,
+        BLUESKY: !!data?.BLUESKY?.post_content,
       });
       setGeneratedPosts(data);
     },
     onError: (error) => {
       console.log(
         "\n\n ---> apps/web/src/routes/notes/$id/create-posts/index.tsx:69 -> error: ",
-        error,
+        error
       );
       toast.error("Failed to generate post. Please try again.");
     },
@@ -82,7 +82,7 @@ function RouteComponent() {
     onError: (error) => {
       console.log(
         "\n\n ---> apps/web/src/routes/notes/$id/create-posts/index.tsx:69 -> error: ",
-        error,
+        error
       );
       if (error instanceof ZodError) {
         toast.error(fromZodError(error).message);
@@ -136,7 +136,7 @@ function RouteComponent() {
   const handleScheduleConfirm = (
     date: string,
     time: string,
-    timezone: string,
+    timezone: string
   ) => {
     setTimeout(() => {
       toast("Posts scheduled", {
@@ -159,7 +159,7 @@ function RouteComponent() {
   const hasContent = Object.keys(selectedPlatforms).some(
     (platform) =>
       selectedPlatforms[platform as Platform] &&
-      generatedPosts[platform as Platform]?.post_content,
+      generatedPosts[platform as Platform]?.post_content
   );
 
   return (
@@ -200,7 +200,7 @@ function RouteComponent() {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="linkedin"
-                    checked={selectedPlatforms.linkedin}
+                    checked={selectedPlatforms.LINKEDIN}
                     onCheckedChange={(checked) =>
                       handlePlatformChange("linkedin", checked as boolean)
                     }
@@ -212,7 +212,7 @@ function RouteComponent() {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="x"
-                    checked={selectedPlatforms.x}
+                    checked={selectedPlatforms.X}
                     onCheckedChange={(checked) =>
                       handlePlatformChange("x", checked as boolean)
                     }
@@ -224,7 +224,7 @@ function RouteComponent() {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="bluesky"
-                    checked={selectedPlatforms.bluesky}
+                    checked={selectedPlatforms.BLUESKY}
                     onCheckedChange={(checked) =>
                       handlePlatformChange("bluesky", checked as boolean)
                     }
@@ -242,11 +242,8 @@ function RouteComponent() {
                 generatePosts({
                   content: note?.content ?? "",
                   platforms: Object.keys(selectedPlatforms).filter(
-                    (platform) =>
-                      selectedPlatforms[
-                        platform as keyof typeof selectedPlatforms
-                      ],
-                  ) as ("linkedin" | "x" | "bluesky")[],
+                    (platform) => selectedPlatforms[platform as Platform]
+                  ) as Platform[],
                 })
               }
               className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
@@ -284,7 +281,7 @@ function RouteComponent() {
                 <TabsTrigger
                   value="linkedin"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.linkedin}
+                  disabled={!selectedPlatforms.LINKEDIN}
                 >
                   <Linkedin className="h-4 w-4" />
                   LinkedIn
@@ -292,14 +289,14 @@ function RouteComponent() {
                 <TabsTrigger
                   value="x"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.x}
+                  disabled={!selectedPlatforms.X}
                 >
                   <Twitter className="h-4 w-4" />X
                 </TabsTrigger>
                 <TabsTrigger
                   value="bluesky"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.bluesky}
+                  disabled={!selectedPlatforms.BLUESKY}
                 >
                   <svg
                     width="16"
@@ -331,11 +328,11 @@ function RouteComponent() {
                   <Textarea
                     placeholder="LinkedIn post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.linkedin?.post_content || ""}
+                    value={generatedPosts.LINKEDIN?.post_content || ""}
                     onChange={(e) =>
-                      handlePostContentChange("linkedin", e.target.value)
+                      handlePostContentChange("LINKEDIN", e.target.value)
                     }
-                    disabled={!selectedPlatforms.linkedin || isGenerating}
+                    disabled={!selectedPlatforms.LINKEDIN || isGenerating}
                   />
                 </div>
               </TabsContent>
@@ -352,11 +349,11 @@ function RouteComponent() {
                   <Textarea
                     placeholder="X post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.x?.post_content || ""}
+                    value={generatedPosts.X?.post_content || ""}
                     onChange={(e) =>
-                      handlePostContentChange("x", e.target.value)
+                      handlePostContentChange("X", e.target.value)
                     }
-                    disabled={!selectedPlatforms.x || isGenerating}
+                    disabled={!selectedPlatforms.X || isGenerating}
                   />
                 </div>
               </TabsContent>
@@ -386,11 +383,11 @@ function RouteComponent() {
                   <Textarea
                     placeholder="Bluesky post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.bluesky?.post_content || ""}
+                    value={generatedPosts.BLUESKY?.post_content || ""}
                     onChange={(e) =>
-                      handlePostContentChange("bluesky", e.target.value)
+                      handlePostContentChange("BLUESKY", e.target.value)
                     }
-                    disabled={!selectedPlatforms.bluesky || isGenerating}
+                    disabled={!selectedPlatforms.BLUESKY || isGenerating}
                   />
                 </div>
               </TabsContent>
@@ -406,8 +403,8 @@ function RouteComponent() {
                     (platform) =>
                       selectedPlatforms[
                         platform as keyof typeof selectedPlatforms
-                      ],
-                  ) as ("linkedin" | "x" | "bluesky")[],
+                      ]
+                  ) as Platform[],
                 })
               }
               disabled={
@@ -420,7 +417,7 @@ function RouteComponent() {
               <SavePostsDropdown
                 onSaveDraft={() =>
                   createPost({
-                    content: generatedPosts.linkedin?.post_content ?? "",
+                    content: generatedPosts.LINKEDIN?.post_content ?? "",
                     platform: "linkedin",
                     published: false,
                     noteId: note?.id,

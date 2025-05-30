@@ -11,7 +11,6 @@ import {
   PlusCircle,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -23,6 +22,7 @@ import { Linkedin, Twitter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
 import { getPostsService } from "@/api/post.service";
+import { getStatusBadge } from "@/components/status-badge";
 
 export const Route = createFileRoute("/notes/$id/posts/")({
   component: RouteComponent,
@@ -66,12 +66,8 @@ function RouteComponent() {
       ? posts
       : posts?.filter(
           (post) =>
-            (post.published
-              ? "published"
-              : post.scheduledFor
-                ? "scheduled"
-                : "draft") === activeTab ||
-            post.platform.toLowerCase() === activeTab.toLowerCase(),
+            post.status.toLowerCase() === activeTab.toLowerCase() ||
+            post.platform.toLowerCase() === activeTab.toLowerCase()
         );
 
   const getPlatformIcon = (platform: string) => {
@@ -111,50 +107,20 @@ function RouteComponent() {
     }
   };
 
-  const getPlatformName = (platform: string) => {
+  const getPlatformName = (platform: Post["platform"]) => {
+    console.log(
+      "\n\n ---> apps/web/src/routes/notes/$id/posts/index.tsx:110 -> platform: ",
+      platform
+    );
     switch (platform) {
-      case "linkedin":
+      case "LINKEDIN":
         return "LinkedIn";
-      case "x":
+      case "X":
         return "X (Twitter)";
-      case "bluesky":
+      case "BLUESKY":
         return "Bluesky";
       default:
         return platform;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "draft":
-        return (
-          <Badge
-            variant="outline"
-            className="text-xs bg-amber-50 border-amber-200 text-amber-700"
-          >
-            Draft
-          </Badge>
-        );
-      case "scheduled":
-        return (
-          <Badge
-            variant="outline"
-            className="text-xs bg-emerald-50 border-emerald-200 text-emerald-700"
-          >
-            Scheduled
-          </Badge>
-        );
-      case "published":
-        return (
-          <Badge
-            variant="outline"
-            className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-          >
-            Published
-          </Badge>
-        );
-      default:
-        return null;
     }
   };
 
@@ -238,13 +204,7 @@ function RouteComponent() {
                             <h3 className="font-medium">
                               {getPlatformName(post.platform)}
                             </h3>
-                            {getStatusBadge(
-                              post?.published
-                                ? "published"
-                                : post.scheduledFor
-                                  ? "scheduled"
-                                  : "draft",
-                            )}
+                            {getStatusBadge(post.status)}
                           </div>
                           <p className="text-sm text-slate-600 whitespace-pre-line">
                             {post.content}

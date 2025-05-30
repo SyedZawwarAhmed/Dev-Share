@@ -29,7 +29,7 @@ const mockPost = {
   id: 102,
   noteId: 1,
   noteTitle: "Next.js Server Actions",
-  platform: "twitter" as const,
+  platform: "X" as Platform,
   content:
     "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
   status: "draft",
@@ -39,9 +39,9 @@ const mockPost = {
 
 // Mock auth status - in real app this would come from your auth state
 const mockAuthStatus = {
-  linkedin: true,
-  twitter: false,
-  bluesky: false,
+  LINKEDIN: true,
+  X: false,
+  BLUESKY: false,
 };
 
 export const Route = createFileRoute("/posts/$id/schedule/")({
@@ -56,7 +56,7 @@ function RouteComponent() {
   const [timeZone, setTimeZone] = useState("America/New_York");
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(
-    mockAuthStatus[mockPost.platform],
+    mockAuthStatus[mockPost.platform]
   );
 
   const handleSchedule = () => {
@@ -182,8 +182,7 @@ function RouteComponent() {
                   size="sm"
                   className="bg-amber-600 hover:bg-amber-700"
                 >
-                  Connect{" "}
-                  {mockPost.platform === "twitter" ? "X" : mockPost.platform}{" "}
+                  Connect {mockPost.platform === "X" ? "X" : mockPost.platform}{" "}
                   Account
                 </Button>
               </div>
