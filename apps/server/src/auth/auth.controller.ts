@@ -48,6 +48,12 @@ export class AuthController {
     return req.logout();
   }
 
+  @UseGuards(JwtOAuthGuard)
+  @Get('me')
+  async me(@Req() req) {
+    return this.authService.me(req.user);
+  }
+
   @Get('google')
   @UseGuards(GoogleOAuthGuard)
   async googleAuth() {
@@ -58,35 +64,12 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   async googleAuthCallback(@Req() req, @Res() res: Response) {
     try {
-      const { token, user } = await this.authService.googleLogin(req.user);
-
-      // Redirect to the frontend dashboard
+      const { token } = await this.authService.googleLogin(req.user);
       const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
-
-      // Optionally add user info as query parameters
-      redirectUrl.searchParams.append('id', encodeURIComponent(user?.id));
-      redirectUrl.searchParams.append(
-        'firstName',
-        encodeURIComponent(user?.firstName),
-      );
-      redirectUrl.searchParams.append(
-        'lastName',
-        encodeURIComponent(user?.lastName),
-      );
-      redirectUrl.searchParams.append('email', encodeURIComponent(user?.email));
       redirectUrl.searchParams.append('token', encodeURIComponent(token));
-      redirectUrl.searchParams.append(
-        'image',
-        encodeURIComponent(user?.profileImage),
-      );
-
-      // Redirect to the frontend
       res.redirect(redirectUrl.toString());
     } catch (error) {
-      // Handle any errors during the OAuth callback
       console.error('Google OAuth callback error:', error);
-
-      // Redirect to login page with error
       res.redirect(
         `${process.env.FRONTEND_URL}/login?error=Authentication failed`,
       );
@@ -103,25 +86,9 @@ export class AuthController {
   @UseGuards(LinkedinOAuthGuard)
   async linkedinAuthCallback(@Req() req, @Res() res: Response) {
     try {
-      const { token, user } = await this.authService.linkedinLogin(req.user);
-
+      const { token } = await this.authService.linkedinLogin(req.user);
       const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
-      redirectUrl.searchParams.append('id', encodeURIComponent(user?.id));
-      redirectUrl.searchParams.append(
-        'firstName',
-        encodeURIComponent(user?.firstName),
-      );
-      redirectUrl.searchParams.append(
-        'lastName',
-        encodeURIComponent(user?.lastName),
-      );
-      redirectUrl.searchParams.append('email', encodeURIComponent(user?.email));
       redirectUrl.searchParams.append('token', encodeURIComponent(token));
-      redirectUrl.searchParams.append(
-        'image',
-        encodeURIComponent(user?.profileImage),
-      );
-
       res.redirect(redirectUrl.toString());
     } catch (error) {
       console.error('LinkedIn OAuth callback error:', error);

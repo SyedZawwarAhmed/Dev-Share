@@ -53,6 +53,10 @@ export class AuthService {
     };
   }
 
+  async me(user: any) {
+    return user;
+  }
+
   async googleLogin(profile: any) {
     const { email, given_name, family_name, picture } = profile._json;
 
