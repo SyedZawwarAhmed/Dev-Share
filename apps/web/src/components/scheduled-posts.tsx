@@ -112,7 +112,7 @@ export default function ScheduledPosts() {
   };
 
   const scheduledPosts = mockPosts.filter(
-    (post) => post.status === "scheduled"
+    (post) => post.status === "scheduled",
   );
   const draftPosts = mockPosts.filter((post) => post.status === "draft");
 

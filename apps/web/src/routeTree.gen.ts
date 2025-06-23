@@ -19,6 +19,7 @@ import { Route as NewNoteIndexImport } from './routes/new-note/index'
 import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as ForgotPasswordIndexImport } from './routes/forgot-password/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as ConnectedPlatformsIndexImport } from './routes/connected-platforms/index'
 import { Route as CallbackIndexImport } from './routes/callback/index'
 import { Route as PostsIdScheduleIndexImport } from './routes/posts/$id/schedule/index'
 import { Route as PostsIdEditIndexImport } from './routes/posts/$id/edit/index'
@@ -76,6 +77,12 @@ const DashboardIndexRoute = DashboardIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ConnectedPlatformsIndexRoute = ConnectedPlatformsIndexImport.update({
+  id: '/connected-platforms/',
+  path: '/connected-platforms/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const CallbackIndexRoute = CallbackIndexImport.update({
   id: '/callback/',
   path: '/callback/',
@@ -128,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/callback'
       fullPath: '/callback'
       preLoaderRoute: typeof CallbackIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/connected-platforms/': {
+      id: '/connected-platforms/'
+      path: '/connected-platforms'
+      fullPath: '/connected-platforms'
+      preLoaderRoute: typeof ConnectedPlatformsIndexImport
       parentRoute: typeof rootRoute
     }
     '/dashboard/': {
@@ -222,6 +236,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/callback': typeof CallbackIndexRoute
+  '/connected-platforms': typeof ConnectedPlatformsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/forgot-password': typeof ForgotPasswordIndexRoute
   '/login': typeof LoginIndexRoute
@@ -239,6 +254,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/callback': typeof CallbackIndexRoute
+  '/connected-platforms': typeof ConnectedPlatformsIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/forgot-password': typeof ForgotPasswordIndexRoute
   '/login': typeof LoginIndexRoute
@@ -257,6 +273,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/callback/': typeof CallbackIndexRoute
+  '/connected-platforms/': typeof ConnectedPlatformsIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/forgot-password/': typeof ForgotPasswordIndexRoute
   '/login/': typeof LoginIndexRoute
@@ -276,6 +293,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/callback'
+    | '/connected-platforms'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
@@ -292,6 +310,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/callback'
+    | '/connected-platforms'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
@@ -308,6 +327,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/callback/'
+    | '/connected-platforms/'
     | '/dashboard/'
     | '/forgot-password/'
     | '/login/'
@@ -326,6 +346,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CallbackIndexRoute: typeof CallbackIndexRoute
+  ConnectedPlatformsIndexRoute: typeof ConnectedPlatformsIndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   ForgotPasswordIndexRoute: typeof ForgotPasswordIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -343,6 +364,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CallbackIndexRoute: CallbackIndexRoute,
+  ConnectedPlatformsIndexRoute: ConnectedPlatformsIndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   ForgotPasswordIndexRoute: ForgotPasswordIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
@@ -369,6 +391,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/callback/",
+        "/connected-platforms/",
         "/dashboard/",
         "/forgot-password/",
         "/login/",
@@ -388,6 +411,9 @@ export const routeTree = rootRoute
     },
     "/callback/": {
       "filePath": "callback/index.tsx"
+    },
+    "/connected-platforms/": {
+      "filePath": "connected-platforms/index.tsx"
     },
     "/dashboard/": {
       "filePath": "dashboard/index.tsx"

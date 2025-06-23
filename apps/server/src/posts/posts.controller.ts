@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtOAuthGuard } from 'src/auth/jwt/jwt.oauth.guard';
 
@@ -25,14 +25,26 @@ export class PostsController {
   }
 
   @UseGuards(JwtOAuthGuard)
-  @Post('update-post/:id')
+  @Put(':id')
   updatePost(@Req() req) {
-    return this.postsService.updatePost(req.user.id, req?.body.id, req?.body);
+    return this.postsService.updatePost(req.user.id, req?.params?.id, req?.body);
   }
 
   @UseGuards(JwtOAuthGuard)
   @Delete(':id')
   deletePost(@Req() req) {
     return this.postsService.deletePost(req.user.id, req?.params.id);
+  }
+
+  @UseGuards(JwtOAuthGuard)
+  @Post('schedule-post/:id')
+  schedulePost(@Req() req) {
+    return this.postsService.schedulePost(req.user.id, req?.params.id, req?.body);
+  }
+
+  @UseGuards(JwtOAuthGuard)
+  @Post('publish/:id')
+  postNow(@Req() req) {
+    return this.postsService.publishPostNow(req.user.id, req?.params.id);
   }
 }

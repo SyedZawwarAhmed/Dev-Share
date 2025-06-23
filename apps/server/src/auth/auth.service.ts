@@ -54,7 +54,13 @@ export class AuthService {
   }
 
   async me(user: any) {
-    return user;
+    const userData = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        accounts: true,
+      },
+    });
+    return userData;
   }
 
   async googleLogin(profile: any) {

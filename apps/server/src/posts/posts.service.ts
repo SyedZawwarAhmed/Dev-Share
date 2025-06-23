@@ -1,9 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SocialMediaService } from './social-media.service';
+import { PostsSchedulerService } from './posts-scheduler.service';
+import { PostStatus } from 'generated/prisma';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private socialMediaService: SocialMediaService,
+    private postsSchedulerService: PostsSchedulerService,
+  ) {}
 
   async getPosts(userId: string) {
     return await this.prisma.post.findMany({
@@ -31,6 +38,9 @@ export class PostsService {
         userId,
         isDeleted: false,
       },
+      include: {
+        note: true
+      }
     });
   }
 
@@ -54,5 +64,45 @@ export class PostsService {
         isDeleted: true,
       },
     });
+  }
+
+  async schedulePost(userId: string, postId: string, post) {
+    const scheduledAt = new Date(post.scheduledAt);
+    const now = new Date();
+    
+    if (scheduledAt < now) {
+      throw new BadRequestException('Scheduled time must be in the future');
+    }
+
+    // Use the scheduler service to properly schedule the post
+    await this.postsSchedulerService.schedulePost(userId, postId, scheduledAt);
+    
+    return this.prisma.post.findFirst({
+      where: {
+        id: postId,
+        userId,
+      },
+    });
+  }
+
+  async publishPostNow(userId: string, postId: string) {
+    const post = await this.prisma.post.findFirst({
+      where: {
+        id: postId,
+        userId,
+        isDeleted: false,
+      },
+    });
+
+    if (!post) {
+      throw new BadRequestException('Post not found');
+    }
+
+    const result = await this.socialMediaService.publishPost(postId);
+
+    return {
+      post,
+      result,
+    };
   }
 }

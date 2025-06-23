@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,48 +13,51 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Linkedin, Twitter } from "lucide-react";
+import { getPostService, updatePostService } from "@/api/post.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-// Mock data for the post
-const mockPost = {
-  id: 101,
-  noteId: 1,
-  noteTitle: "Next.js Server Actions",
-  platform: "linkedin",
-  content:
-    "I recently explored Next.js Server Actions and discovered significant performance benefits.\n\nKey advantages include:\n• No need for API routes\n• Progressive enhancement\n• Works with and without JavaScript\n• Simplified form handling\n• Built-in CSRF protection\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Actions into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
-  status: "scheduled",
-  scheduledFor: "2023-04-07T15:00:00Z",
-  createdAt: "2023-04-05T16:30:00Z",
-  updatedAt: "2023-04-05T16:45:00Z",
-};
+import { updatePostSchema } from "@/schemas/post.schema";
+import { z } from "zod";
 
 export const Route = createFileRoute("/posts/$id/edit/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [isSaving, setIsSaving] = useState(false);
-  const [content, setContent] = useState(mockPost.content);
+  const { id } = Route.useParams();
+  const [content, setContent] = useState("");
+  const navigate = useNavigate();
 
-  const handleSave = () => {
-    if (!content.trim()) {
-      toast("Missing content", {
-        description: "Please provide content for your post.",
-      });
-      return;
+  const { data: post, isLoading: isLoadingPost } = useQuery({
+    queryKey: ["post", id],
+    queryFn: () => getPostService(id),
+  });
+
+  const { mutate: updatePost, isPending: isUpdatingPost } = useMutation({
+    mutationFn: (post: z.infer<typeof updatePostSchema>) =>
+      updatePostService(id, post),
+    onSuccess: () => {
+      toast.success("Post updated successfully");
+      navigate({ to: "/posts", search: { status: "" } });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  useEffect(() => {
+    if (post) {
+      setContent(post.content);
     }
+  }, [post]);
 
-    setIsSaving(true);
-    // Simulate saving to database
-    setTimeout(() => {
-      toast("Post updated", {
-        description: "Your post has been updated successfully.",
-      });
-      setIsSaving(false);
-      // In a real app, redirect back to the posts list
-      window.location.href = "/posts";
-    }, 1500);
+  const handleSave = async () => {
+    if (!post) return;
+    const { userId, note, noteId, ...rest } = post;
+    updatePost({
+      ...rest,
+      content,
+    });
   };
 
   const getPlatformIcon = (platform: string) => {
@@ -116,7 +119,8 @@ function RouteComponent() {
         <div>
           <h1 className="text-2xl font-bold text-purple-800">Edit Post</h1>
           <p className="text-slate-600">
-            Editing {mockPost.platform} post for note: {mockPost.noteTitle}
+            Editing post for note:{" "}
+            {isLoadingPost ? "Loading..." : post?.note?.title}
           </p>
         </div>
       </div>
@@ -127,10 +131,9 @@ function RouteComponent() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {getPlatformIcon(mockPost.platform)}
-
+            {post?.platform ? getPlatformIcon(post?.platform) : null}
             <Textarea
-              placeholder={`Enter your ${mockPost.platform} post content`}
+              placeholder={`Enter your post content`}
               className="min-h-[300px]"
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -138,16 +141,10 @@ function RouteComponent() {
 
             <div className="text-sm text-slate-500">
               <p>
-                <strong>Note:</strong> This post is for the {mockPost.platform}{" "}
-                platform. Make sure your content is optimized for this
-                platform's audience and format.
+                <strong>Note:</strong> This post is for the platform. Make sure
+                your content is optimized for this platform's audience and
+                format.
               </p>
-              {mockPost.platform === "twitter" && (
-                <p className="mt-2">
-                  Remember that X (Twitter) has a character limit of 280
-                  characters.
-                </p>
-              )}
             </div>
           </div>
         </CardContent>
@@ -158,9 +155,8 @@ function RouteComponent() {
           <Button
             onClick={handleSave}
             className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-            disabled={isSaving}
           >
-            {isSaving ? (
+            {isUpdatingPost ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Saving...

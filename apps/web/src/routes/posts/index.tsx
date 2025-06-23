@@ -10,6 +10,7 @@ import {
   Loader2,
   MoreHorizontal,
   Search,
+  Send,
   Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -28,9 +29,10 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Linkedin, Twitter } from "lucide-react";
-import { getPostsService } from "@/api/post.service";
-import { useQuery } from "@tanstack/react-query";
+import { getPostsService, publishPostService } from "@/api/post.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/posts/")({
   component: RouteComponent,
@@ -45,6 +47,16 @@ function RouteComponent() {
   const { data: posts, isPending: isPostsLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: getPostsService,
+  });
+
+  const { mutate: publishPost, isPending: isPublishing } = useMutation({
+    mutationFn: publishPostService,
+    onSuccess: () => {
+      toast.success("Post published successfully");
+    },
+    onError: () => {
+      toast.error("Failed to publish post");
+    },
   });
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -149,6 +161,10 @@ function RouteComponent() {
       default:
         return platform;
     }
+  };
+
+  const handlePostNow = (postId: string) => {
+    publishPost(postId);
   };
 
   return (
@@ -324,6 +340,20 @@ function RouteComponent() {
                                   </DropdownMenuItem>
                                 </Link>
                               )}
+                              {post?.status === "DRAFT" && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    handlePostNow(post.id);
+                                  }}
+                                >
+                                  <Send className="h-4 w-4 mr-2" />
+                                  {isPublishing ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    "Post Now"
+                                  )}
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem className="text-red-600">
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete Post
@@ -413,6 +443,18 @@ function RouteComponent() {
                                 <DropdownMenuItem>
                                   <Calendar className="h-4 w-4 mr-2" />
                                   Schedule Post
+                                </DropdownMenuItem>
+                              </Link>
+                            )}
+
+                            {post?.status === "DRAFT" && (
+                              <Link
+                                to={`/posts/$id/schedule`}
+                                params={{ id: post.id.toString() }}
+                              >
+                                <DropdownMenuItem>
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Post Now
                                 </DropdownMenuItem>
                               </Link>
                             )}

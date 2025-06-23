@@ -88,6 +88,18 @@ export default function AppHeader() {
                 Posts
               </Button>
             </Link>
+            <Link to="/connected-platforms">
+              <Button
+                variant={
+                  pathname === "/connected-platforms" || pathname.startsWith("/connected-platforms/")
+                    ? "secondary"
+                    : "ghost"
+                }
+                size="sm"
+              >
+                Connected Platforms
+              </Button>
+            </Link>
           </nav>
         </div>
 

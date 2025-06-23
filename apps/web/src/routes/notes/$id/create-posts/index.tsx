@@ -25,6 +25,7 @@ import ScheduleModal from "@/components/schedule-modal";
 import { addPostService } from "@/api/post.service";
 import { fromZodError } from "zod-validation-error";
 import { ZodError } from "zod";
+import { useAuthStore } from "@/stores/auth.store";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/notes/$id/create-posts/")({
 
 function RouteComponent() {
   const params = Route.useParams();
+  const { user } = useAuthStore();
 
   const { data: note } = useQuery({
     queryKey: [`note-${params.id}`],
@@ -39,10 +41,10 @@ function RouteComponent() {
   });
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("linkedin");
+  const [activeTab, setActiveTab] = useState("LINKEDIN");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
-    LINKEDIN: true,
-    X: true,
+    LINKEDIN: false,
+    X: false,
     BLUESKY: false,
   });
   const [generatedPosts, setGeneratedPosts] = useState({
@@ -115,7 +117,7 @@ function RouteComponent() {
   //   }, 1500);
   // };
 
-  const handlePlatformChange = (platform: string, checked: boolean) => {
+  const handlePlatformChange = (platform: Platform, checked: boolean) => {
     setSelectedPlatforms((prev) => ({
       ...prev,
       [platform]: checked,
@@ -202,11 +204,32 @@ function RouteComponent() {
                     id="linkedin"
                     checked={selectedPlatforms.LINKEDIN}
                     onCheckedChange={(checked) =>
-                      handlePlatformChange("linkedin", checked as boolean)
+                      handlePlatformChange("LINKEDIN", checked as boolean)
+                    }
+                    disabled={
+                      !user?.accounts?.some(
+                        (account) => account.provider === "LINKEDIN"
+                      )
                     }
                   />
-                  <Label htmlFor="linkedin" className="text-sm font-normal">
+                  <Label
+                    htmlFor="linkedin"
+                    className={`text-sm font-normal ${
+                      !user?.accounts?.some(
+                        (account) => account.provider === "LINKEDIN"
+                      )
+                        ? "text-slate-400 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
                     LinkedIn
+                    {!user?.accounts?.some(
+                      (account) => account.provider === "LINKEDIN"
+                    ) && (
+                      <span className="text-xs text-slate-400 ml-1">
+                        (Connect account first)
+                      </span>
+                    )}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -214,11 +237,32 @@ function RouteComponent() {
                     id="x"
                     checked={selectedPlatforms.X}
                     onCheckedChange={(checked) =>
-                      handlePlatformChange("x", checked as boolean)
+                      handlePlatformChange("X", checked as boolean)
+                    }
+                    disabled={
+                      !user?.accounts?.some(
+                        (account) => account.provider === "X"
+                      )
                     }
                   />
-                  <Label htmlFor="x" className="text-sm font-normal">
+                  <Label
+                    htmlFor="x"
+                    className={`text-sm font-normal ${
+                      !user?.accounts?.some(
+                        (account) => account.provider === "X"
+                      )
+                        ? "text-slate-400 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
                     X (Twitter)
+                    {!user?.accounts?.some(
+                      (account) => account.provider === "X"
+                    ) && (
+                      <span className="text-xs text-slate-400 ml-1">
+                        (Connect account first)
+                      </span>
+                    )}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -226,14 +270,51 @@ function RouteComponent() {
                     id="bluesky"
                     checked={selectedPlatforms.BLUESKY}
                     onCheckedChange={(checked) =>
-                      handlePlatformChange("bluesky", checked as boolean)
+                      handlePlatformChange("BLUESKY", checked as boolean)
+                    }
+                    disabled={
+                      !user?.accounts?.some(
+                        (account) => account.provider === "BLUESKY"
+                      )
                     }
                   />
-                  <Label htmlFor="bluesky" className="text-sm font-normal">
+                  <Label
+                    htmlFor="bluesky"
+                    className={`text-sm font-normal ${
+                      !user?.accounts?.some(
+                        (account) => account.provider === "BLUESKY"
+                      )
+                        ? "text-slate-400 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
                     Bluesky
+                    {!user?.accounts?.some(
+                      (account) => account.provider === "BLUESKY"
+                    ) && (
+                      <span className="text-xs text-slate-400 ml-1">
+                        (Connect account first)
+                      </span>
+                    )}
                   </Label>
                 </div>
               </div>
+              {!user?.accounts?.some((account) =>
+                ["LINKEDIN", "X", "BLUESKY"].includes(account.provider)
+              ) && (
+                <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-sm text-amber-700">
+                    <strong>No platforms connected.</strong>{" "}
+                    <Link
+                      to="/connected-platforms"
+                      className="text-amber-800 underline hover:text-amber-900"
+                    >
+                      Connect your social media accounts
+                    </Link>{" "}
+                    to start generating and posting content.
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter>
@@ -418,7 +499,7 @@ function RouteComponent() {
                 onSaveDraft={() =>
                   createPost({
                     content: generatedPosts.LINKEDIN?.post_content ?? "",
-                    platform: "linkedin",
+                    platform: "LINKEDIN",
                     published: false,
                     noteId: note?.id,
                   })

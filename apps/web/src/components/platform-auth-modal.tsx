@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ExternalLink, Loader2, Shield } from "lucide-react";
 import { Linkedin, Twitter } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 
 interface PlatformAuthModalProps {
   isOpen: boolean;
@@ -19,21 +19,19 @@ interface PlatformAuthModalProps {
   onAuthComplete: () => void;
 }
 
-// Mock auth status - in real app this would come from your auth state
-const mockAuthStatus = {
-  LINKEDIN: true,
-  X: false,
-  BLUESKY: false,
-};
-
 export default function PlatformAuthModal({
   isOpen,
   onClose,
   platform,
   onAuthComplete,
 }: PlatformAuthModalProps) {
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const isAuthenticated = mockAuthStatus[platform];
+  const { isAuthenticated, isLoading: isAuthenticating } = useAuthStore();
+
+  // const authStatus = {
+  //   LINKEDIN: true,
+  //   X: false,
+  //   BLUESKY: false,
+  // };
 
   const platformConfig = {
     LINKEDIN: {
@@ -78,32 +76,24 @@ export default function PlatformAuthModal({
   const config = platformConfig[platform];
 
   const handleAuth = () => {
-    setIsAuthenticating(true);
-
-    // Simulate OAuth flow
-    setTimeout(() => {
-      // In a real app, this would redirect to the OAuth provider
-      const authUrl = getAuthUrl(platform);
-      window.location.href = authUrl;
-    }, 1000);
   };
 
-  const getAuthUrl = (platform: Platform) => {
-    // In a real app, these would be your actual OAuth URLs
-    const baseUrl = window.location.origin;
-    const redirectUri = `${baseUrl}/auth/callback/${platform}`;
+  // const getAuthUrl = (platform: Platform) => {
+  //   // In a real app, these would be your actual OAuth URLs
+  //   const baseUrl = window.location.origin;
+  //   const redirectUri = `${baseUrl}/auth/callback/${platform}`;
 
-    switch (platform) {
-      case "LINKEDIN":
-        return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=w_member_social`;
-      case "X":
-        return `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.write%20users.read`;
-      case "BLUESKY":
-        return `${baseUrl}/auth/bluesky?redirect_uri=${encodeURIComponent(redirectUri)}`;
-      default:
-        return "#";
-    }
-  };
+  //   switch (platform) {
+  //     case "LINKEDIN":
+  //       return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=w_member_social`;
+  //     case "X":
+  //       return `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.write%20users.read`;
+  //     case "BLUESKY":
+  //       return `${baseUrl}/auth/bluesky?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  //     default:
+  //       return "#";
+  //   }
+  // };
 
   const handleContinue = () => {
     onAuthComplete();

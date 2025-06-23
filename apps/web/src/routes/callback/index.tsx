@@ -1,4 +1,7 @@
-import { handleGoogleCallback } from "@/lib/auth";
+import { getUserService } from "@/api/auth.service";
+import { handleLoginCallback } from "@/lib/auth";
+import { useAuthStore } from "@/stores/auth.store";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 
@@ -10,16 +13,35 @@ function RouteComponent() {
   const navigate = useNavigate();
   const searchParams = useMemo(
     () => new URLSearchParams(window.location.search),
-    []
+    [],
+  );
+  const token = useAuthStore((state) => state.token);
+  const setUser = useAuthStore((state) => state.setUser);
+
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      try {
+        const data = await getUserService();
+        setUser(data);
+        navigate({ to: "/dashboard" });
+      } catch (error) {
+        console.log(
+          "\n\n ---> apps/web/src/routes/callback/index.tsx:29 -> error: ",
+          error,
+        );
+        navigate({ to: "/login" });
+      }
+    },
+    enabled: !!token,
+  });
+  console.log(
+    "\n\n ---> apps/web/src/routes/callback/index.tsx:23 -> user: ",
+    user,
   );
 
   useEffect(() => {
-    const processCallback = async () => {
-      const success = await handleGoogleCallback(searchParams);
-      navigate({ to: success ? "/dashboard" : "/login" });
-    };
-
-    processCallback();
+    handleLoginCallback(searchParams);
   }, [searchParams, navigate]);
 
   return (

@@ -1,5 +1,5 @@
 import apiService from "@/lib/api";
-import { createPostSchema } from "@/schemas/post.schema";
+import { createPostSchema, updatePostSchema } from "@/schemas/post.schema";
 import { z } from "zod";
 
 export const getPostsService = async () => {
@@ -20,12 +20,18 @@ export const getPostService = async (id: string) => {
   return data.data;
 };
 
-export const updatePostService = async (id: string, post: Post) => {
-  const data = await apiService.put<Post>(`/posts/${id}`, post);
+export const updatePostService = async (id: string, post: z.infer<typeof updatePostSchema>) => {
+  const validatedPost = updatePostSchema.parse(post);
+  const data = await apiService.put<Post>(`/posts/${id}`, validatedPost);
   return data.data;
 };
 
 export const deletePostService = async (id: string) => {
   const data = await apiService.delete<Post>(`/posts/${id}`);
+  return data.data;
+};
+
+export const publishPostService = async (id: string) => {
+  const data = await apiService.post<Post>(`/posts/publish/${id}`);
   return data.data;
 };
