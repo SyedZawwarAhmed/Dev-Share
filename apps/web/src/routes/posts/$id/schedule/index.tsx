@@ -24,7 +24,6 @@ import {
 import { toast } from "sonner";
 import { getPostService } from "@/api/post.service";
 import { useQuery } from "@tanstack/react-query";
-import { useAuthStore } from "@/stores/auth.store";
 
 export const Route = createFileRoute("/posts/$id/schedule/")({
   component: RouteComponent,
@@ -42,7 +41,6 @@ function RouteComponent() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [timeZone, setTimeZone] = useState("America/New_York");
-  const { user } = useAuthStore();
 
   const handleSchedule = () => {
     if (!date || !time) {
@@ -188,10 +186,7 @@ function RouteComponent() {
 
               <div className="space-y-2">
                 <Label htmlFor="timezone">Time Zone</Label>
-                <Select
-                  value={timeZone}
-                  onValueChange={setTimeZone}
-                >
+                <Select value={timeZone} onValueChange={setTimeZone}>
                   <SelectTrigger id="timezone">
                     <SelectValue placeholder="Select time zone" />
                   </SelectTrigger>

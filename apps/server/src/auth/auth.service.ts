@@ -113,7 +113,7 @@ export class AuthService {
   }
 
   async linkedinLogin(profile: any) {
-    const { email, accessToken } = profile;
+    const { email, accessToken, id } = profile;
 
     const user = await this.prisma.user.update({
       where: { email },
@@ -123,14 +123,13 @@ export class AuthService {
             where: {
               provider_providerAccountId: {
                 provider: AuthProvider.LINKEDIN,
-                providerAccountId: email,
+                providerAccountId: id,
               },
             },
             create: {
               type: 'oauth',
               provider: AuthProvider.LINKEDIN,
-              providerAccountId: email,
-
+              providerAccountId: id,
               access_token: accessToken,
             },
             update: {

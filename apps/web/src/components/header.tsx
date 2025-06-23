@@ -91,7 +91,8 @@ export default function AppHeader() {
             <Link to="/connected-platforms">
               <Button
                 variant={
-                  pathname === "/connected-platforms" || pathname.startsWith("/connected-platforms/")
+                  pathname === "/connected-platforms" ||
+                  pathname.startsWith("/connected-platforms/")
                     ? "secondary"
                     : "ghost"
                 }
@@ -151,7 +152,7 @@ export default function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.image} alt="User" />
+                  <AvatarImage src={user?.profileImage} alt="User" />
                   <AvatarFallback>
                     {user?.firstName?.[0] ?? "U"}
                     {user?.lastName?.[0]}

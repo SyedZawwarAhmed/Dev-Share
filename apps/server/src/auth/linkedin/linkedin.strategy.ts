@@ -32,14 +32,14 @@ export class LinkedinStrategy extends PassportStrategy(Strategy, 'linkedin') {
     profile: any,
     done: Function,
   ) {
-    const { name, email, givenName, familyName, displayName, picture } =
-      profile;
+    const { id, email, givenName, familyName, picture } = profile;
     const user = {
       email,
+      id,
       firstName: givenName,
       lastName: familyName,
       profileImage: picture,
-      accessToken, // Store this for making LinkedIn API calls
+      accessToken,
       refreshToken,
     };
     done(null, user);
