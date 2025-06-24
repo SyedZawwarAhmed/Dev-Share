@@ -452,9 +452,17 @@ function RouteComponent() {
                                 to={`/posts/$id/schedule`}
                                 params={{ id: post.id.toString() }}
                               >
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    handlePostNow(post.id);
+                                  }}
+                                >
                                   <Send className="h-4 w-4 mr-2" />
-                                  Post Now
+                                  {isPublishing ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    "Post Now"
+                                  )}
                                 </DropdownMenuItem>
                               </Link>
                             )}
