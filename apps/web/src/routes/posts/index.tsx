@@ -12,6 +12,7 @@ import {
   Search,
   Send,
   Trash2,
+  CheckCircle2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,6 +21,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -30,7 +39,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Linkedin, Twitter } from "lucide-react";
 import { getPostsService, publishPostService } from "@/api/post.service";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
 import { toast } from "sonner";
 
@@ -44,6 +53,7 @@ export const Route = createFileRoute("/posts/")({
 });
 
 function RouteComponent() {
+  const queryClient = useQueryClient();
   const { data: posts, isPending: isPostsLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: getPostsService,
@@ -52,7 +62,8 @@ function RouteComponent() {
   const { mutate: publishPost, isPending: isPublishing } = useMutation({
     mutationFn: publishPostService,
     onSuccess: () => {
-      toast.success("Post published successfully");
+      setShowSuccessDialog(true);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: () => {
       toast.error("Failed to publish post");
@@ -63,6 +74,7 @@ function RouteComponent() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Filter and sort posts
   const filteredPosts = posts;
@@ -165,6 +177,10 @@ function RouteComponent() {
 
   const handlePostNow = (postId: string) => {
     publishPost(postId);
+  };
+
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
   };
 
   return (
@@ -516,6 +532,30 @@ function RouteComponent() {
           </TabsContent>
         </Tabs>
       )}
+
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            </div>
+            <DialogTitle className="text-xl font-semibold text-gray-900 text-center">
+              Post Published Successfully!
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 mt-2 text-center">
+              Your post has been published successfully.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center mt-6">
+            <Button
+              onClick={handleSuccessDialogClose}
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
