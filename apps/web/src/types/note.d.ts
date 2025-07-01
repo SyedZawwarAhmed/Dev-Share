@@ -14,3 +14,8 @@ type CreateNotePayload = {
   content: string;
   status: "DRAFT" | "ACTIVE";
 };
+
+type UpdateNotePayload = {
+  title: string;
+  content: string;
+};

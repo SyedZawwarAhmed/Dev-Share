@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,25 +13,38 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { getNoteService, updateNoteService } from "@/api/note.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/notes/$id/edit/")({
   component: RouteComponent,
 });
 
-// Mock data for the note
-const mockNote = {
-  id: 1,
-  title: "Next.js Server Actions",
-  content:
-    "Server Actions are a Next.js feature built on top of React Actions. They allow you to define async server functions that can be called directly from your components. This eliminates the need for API endpoints!\n\nKey features:\n- No need for API routes\n- Progressive enhancement\n- Works with and without JavaScript\n- Form handling is much simpler\n- Built-in security against CSRF attacks\n\nExample usage:\n```tsx\n'use server'\n\nasync function submitForm(formData: FormData) {\n  // Server-side code here\n  const name = formData.get('name')\n  await saveToDatabase({ name })\n}\n```\n\nThis is a game-changer for building forms and mutations in Next.js applications.",
-  createdAt: "2023-04-05T14:30:00Z",
-  status: "active",
-};
-
 function RouteComponent() {
-  const [isSaving, setIsSaving] = useState(false);
-  const [title, setTitle] = useState(mockNote.title);
-  const [content, setContent] = useState(mockNote.content);
+  const { id } = Route.useParams();
+  const navigate = useNavigate();
+  const { data: note } = useQuery({
+    queryKey: ["notes", id],
+    queryFn: () => getNoteService(id),
+  });
+  const { mutate: updateNote, isPending: isNoteUpdating } = useMutation({
+    mutationFn: (data: UpdateNotePayload) => updateNoteService(id, data),
+    onSuccess: () => {
+      toast("Note updated", {
+        description: "Your learning note has been updated successfully.",
+      });
+      navigate({ to: "/notes" });
+    },
+  });
+  const [title, setTitle] = useState(note?.title || "");
+  const [content, setContent] = useState(note?.content || "");
+
+  useEffect(() => {
+    if (note) {
+      setTitle(note.title);
+      setContent(note.content);
+    }
+  }, [note]);
 
   const handleSave = () => {
     if (!title.trim()) {
@@ -48,16 +61,10 @@ function RouteComponent() {
       return;
     }
 
-    setIsSaving(true);
-    // Simulate saving to database
-    setTimeout(() => {
-      toast("Note updated", {
-        description: "Your learning note has been updated successfully.",
-      });
-      setIsSaving(false);
-      // In a real app, redirect back to the notes list
-      window.location.href = "/notes";
-    }, 1500);
+    updateNote({
+      title,
+      content,
+    });
   };
 
   return (
@@ -125,9 +132,9 @@ function RouteComponent() {
           <Button
             onClick={handleSave}
             className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-            disabled={isSaving}
+            disabled={isNoteUpdating}
           >
-            {isSaving ? (
+            {isNoteUpdating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
