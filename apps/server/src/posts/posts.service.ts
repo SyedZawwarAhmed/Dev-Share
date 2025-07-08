@@ -21,6 +21,9 @@ export class PostsService {
       include: {
         note: true,
       },
+      orderBy: {
+        updatedAt: 'desc',
+      },
     });
   }
 
@@ -39,8 +42,8 @@ export class PostsService {
         isDeleted: false,
       },
       include: {
-        note: true
-      }
+        note: true,
+      },
     });
   }
 
@@ -69,14 +72,14 @@ export class PostsService {
   async schedulePost(userId: string, postId: string, post) {
     const scheduledAt = new Date(post.scheduledAt);
     const now = new Date();
-    
+
     if (scheduledAt < now) {
       throw new BadRequestException('Scheduled time must be in the future');
     }
 
     // Use the scheduler service to properly schedule the post
     await this.postsSchedulerService.schedulePost(userId, postId, scheduledAt);
-    
+
     return this.prisma.post.findFirst({
       where: {
         id: postId,
