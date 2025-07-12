@@ -66,7 +66,7 @@ export class PostsSchedulerService {
     }
   }
 
-  async schedulePost(userId: string, postId: string, scheduledAt: Date) {
+  async schedulePost(userId: string, postId: string, scheduledFor: Date) {
     // Update the post status to SCHEDULED
     await this.prisma.post.update({
       where: {
@@ -75,10 +75,10 @@ export class PostsSchedulerService {
       },
       data: {
         status: PostStatus.SCHEDULED,
-        scheduledFor: scheduledAt,
+        scheduledFor,
       },
     });
 
-    this.logger.log(`Post ${postId} scheduled for ${scheduledAt}`);
+    this.logger.log(`Post ${postId} scheduled for ${scheduledFor}`);
   }
 } 

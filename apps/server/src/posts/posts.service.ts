@@ -70,15 +70,15 @@ export class PostsService {
   }
 
   async schedulePost(userId: string, postId: string, post) {
-    const scheduledAt = new Date(post.scheduledAt);
+    const scheduledFor = new Date(post.scheduledFor);
     const now = new Date();
 
-    if (scheduledAt < now) {
+    if (scheduledFor < now) {
       throw new BadRequestException('Scheduled time must be in the future');
     }
 
     // Use the scheduler service to properly schedule the post
-    await this.postsSchedulerService.schedulePost(userId, postId, scheduledAt);
+    await this.postsSchedulerService.schedulePost(userId, postId, scheduledFor);
 
     return this.prisma.post.findFirst({
       where: {
