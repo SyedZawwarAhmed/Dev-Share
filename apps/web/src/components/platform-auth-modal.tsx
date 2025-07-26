@@ -8,9 +8,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ExternalLink, Loader2, Shield } from "lucide-react";
+import { CheckCircle2, ExternalLink, Shield } from "lucide-react";
 import { Linkedin, Twitter } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
+import { getAuthUrl } from "@/lib/auth";
 
 interface PlatformAuthModalProps {
   isOpen: boolean;
@@ -25,13 +26,8 @@ export default function PlatformAuthModal({
   platform,
   onAuthComplete,
 }: PlatformAuthModalProps) {
-  const { isAuthenticated, isLoading: isAuthenticating } = useAuthStore();
-
-  // const authStatus = {
-  //   LINKEDIN: true,
-  //   X: false,
-  //   BLUESKY: false,
-  // };
+  const { user } = useAuthStore();
+  const isAuthenticated = user?.accounts?.some(userAccount => userAccount.provider === platform)
 
   const platformConfig = {
     LINKEDIN: {
@@ -76,24 +72,8 @@ export default function PlatformAuthModal({
   const config = platformConfig[platform];
 
   const handleAuth = () => {
+    window.location.href = getAuthUrl(platform);
   };
-
-  // const getAuthUrl = (platform: Platform) => {
-  //   // In a real app, these would be your actual OAuth URLs
-  //   const baseUrl = window.location.origin;
-  //   const redirectUri = `${baseUrl}/auth/callback/${platform}`;
-
-  //   switch (platform) {
-  //     case "LINKEDIN":
-  //       return `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=w_member_social`;
-  //     case "X":
-  //       return `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.write%20users.read`;
-  //     case "BLUESKY":
-  //       return `${baseUrl}/auth/bluesky?redirect_uri=${encodeURIComponent(redirectUri)}`;
-  //     default:
-  //       return "#";
-  //   }
-  // };
 
   const handleContinue = () => {
     onAuthComplete();
@@ -177,20 +157,20 @@ export default function PlatformAuthModal({
           ) : (
             <Button
               onClick={handleAuth}
-              disabled={isAuthenticating}
+              // disabled={isAuthenticating}
               className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
             >
-              {isAuthenticating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                <>
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Connect {config.name}
-                </>
-              )}
+              {/* {isAuthenticating ? ( */}
+              {/*   <> */}
+              {/*     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
+              {/*     Connecting... */}
+              {/*   </> */}
+              {/* ) : ( */}
+              <>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Connect {config.name}
+              </>
+              {/* )} */}
             </Button>
           )}
         </DialogFooter>

@@ -148,7 +148,12 @@ function RouteComponent() {
                       <p className="text-xs text-slate-500">Connected account</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleConnectPlatform(platform.id)}
+                  >
                     Reconnect
                   </Button>
                 </div>
@@ -162,7 +167,7 @@ function RouteComponent() {
                       Not connected yet
                     </p>
                   </div>
-                  <Button 
+                  <Button
                     onClick={() => handleConnectPlatform(platform.id)}
                     className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                   >

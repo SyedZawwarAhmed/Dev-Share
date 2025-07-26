@@ -34,3 +34,17 @@ export async function logout() {
   toast.success("Successfully logged out!");
   return data.data;
 }
+
+
+export const getAuthUrl = (platform: Platform) => {
+  switch (platform) {
+    case "LINKEDIN":
+      return `${import.meta.env.VITE_API_URL}/auth/linkedin`;
+    case "X":
+      return `${import.meta.env.VITE_API_URL}/auth/x`;
+    case "BLUESKY":
+      return `${import.meta.env.VITE_API_URL}/auth/bluesky`;
+    default:
+      return "#";
+  }
+};

@@ -67,14 +67,19 @@ function RouteComponent() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: () => {
+      setIsPostConfirmationModalOpen(false)
       toast.error("Failed to publish post");
     },
+    onSettled: () => {
+      setIsPostConfirmationModalOpen(false)
+    }
   });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [isPostConfirmationModalOpen, setIsPostConfirmationModalOpen] = useState(false)
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Filter and sort posts
@@ -326,7 +331,10 @@ function RouteComponent() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Dialog>
+                          <Dialog
+                            open={isPostConfirmationModalOpen}
+                            onOpenChange={setIsPostConfirmationModalOpen}
+                          >
                             <DropdownMenu modal={false}>
                               <DropdownMenuTrigger asChild>
                                 <Button

@@ -49,7 +49,7 @@ function RouteComponent() {
       if (!post) {
         throw new Error("Post not found.")
       }
-      schedulePostService(post.id, { scheduledFor: `${date}T${time}` })
+      await schedulePostService(post.id, { scheduledFor: `${date}T${time}` })
     },
     onSuccess: () => {
       toast("Post created", {
