@@ -300,7 +300,7 @@ function RouteComponent() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="bluesky"
+                      id="BLUESKY"
                       checked={selectedPlatforms.BLUESKY}
                       onCheckedChange={(checked) =>
                         handlePlatformChange("BLUESKY", checked as boolean)
@@ -308,7 +308,7 @@ function RouteComponent() {
                       disabled={!user?.accounts?.some(account => account.provider === "BLUESKY")}
                     />
                     <Label
-                      htmlFor="bluesky"
+                      htmlFor="BLUESKY"
                       className={`text-sm font-normal ${!user?.accounts?.some(account => account.provider === "BLUESKY")
                         ? "text-slate-400 cursor-not-allowed"
                         : ""
@@ -474,7 +474,7 @@ function RouteComponent() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="bluesky" className="m-0">
+              <TabsContent value="BLUESKY" className="m-0">
                 <div className="space-y-4">
                   <Badge
                     variant="outline"

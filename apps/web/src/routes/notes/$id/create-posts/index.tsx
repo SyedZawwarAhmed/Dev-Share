@@ -201,7 +201,7 @@ function RouteComponent() {
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="linkedin"
+                    id="LINKEDIN"
                     checked={selectedPlatforms.LINKEDIN}
                     onCheckedChange={(checked) =>
                       handlePlatformChange("LINKEDIN", checked as boolean)
@@ -213,23 +213,22 @@ function RouteComponent() {
                     }
                   />
                   <Label
-                    htmlFor="linkedin"
-                    className={`text-sm font-normal ${
-                      !user?.accounts?.some(
-                        (account) => account.provider === "LINKEDIN"
-                      )
+                    htmlFor="LINKEDIN"
+                    className={`text-sm font-normal ${!user?.accounts?.some(
+                      (account) => account.provider === "LINKEDIN"
+                    )
                         ? "text-slate-400 cursor-not-allowed"
                         : ""
-                    }`}
+                      }`}
                   >
                     LinkedIn
                     {!user?.accounts?.some(
                       (account) => account.provider === "LINKEDIN"
                     ) && (
-                      <span className="text-xs text-slate-400 ml-1">
-                        (Connect account first)
-                      </span>
-                    )}
+                        <span className="text-xs text-slate-400 ml-1">
+                          (Connect account first)
+                        </span>
+                      )}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -247,27 +246,26 @@ function RouteComponent() {
                   />
                   <Label
                     htmlFor="x"
-                    className={`text-sm font-normal ${
-                      !user?.accounts?.some(
-                        (account) => account.provider === "X"
-                      )
+                    className={`text-sm font-normal ${!user?.accounts?.some(
+                      (account) => account.provider === "X"
+                    )
                         ? "text-slate-400 cursor-not-allowed"
                         : ""
-                    }`}
+                      }`}
                   >
                     X (Twitter)
                     {!user?.accounts?.some(
                       (account) => account.provider === "X"
                     ) && (
-                      <span className="text-xs text-slate-400 ml-1">
-                        (Connect account first)
-                      </span>
-                    )}
+                        <span className="text-xs text-slate-400 ml-1">
+                          (Connect account first)
+                        </span>
+                      )}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="bluesky"
+                    id="BLUESKY"
                     checked={selectedPlatforms.BLUESKY}
                     onCheckedChange={(checked) =>
                       handlePlatformChange("BLUESKY", checked as boolean)
@@ -279,42 +277,41 @@ function RouteComponent() {
                     }
                   />
                   <Label
-                    htmlFor="bluesky"
-                    className={`text-sm font-normal ${
-                      !user?.accounts?.some(
-                        (account) => account.provider === "BLUESKY"
-                      )
+                    htmlFor="BLUESKY"
+                    className={`text-sm font-normal ${!user?.accounts?.some(
+                      (account) => account.provider === "BLUESKY"
+                    )
                         ? "text-slate-400 cursor-not-allowed"
                         : ""
-                    }`}
+                      }`}
                   >
                     Bluesky
                     {!user?.accounts?.some(
                       (account) => account.provider === "BLUESKY"
                     ) && (
-                      <span className="text-xs text-slate-400 ml-1">
-                        (Connect account first)
-                      </span>
-                    )}
+                        <span className="text-xs text-slate-400 ml-1">
+                          (Connect account first)
+                        </span>
+                      )}
                   </Label>
                 </div>
               </div>
               {!user?.accounts?.some((account) =>
                 ["LINKEDIN", "X", "BLUESKY"].includes(account.provider)
               ) && (
-                <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                  <p className="text-sm text-amber-700">
-                    <strong>No platforms connected.</strong>{" "}
-                    <Link
-                      to="/connected-platforms"
-                      className="text-amber-800 underline hover:text-amber-900"
-                    >
-                      Connect your social media accounts
-                    </Link>{" "}
-                    to start generating and posting content.
-                  </p>
-                </div>
-              )}
+                  <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                    <p className="text-sm text-amber-700">
+                      <strong>No platforms connected.</strong>{" "}
+                      <Link
+                        to="/connected-platforms"
+                        className="text-amber-800 underline hover:text-amber-900"
+                      >
+                        Connect your social media accounts
+                      </Link>{" "}
+                      to start generating and posting content.
+                    </p>
+                  </div>
+                )}
             </div>
           </CardContent>
           <CardFooter>
@@ -354,13 +351,13 @@ function RouteComponent() {
           </CardHeader>
           <CardContent>
             <Tabs
-              defaultValue="linkedin"
+              defaultValue="LINKEDIN"
               value={activeTab}
               onValueChange={setActiveTab}
             >
               <TabsList className="grid grid-cols-3 mb-4">
                 <TabsTrigger
-                  value="linkedin"
+                  value="LINKEDIN"
                   className="flex items-center gap-1"
                   disabled={!selectedPlatforms.LINKEDIN}
                 >
@@ -375,7 +372,7 @@ function RouteComponent() {
                   <Twitter className="h-4 w-4" />X
                 </TabsTrigger>
                 <TabsTrigger
-                  value="bluesky"
+                  value="BLUESKY"
                   className="flex items-center gap-1"
                   disabled={!selectedPlatforms.BLUESKY}
                 >
@@ -396,7 +393,7 @@ function RouteComponent() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="linkedin" className="m-0">
+              <TabsContent value="LINKEDIN" className="m-0">
                 <div className="space-y-4">
                   <Badge
                     variant="outline"
@@ -439,7 +436,7 @@ function RouteComponent() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="bluesky" className="m-0">
+              <TabsContent value="BLUESKY" className="m-0">
                 <div className="space-y-4">
                   <Badge
                     variant="outline"
@@ -483,7 +480,7 @@ function RouteComponent() {
                   platforms: Object.keys(selectedPlatforms).filter(
                     (platform) =>
                       selectedPlatforms[
-                        platform as keyof typeof selectedPlatforms
+                      platform as keyof typeof selectedPlatforms
                       ]
                   ) as Platform[],
                 })
