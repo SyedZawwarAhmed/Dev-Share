@@ -108,7 +108,7 @@ function RouteComponent() {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-3xl">
+    <main className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-6">
         <Link
           to="/posts"

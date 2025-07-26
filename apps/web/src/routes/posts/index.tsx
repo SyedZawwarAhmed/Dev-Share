@@ -28,6 +28,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -325,57 +326,77 @@ function RouteComponent() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <Link
-                                to={`/posts/$id/edit`}
-                                params={{ id: post.id.toString() }}
-                              >
-                                <DropdownMenuItem>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit Post
-                                </DropdownMenuItem>
-                              </Link>
-                              {post?.status === "DRAFT" && (
+                          <Dialog>
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-8 w-8"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
                                 <Link
-                                  to={`/posts/$id/schedule`}
+                                  to={`/posts/$id/edit`}
                                   params={{ id: post.id.toString() }}
                                 >
                                   <DropdownMenuItem>
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    Schedule Post
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit Post
                                   </DropdownMenuItem>
                                 </Link>
-                              )}
-                              {post?.status === "DRAFT" && (
-                                <DropdownMenuItem
+                                {post?.status === "DRAFT" && (
+                                  <Link
+                                    to={`/posts/$id/schedule`}
+                                    params={{ id: post.id.toString() }}
+                                  >
+                                    <DropdownMenuItem>
+                                      <Calendar className="h-4 w-4 mr-2" />
+                                      Schedule Post
+                                    </DropdownMenuItem>
+                                  </Link>
+                                )}
+                                {post?.status === "DRAFT" && (
+                                  <DialogTrigger asChild>
+                                    <DropdownMenuItem
+                                    >
+                                      <Send className="h-4 w-4 mr-2" />
+                                      Post Now
+                                    </DropdownMenuItem>
+                                  </DialogTrigger>
+                                )}
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete Post
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Are you absolutely sure?
+                                </DialogTitle>
+                                <DialogDescription>
+                                  This action cannot be undone. Are you sure
+                                  you want to publish this post?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button
                                   onClick={() => {
                                     handlePostNow(post.id);
                                   }}
+                                  variant={"gradient"}
+                                  size={"lg"}
+                                  loading={isPublishing}
                                 >
-                                  <Send className="h-4 w-4 mr-2" />
-                                  {isPublishing ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    "Post Now"
-                                  )}
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem className="text-red-600">
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Post
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                  Confirm
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </div>
                     </CardContent>
