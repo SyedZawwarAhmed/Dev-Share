@@ -46,10 +46,30 @@ export class GeminiService {
         model: 'gemini-2.0-flash',
         config: {
           responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'object',
+            properties: {
+              post_content: {
+                type: 'string',
+                description: 'The formatted post content'
+              },
+              suggested_hashtags: {
+                type: 'array',
+                items: {
+                  type: 'string'
+                },
+                description: 'Array of suggested hashtags if applicable'
+              },
+              platform: {
+                type: 'string',
+                description: 'The platform identifier'
+              }
+            },
+            required: ['post_content', 'platform']
+          }
         },
         contents: prompt,
       });
-
       const result = response.candidates?.[0].content?.parts?.[0]?.text;
 
       if (!result) {
