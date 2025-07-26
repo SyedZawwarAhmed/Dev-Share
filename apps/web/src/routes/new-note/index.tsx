@@ -18,19 +18,45 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/stores/auth.store";
 import { Label } from "@radix-ui/react-label";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Linkedin, Loader2, Save, Wand2, X } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-
+import { useState } from "react"; import { toast } from "sonner";
 export const Route = createFileRoute("/new-note/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { user } = useAuthStore();
+  const navigate = useNavigate()
   const { mutate: saveDraft, isPending: isDraftSaving } = useMutation({
-    mutationFn: addNoteService,
+    mutationFn: async () => {
+      if (!user) {
+        toast("Please login to save your note", {
+          description: "Please login to save your note.",
+        });
+        return;
+      }
+      if (!note.title) {
+        toast("Missing title", {
+          description: "Please provide a title for your note before saving.",
+        });
+        return;
+      }
+      await addNoteService(note)
+    },
+    onSuccess: () => {
+      toast("Note saved", {
+        description: "Your learning note has been saved.",
+      });
+
+      navigate({ to: "/notes" });
+    },
+    onError: (error) => {
+      console.error(
+        "\n\n ---> apps/web/src/routes/new-note.tsx:96 -> error: ",
+        error
+      );
+    }
   });
 
   const [note, setNote] = useState<CreateNotePayload>({
@@ -67,32 +93,6 @@ function RouteComponent() {
     },
   });
 
-  const handleSaveDraft = async () => {
-    try {
-      if (!user) {
-        toast("Please login to save your note", {
-          description: "Please login to save your note.",
-        });
-        return;
-      }
-      if (!note.title) {
-        toast("Missing title", {
-          description: "Please provide a title for your note before saving.",
-        });
-        return;
-      }
-
-      saveDraft(note);
-      toast("Draft saved", {
-        description: "Your learning note has been saved as a draft.",
-      });
-    } catch (error) {
-      console.error(
-        "\n\n ---> apps/web/src/routes/new-note.tsx:96 -> error: ",
-        error
-      );
-    }
-  };
 
   const handlePlatformChange = (platform: string, checked: boolean) => {
     setSelectedPlatforms((prev) => ({
@@ -202,13 +202,12 @@ function RouteComponent() {
                       }
                       disabled={!user?.accounts?.some(account => account.provider === "LINKEDIN")}
                     />
-                    <Label 
-                      htmlFor="linkedin" 
-                      className={`text-sm font-normal ${
-                        !user?.accounts?.some(account => account.provider === "LINKEDIN") 
-                          ? "text-slate-400 cursor-not-allowed" 
-                          : ""
-                      }`}
+                    <Label
+                      htmlFor="linkedin"
+                      className={`text-sm font-normal ${!user?.accounts?.some(account => account.provider === "LINKEDIN")
+                        ? "text-slate-400 cursor-not-allowed"
+                        : ""
+                        }`}
                     >
                       LinkedIn
                       {!user?.accounts?.some(account => account.provider === "LINKEDIN") && (
@@ -225,13 +224,12 @@ function RouteComponent() {
                       }
                       disabled={!user?.accounts?.some(account => account.provider === "X")}
                     />
-                    <Label 
-                      htmlFor="x" 
-                      className={`text-sm font-normal ${
-                        !user?.accounts?.some(account => account.provider === "X") 
-                          ? "text-slate-400 cursor-not-allowed" 
-                          : ""
-                      }`}
+                    <Label
+                      htmlFor="x"
+                      className={`text-sm font-normal ${!user?.accounts?.some(account => account.provider === "X")
+                        ? "text-slate-400 cursor-not-allowed"
+                        : ""
+                        }`}
                     >
                       X (Twitter)
                       {!user?.accounts?.some(account => account.provider === "X") && (
@@ -248,13 +246,12 @@ function RouteComponent() {
                       }
                       disabled={!user?.accounts?.some(account => account.provider === "BLUESKY")}
                     />
-                    <Label 
-                      htmlFor="bluesky" 
-                      className={`text-sm font-normal ${
-                        !user?.accounts?.some(account => account.provider === "BLUESKY") 
-                          ? "text-slate-400 cursor-not-allowed" 
-                          : ""
-                      }`}
+                    <Label
+                      htmlFor="bluesky"
+                      className={`text-sm font-normal ${!user?.accounts?.some(account => account.provider === "BLUESKY")
+                        ? "text-slate-400 cursor-not-allowed"
+                        : ""
+                        }`}
                     >
                       Bluesky
                       {!user?.accounts?.some(account => account.provider === "BLUESKY") && (
@@ -279,7 +276,7 @@ function RouteComponent() {
           </CardContent>
           <CardFooter className="flex gap-3">
             <Button
-              onClick={handleSaveDraft}
+              onClick={() => saveDraft()}
               variant="outline"
               className="flex-1"
             >
@@ -302,7 +299,7 @@ function RouteComponent() {
                   platforms: Object.keys(selectedPlatforms).filter(
                     (platform) =>
                       selectedPlatforms[
-                        platform as keyof typeof selectedPlatforms
+                      platform as keyof typeof selectedPlatforms
                       ]
                   ) as Platform[],
                 })
@@ -460,7 +457,7 @@ function RouteComponent() {
               Regenerate
             </Button>
             <SavePostsDropdown
-              onSaveDraft={handleSaveDraft}
+              onSaveDraft={() => saveDraft()}
               onSchedule={handleSchedule}
               onPostNow={handlePostNow}
               isLoading={isSaving}
