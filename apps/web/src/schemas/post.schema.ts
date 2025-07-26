@@ -145,25 +145,37 @@ export const updatePostSchema = z
       .nullable()
       .optional(),
   })
-  // .superRefine((data, ctx) => {
-  //   if (data.scheduledFor) {
-  //     const scheduledDate = new Date(data.scheduledFor);
-  //     const now = new Date();
+// .superRefine((data, ctx) => {
+//   if (data.scheduledFor) {
+//     const scheduledDate = new Date(data.scheduledFor);
+//     const now = new Date();
 
-  //     if (scheduledDate < now) {
-  //       ctx.addIssue({
-  //         code: z.ZodIssueCode.custom,
-  //         message: "Scheduled date must be in the future",
-  //         path: ["scheduledFor"],
-  //       });
-  //     }
-  //   }
+//     if (scheduledDate < now) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         message: "Scheduled date must be in the future",
+//         path: ["scheduledFor"],
+//       });
+//     }
+//   }
 
-  //   if (data.published && !data.publishedAt) {
-  //     ctx.addIssue({
-  //       code: z.ZodIssueCode.custom,
-  //       message: "Published date is required when post is published",
-  //       path: ["publishedAt"],
-  //     });
-  //   }
-  // });
+//   if (data.published && !data.publishedAt) {
+//     ctx.addIssue({
+//       code: z.ZodIssueCode.custom,
+//       message: "Published date is required when post is published",
+//       path: ["publishedAt"],
+//     });
+//   }
+// });
+//
+
+
+export const schedulePostSchema = z
+  .object({
+    scheduledFor: z
+      .string({
+        required_error: "Content is required",
+        invalid_type_error: "Content must be a string",
+      })
+      .min(1, "Content cannot be empty"),
+  })

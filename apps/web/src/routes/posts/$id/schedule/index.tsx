@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,16 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { Linkedin, Twitter } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
-import { getPostService } from "@/api/post.service";
-import { useQuery } from "@tanstack/react-query";
+import { getPostService, schedulePostService } from "@/api/post.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fromZodError } from "zod-validation-error";
+import { ZodError } from "zod";
 
 export const Route = createFileRoute("/posts/$id/schedule/")({
   component: RouteComponent,
@@ -31,36 +26,51 @@ export const Route = createFileRoute("/posts/$id/schedule/")({
 
 function RouteComponent() {
   const params = Route.useParams();
+  const navigate = useNavigate()
+
+
+
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
 
   const { data: post } = useQuery({
     queryKey: ["post", params.id],
     queryFn: async () => getPostService(params.id),
   });
 
-  const [isScheduling, setIsScheduling] = useState(false);
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [timeZone, setTimeZone] = useState("America/New_York");
-
-  const handleSchedule = () => {
-    if (!date || !time) {
-      toast("Missing information", {
-        description: "Please select both a date and time for scheduling.",
-      });
-      return;
-    }
-
-    setIsScheduling(true);
-    // Simulate scheduling
-    setTimeout(() => {
-      toast("Post scheduled", {
+  const { mutate: schedulePost, isPending: isScheduling } = useMutation({
+    mutationFn: async () => {
+      if (!date || !time) {
+        toast("Missing information", {
+          description: "Please select both a date and time for scheduling.",
+        });
+        return;
+      }
+      if (!post) {
+        throw new Error("Post not found.")
+      }
+      schedulePostService(post.id, { scheduledFor: `${date}T${time}` })
+    },
+    onSuccess: () => {
+      toast("Post created", {
         description: "Your post has been scheduled successfully.",
       });
-      setIsScheduling(false);
-      // In a real app, redirect back to the posts list
-      window.location.href = "/posts";
-    }, 1500);
-  };
+      navigate({ to: "/posts", search: { status: '' } })
+    },
+    onError: (error) => {
+      console.error(
+        "\n\n ---> schedule/index.tsx:61 -> error: ",
+        error
+      );
+      if (error instanceof ZodError) {
+        toast.error(fromZodError(error).message);
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
+
+
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
@@ -184,32 +194,6 @@ function RouteComponent() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="timezone">Time Zone</Label>
-                <Select value={timeZone} onValueChange={setTimeZone}>
-                  <SelectTrigger id="timezone">
-                    <SelectValue placeholder="Select time zone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="America/New_York">
-                      Eastern Time (ET)
-                    </SelectItem>
-                    <SelectItem value="America/Chicago">
-                      Central Time (CT)
-                    </SelectItem>
-                    <SelectItem value="America/Denver">
-                      Mountain Time (MT)
-                    </SelectItem>
-                    <SelectItem value="America/Los_Angeles">
-                      Pacific Time (PT)
-                    </SelectItem>
-                    <SelectItem value="Europe/London">London (GMT)</SelectItem>
-                    <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
-                    <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm text-blue-800">
                 <p>
                   <strong>Tip:</strong> Schedule your posts during peak
@@ -224,7 +208,7 @@ function RouteComponent() {
               <Button variant="outline">Cancel</Button>
             </Link>
             <Button
-              onClick={handleSchedule}
+              onClick={() => schedulePost()}
               className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
               disabled={isScheduling}
             >

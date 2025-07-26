@@ -4,7 +4,7 @@ import { JwtOAuthGuard } from 'src/auth/jwt/jwt.oauth.guard';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private postsService: PostsService) {}
+  constructor(private postsService: PostsService) { }
 
   @Post()
   @UseGuards(JwtOAuthGuard)

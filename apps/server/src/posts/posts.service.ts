@@ -10,7 +10,7 @@ export class PostsService {
     private prisma: PrismaService,
     private socialMediaService: SocialMediaService,
     private postsSchedulerService: PostsSchedulerService,
-  ) {}
+  ) { }
 
   async getPosts(userId: string) {
     return await this.prisma.post.findMany({
@@ -69,8 +69,8 @@ export class PostsService {
     });
   }
 
-  async schedulePost(userId: string, postId: string, post) {
-    const scheduledFor = new Date(post.scheduledFor);
+  async schedulePost(userId: string, postId: string, schedule: { scheduledFor: string }) {
+    const scheduledFor = new Date(schedule.scheduledFor);
     const now = new Date();
 
     if (scheduledFor < now) {

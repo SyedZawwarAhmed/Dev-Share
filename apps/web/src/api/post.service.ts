@@ -1,5 +1,5 @@
 import apiService from "@/lib/api";
-import { createPostSchema, updatePostSchema } from "@/schemas/post.schema";
+import { createPostSchema, schedulePostSchema, updatePostSchema } from "@/schemas/post.schema";
 import { z } from "zod";
 
 export const getPostsService = async () => {
@@ -33,5 +33,11 @@ export const deletePostService = async (id: string) => {
 
 export const publishPostService = async (id: string) => {
   const data = await apiService.post<Post>(`/posts/publish/${id}`);
+  return data.data;
+};
+
+export const schedulePostService = async (id: string, schedule: z.infer<typeof schedulePostSchema>) => {
+  const validatedSchedule = schedulePostSchema.parse(schedule)
+  const data = await apiService.post<Post>(`/posts/schedule-post/${id}`, validatedSchedule);
   return data.data;
 };
