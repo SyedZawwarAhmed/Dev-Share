@@ -1,7 +1,7 @@
 import { generatePostsService } from "@/api/gemini.service";
 import { addNoteService } from "@/api/note.service";
 import { addPostService } from "@/api/post.service";
-import SavePostsDropdown from "@/components/save-posts-dropdown";
+import SavePostsButton from "@/components/save-posts-button";
 import ScheduleModal from "@/components/schedule-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -529,7 +529,7 @@ function RouteComponent() {
             >
               Regenerate
             </Button>
-            <SavePostsDropdown
+            <SavePostsButton
               onSaveDraft={createPost}
               onSchedule={handleSchedule}
               onPostNow={handlePostNow}

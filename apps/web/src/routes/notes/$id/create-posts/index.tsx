@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
 import { generatePostsService } from "@/api/gemini.service";
-import SavePostsDropdown from "@/components/save-posts-dropdown";
+import SavePostsButton from "@/components/save-posts-button";
 import ScheduleModal from "@/components/schedule-modal";
 import { addPostService } from "@/api/post.service";
 import { fromZodError } from "zod-validation-error";
@@ -217,8 +217,8 @@ function RouteComponent() {
                     className={`text-sm font-normal ${!user?.accounts?.some(
                       (account) => account.provider === "LINKEDIN"
                     )
-                        ? "text-slate-400 cursor-not-allowed"
-                        : ""
+                      ? "text-slate-400 cursor-not-allowed"
+                      : ""
                       }`}
                   >
                     LinkedIn
@@ -249,8 +249,8 @@ function RouteComponent() {
                     className={`text-sm font-normal ${!user?.accounts?.some(
                       (account) => account.provider === "X"
                     )
-                        ? "text-slate-400 cursor-not-allowed"
-                        : ""
+                      ? "text-slate-400 cursor-not-allowed"
+                      : ""
                       }`}
                   >
                     X (Twitter)
@@ -281,8 +281,8 @@ function RouteComponent() {
                     className={`text-sm font-normal ${!user?.accounts?.some(
                       (account) => account.provider === "BLUESKY"
                     )
-                        ? "text-slate-400 cursor-not-allowed"
-                        : ""
+                      ? "text-slate-400 cursor-not-allowed"
+                      : ""
                       }`}
                   >
                     Bluesky
@@ -492,7 +492,7 @@ function RouteComponent() {
               Regenerate
             </Button>
             {note?.id ? (
-              <SavePostsDropdown
+              <SavePostsButton
                 onSaveDraft={() =>
                   createPost({
                     content: generatedPosts.LINKEDIN?.post_content ?? "",
