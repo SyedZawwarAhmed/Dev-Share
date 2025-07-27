@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -46,10 +46,21 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/notes/")({
   component: RouteComponent,
+  beforeLoad: ({ search }) => {
+    search;
+  },
+  validateSearch: (search?: { search?: string }) => {
+    if (!search?.search) return {};
+    return {
+      search: search?.search || "",
+    };
+  },
 });
 
 function RouteComponent() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { search } = Route.useSearch();
+  const navigate = useNavigate();
+
   const [sortBy, setSortBy] = useState("newest");
   const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
@@ -57,8 +68,8 @@ function RouteComponent() {
   const queryClient = useQueryClient();
 
   const { data: notes, isLoading: isNotesLoading } = useQuery({
-    queryKey: ["notes"],
-    queryFn: getNotesService,
+    queryKey: ["notes", search],
+    queryFn: async () => getNotesService({ search }),
   });
 
   const { mutateAsync: deleteNote, isPending: isDeletingNote } = useMutation({
@@ -89,25 +100,25 @@ function RouteComponent() {
     }));
   };
 
-  const filteredNotes = notes
-    ?.filter((note) => {
-      const matchesSearch =
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredNotes = notes;
+  // ?.filter((note) => {
+  //   const matchesSearch =
+  //     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     note.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchesSearch;
-    })
-    .sort((a, b) => {
-      if (sortBy === "newest") {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      } else {
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      }
-    });
+  //   return matchesSearch;
+  // })
+  // .sort((a, b) => {
+  //   if (sortBy === "newest") {
+  //     return (
+  //       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  //     );
+  //   } else {
+  //     return (
+  //       new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  //     );
+  //   }
+  // });
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl">
@@ -136,8 +147,13 @@ function RouteComponent() {
               <Input
                 placeholder="Search notes..."
                 className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={search}
+                onChange={(e) =>
+                  navigate({
+                    to: ".",
+                    search: { search: e.target.value },
+                  })
+                }
               />
             </div>
             <div className="flex gap-2">

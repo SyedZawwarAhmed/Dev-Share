@@ -28,8 +28,6 @@ function RouteComponent() {
   const params = Route.useParams();
   const navigate = useNavigate()
 
-
-
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 

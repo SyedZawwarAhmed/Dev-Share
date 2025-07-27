@@ -12,12 +12,12 @@ import { JwtOAuthGuard } from 'src/auth/jwt/jwt.oauth.guard';
 
 @Controller('notes')
 export class NotesController {
-  constructor(private notesService: NotesService) {}
+  constructor(private notesService: NotesService) { }
 
   @Post()
   @UseGuards(JwtOAuthGuard)
   getNotes(@Req() req) {
-    return this.notesService.getNotes(req.user.id);
+    return this.notesService.getNotes(req.user.id, req?.body);
   }
 
   @UseGuards(JwtOAuthGuard)

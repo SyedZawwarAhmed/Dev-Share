@@ -39,7 +39,7 @@ export default function AppHeader() {
     } catch (error) {
       console.error(
         "\n\n ---> apps/web/src/components/header.tsx:39 -> error: ",
-        error
+        error,
       );
       toast("Logout failed. Please try again.");
     }
@@ -76,7 +76,7 @@ export default function AppHeader() {
                 Notes
               </Button>
             </Link>
-            <Link to="/posts" search={{ status: "" }}>
+            <Link to="/posts">
               <Button
                 variant={
                   pathname === "/posts" || pathname.startsWith("/posts/")

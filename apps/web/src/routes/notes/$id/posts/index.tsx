@@ -159,6 +159,9 @@ function RouteComponent() {
       <div className="mb-6">
         <Link
           to="/notes"
+          search={{
+            search: ''
+          }}
           className="flex items-center text-purple-600 hover:text-purple-800"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />

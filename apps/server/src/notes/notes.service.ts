@@ -5,12 +5,30 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class NotesService {
   constructor(private prisma: PrismaService) {}
 
-  async getNotes(userId: string) {
+  async getNotes(
+    userId: string,
+    body: { search?: string; orderBy?: 'asc' | 'desc' },
+  ) {
     return (
       await this.prisma.note.findMany({
         where: {
           userId,
           isDeleted: false,
+          OR: [
+            {
+              content: {
+                contains: body?.search ?? '',
+              },
+            },
+            {
+              title: {
+                contains: body?.search ?? '',
+              },
+            },
+          ],
+        },
+        orderBy: {
+          updatedAt: body.orderBy ?? 'desc',
         },
         include: {
           _count: {

@@ -1,7 +1,12 @@
 import apiService from "@/lib/api";
+import { getNotesBodySchema } from "@/schemas/note.schema";
+import { z } from "zod";
 
-export const getNotesService = async () => {
-  const data = await apiService.post<Note[]>("/notes");
+export const getNotesService = async (
+  body: z.infer<typeof getNotesBodySchema>,
+) => {
+  const validatedBody = getNotesBodySchema.parse(body);
+  const data = await apiService.post<Note[]>("/notes", validatedBody);
   return data.data;
 };
 
@@ -17,7 +22,7 @@ export const getNoteService = async (id: string) => {
 
 export const updateNoteService = async (
   id: string,
-  note: UpdateNotePayload
+  note: UpdateNotePayload,
 ) => {
   const data = await apiService.put<Note>(`/notes/${id}`, note);
   return data.data;

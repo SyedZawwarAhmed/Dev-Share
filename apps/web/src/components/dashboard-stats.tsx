@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 export default function DashboardStats() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Link to="/notes" className="block">
+      <Link to="/notes" search={{ search: "" }} className="block">
         <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-100 hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center">

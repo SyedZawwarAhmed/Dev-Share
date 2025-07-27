@@ -52,7 +52,7 @@ function RouteComponent() {
         description: "Your learning note has been saved.",
       });
 
-      navigate({ to: "/notes" });
+      navigate({ to: "/notes", search: { search: '' } });
     },
     onError: (error) => {
       console.error(

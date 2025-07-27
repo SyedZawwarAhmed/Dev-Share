@@ -46,6 +46,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/posts/")({
   component: RouteComponent,
   validateSearch: (search?: { status?: "draft" | "scheduled" | "" }) => {
+    if (!search?.status) return {};
     return {
       status: search?.status,
     };
@@ -66,19 +67,20 @@ function RouteComponent() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: () => {
-      setIsPostConfirmationModalOpen(false)
+      setIsPostConfirmationModalOpen(false);
       toast.error("Failed to publish post");
     },
     onSettled: () => {
-      setIsPostConfirmationModalOpen(false)
-    }
+      setIsPostConfirmationModalOpen(false);
+    },
   });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [isPostConfirmationModalOpen, setIsPostConfirmationModalOpen] = useState(false)
+  const [isPostConfirmationModalOpen, setIsPostConfirmationModalOpen] =
+    useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Filter and sort posts
@@ -299,11 +301,11 @@ function RouteComponent() {
                                     <span>
                                       Scheduled for:{" "}
                                       {formatDate(
-                                        post?.scheduledFor?.toString()
+                                        post?.scheduledFor?.toString(),
                                       )}{" "}
                                       at{" "}
                                       {formatTime(
-                                        post?.scheduledFor?.toString()
+                                        post?.scheduledFor?.toString(),
                                       )}
                                     </span>
                                   </>
@@ -316,11 +318,11 @@ function RouteComponent() {
                                     <span>
                                       Published:{" "}
                                       {formatDate(
-                                        post?.publishedAt?.toString()
+                                        post?.publishedAt?.toString(),
                                       )}{" "}
                                       at{" "}
                                       {formatTime(
-                                        post?.publishedAt?.toString()
+                                        post?.publishedAt?.toString(),
                                       )}
                                     </span>
                                   </>
@@ -367,8 +369,7 @@ function RouteComponent() {
                                 )}
                                 {post?.status === "DRAFT" && (
                                   <DialogTrigger asChild>
-                                    <DropdownMenuItem
-                                    >
+                                    <DropdownMenuItem>
                                       <Send className="h-4 w-4 mr-2" />
                                       Post Now
                                     </DropdownMenuItem>
@@ -386,8 +387,8 @@ function RouteComponent() {
                                   Are you absolutely sure?
                                 </DialogTitle>
                                 <DialogDescription>
-                                  This action cannot be undone. Are you sure
-                                  you want to publish this post?
+                                  This action cannot be undone. Are you sure you
+                                  want to publish this post?
                                 </DialogDescription>
                               </DialogHeader>
                               <DialogFooter>
