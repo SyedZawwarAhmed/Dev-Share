@@ -40,8 +40,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/notes/")({
@@ -50,7 +50,6 @@ export const Route = createFileRoute("/notes/")({
 
 function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
@@ -96,10 +95,7 @@ function RouteComponent() {
         note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         note.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || note.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     })
     .sort((a, b) => {
       if (sortBy === "newest") {
@@ -145,17 +141,6 @@ function RouteComponent() {
               />
             </div>
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Notes</SelectItem>
-                  <SelectItem value="DRAFT">Drafts</SelectItem>
-                  <SelectItem value="ACTIVE">Active</SelectItem>
-                </SelectContent>
-              </Select>
-
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Sort by" />
@@ -207,22 +192,6 @@ function RouteComponent() {
                             <div>
                               <div className="flex items-center gap-2 mb-1">
                                 <h3 className="font-medium">{note.title}</h3>
-                                {note.status === "DRAFT" && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs bg-amber-50 border-amber-200 text-amber-700"
-                                  >
-                                    Draft
-                                  </Badge>
-                                )}
-                                {note.status === "ACTIVE" && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-                                  >
-                                    Active
-                                  </Badge>
-                                )}
                                 {note?.postCount > 0 && (
                                   <Badge
                                     variant="outline"
@@ -436,22 +405,6 @@ function RouteComponent() {
                     </div>
 
                     <div className="mb-3 flex gap-2">
-                      {note.status === "DRAFT" && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-amber-50 border-amber-200 text-amber-700"
-                        >
-                          Draft
-                        </Badge>
-                      )}
-                      {note.status === "ACTIVE" && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-                        >
-                          Active
-                        </Badge>
-                      )}
                       {note?.postCount > 0 && (
                         <Badge
                           variant="outline"

@@ -59,12 +59,6 @@ export default function RecentNotes() {
           <div className="flex items-center gap-2 mb-1">
             <FileText className="h-4 w-4 text-purple-600" />
             <span className="font-medium text-sm">Rust Web Development</span>
-            <Badge
-              variant="outline"
-              className="ml-auto text-xs bg-amber-50 border-amber-200 text-amber-700"
-            >
-              Draft
-            </Badge>
           </div>
           <p className="text-xs text-slate-500 mb-2">Added 3 days ago</p>
           <div className="flex justify-end">
