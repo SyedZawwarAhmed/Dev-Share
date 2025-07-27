@@ -38,7 +38,7 @@ function RouteComponent() {
       updatePostService(id, post),
     onSuccess: () => {
       toast.success("Post updated successfully");
-      navigate({ to: "/posts", search: { status: "" } });
+      navigate({ to: "/posts" });
     },
     onError: (error) => {
       toast.error(error.message);
@@ -107,7 +107,6 @@ function RouteComponent() {
       <div className="mb-6">
         <Link
           to="/posts"
-          search={{ status: "" }}
           className="flex items-center text-purple-600 hover:text-purple-800"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -149,7 +148,7 @@ function RouteComponent() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Link to="/posts" search={{ status: "" }}>
+          <Link to="/posts">
             <Button variant="outline">Cancel</Button>
           </Link>
           <Button

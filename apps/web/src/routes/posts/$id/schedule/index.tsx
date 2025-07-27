@@ -26,7 +26,7 @@ export const Route = createFileRoute("/posts/$id/schedule/")({
 
 function RouteComponent() {
   const params = Route.useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -45,21 +45,18 @@ function RouteComponent() {
         return;
       }
       if (!post) {
-        throw new Error("Post not found.")
+        throw new Error("Post not found.");
       }
-      await schedulePostService(post.id, { scheduledFor: `${date}T${time}` })
+      await schedulePostService(post.id, { scheduledFor: `${date}T${time}` });
     },
     onSuccess: () => {
       toast("Post created", {
         description: "Your post has been scheduled successfully.",
       });
-      navigate({ to: "/posts", search: { status: '' } })
+      navigate({ to: "/posts" });
     },
     onError: (error) => {
-      console.error(
-        "\n\n ---> schedule/index.tsx:61 -> error: ",
-        error
-      );
+      console.error("\n\n ---> schedule/index.tsx:61 -> error: ", error);
       if (error instanceof ZodError) {
         toast.error(fromZodError(error).message);
       } else {
@@ -67,8 +64,6 @@ function RouteComponent() {
       }
     },
   });
-
-
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
@@ -120,7 +115,6 @@ function RouteComponent() {
       <div className="mb-6">
         <Link
           to="/posts"
-          search={{ status: "" }}
           className="flex items-center text-purple-600 hover:text-purple-800"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -202,7 +196,7 @@ function RouteComponent() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Link to="/posts" search={{ status: "" }}>
+            <Link to="/posts">
               <Button variant="outline">Cancel</Button>
             </Link>
             <Button

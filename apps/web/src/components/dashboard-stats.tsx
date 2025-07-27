@@ -38,7 +38,7 @@ export default function DashboardStats() {
         </Card>
       </Link>
 
-      <Link to="/posts" search={{ status: "" }} className="block">
+      <Link to="/posts" className="block">
         <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-100 hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center">
