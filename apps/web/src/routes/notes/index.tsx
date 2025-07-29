@@ -58,6 +58,204 @@ export const Route = createFileRoute("/notes/")({
   },
 });
 
+function NoteCard({
+  note,
+  viewType,
+  deleteDialogs,
+  handleDeleteDialog,
+  deleteNote,
+  isDeletingNote,
+}: {
+  note: Note;
+  viewType: "list" | "grid";
+  deleteDialogs: { [key: string]: boolean };
+  handleDeleteDialog: (noteId: string, isOpen: boolean) => void;
+  deleteNote: (noteId: string) => void;
+  isDeletingNote: boolean;
+}) {
+  const isGridView = viewType === "grid";
+
+  return (
+    <Card
+      className={`hover:shadow-md transition-shadow ${
+        isGridView ? "h-full flex flex-col" : ""
+      }`}
+    >
+      <CardContent className={`p-4 ${isGridView ? "flex-1" : ""}`}>
+        <div
+          className={`flex justify-between items-start ${
+            isGridView ? "mb-3" : ""
+          }`}
+        >
+          <div
+            className={`flex items-start gap-3 ${
+              isGridView ? "gap-2 flex-1 min-w-0" : ""
+            }`}
+          >
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <FileText
+                className={`text-purple-600 ${isGridView ? "h-4 w-4" : "h-5 w-5"}`}
+              />
+            </div>
+            <div className={isGridView ? "flex-1 min-w-0" : ""}>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className={`font-medium ${isGridView ? "truncate" : ""}`}>
+                  {note.title}
+                </h3>
+                {!isGridView && note?.postCount > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs bg-blue-50 border-blue-200 text-blue-700"
+                  >
+                    {note?.postCount} {note?.postCount === 1 ? "Post" : "Posts"}
+                  </Badge>
+                )}
+              </div>
+              {!isGridView && (
+                <>
+                  <p className="text-sm text-slate-600 line-clamp-2 mb-2">
+                    {note.content}
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Calendar className="h-3 w-3" />
+                    <span>{formatDate(note.createdAt)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className={`flex items-center gap-2 ${isGridView ? "" : ""}`}>
+            {!isGridView && note.postCount === 0 && (
+              <Link to={`/notes/$id/create-posts`} params={{ id: note.id }}>
+                <Button size="sm" variant="outline" className="h-8">
+                  <Wand2 className="h-3 w-3 mr-1" />
+                  Create Posts
+                </Button>
+              </Link>
+            )}
+            {!isGridView && note.postCount > 0 && (
+              <Link to={`/notes/$id/posts`} params={{ id: note.id }}>
+                <Button size="sm" variant="outline" className="h-8">
+                  View Posts
+                </Button>
+              </Link>
+            )}
+            <Dialog
+              open={deleteDialogs[note.id]}
+              onOpenChange={(isOpen) => handleDeleteDialog(note.id, isOpen)}
+            >
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className={isGridView ? "h-7 w-7" : "h-8 w-8"}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <Link to={`/notes/$id/edit`} params={{ id: note.id }}>
+                    <DropdownMenuItem>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Note
+                    </DropdownMenuItem>
+                  </Link>
+                  {note.postCount === 0 && (
+                    <Link
+                      to={`/notes/$id/create-posts`}
+                      params={{ id: note.id }}
+                    >
+                      <DropdownMenuItem>
+                        <Wand2 className="h-4 w-4 mr-2" />
+                        Create Posts
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem className="text-red-600">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Note
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you absolutely sure?</DialogTitle>
+                  <DialogDescription>
+                    This action cannot be undone. Are you sure you want to
+                    delete this note?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    onClick={() => {
+                      deleteNote(note.id);
+                    }}
+                    variant={"gradient"}
+                    size={"lg"}
+                    loading={isDeletingNote}
+                  >
+                    Confirm
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {isGridView && (
+          <>
+            <div className="mb-3 flex gap-2">
+              {note?.postCount > 0 && (
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-blue-50 border-blue-200 text-blue-700"
+                >
+                  {note?.postCount} {note?.postCount === 1 ? "Post" : "Posts"}
+                </Badge>
+              )}
+            </div>
+
+            <p className="text-sm text-slate-600 line-clamp-3 mb-4">
+              {note.content}
+            </p>
+
+            <div className="flex items-center justify-between mt-auto text-xs text-slate-500">
+              <div className="flex items-center">
+                <Calendar className="h-3 w-3 mr-1" />
+                <span>{formatDate(note.createdAt)}</span>
+              </div>
+            </div>
+          </>
+        )}
+      </CardContent>
+
+      {/* Grid view action buttons */}
+      {isGridView && (
+        <div className="p-4 pt-0">
+          {note.postCount === 0 ? (
+            <Link to={`/notes/$id/create-posts`} params={{ id: note.id }}>
+              <Button size="sm" variant="outline" className="h-8 w-full">
+                <Wand2 className="h-3 w-3 mr-1" />
+                Create Posts
+              </Button>
+            </Link>
+          ) : (
+            <Link to={`/notes/$id/posts`} params={{ id: note.id }}>
+              <Button size="sm" variant="outline" className="h-8 w-full">
+                View Posts
+              </Button>
+            </Link>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function RouteComponent() {
   const { search } = Route.useSearch();
   const navigate = useNavigate();
@@ -132,7 +330,39 @@ function RouteComponent() {
     [],
   );
 
-  const filteredNotes = notes;
+  const renderNotes = (viewType: "list" | "grid") => {
+    if (!notes || notes.length === 0) {
+      return (
+        <div className="text-center py-12 text-slate-500">
+          <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+          <h3 className="text-lg font-medium mb-2">No notes found</h3>
+          <p>Try adjusting your search or filters</p>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={
+          viewType === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            : "space-y-4"
+        }
+      >
+        {notes.map((note) => (
+          <NoteCard
+            key={note.id}
+            note={note}
+            viewType={viewType}
+            deleteDialogs={deleteDialogs}
+            handleDeleteDialog={handleDeleteDialog}
+            deleteNote={deleteNote}
+            isDeletingNote={isDeletingNote}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl">
@@ -186,7 +416,7 @@ function RouteComponent() {
           <h3 className="text-lg font-medium mb-2">Loading...</h3>
           <p>Please wait while we fetch your notes</p>
         </div>
-      ) : !filteredNotes ? (
+      ) : !notes ? (
         <div className="text-center py-12 text-slate-500">
           <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
           <h3 className="text-lg font-medium mb-2">No notes found</h3>
@@ -200,278 +430,11 @@ function RouteComponent() {
           </TabsList>
 
           <TabsContent value="list" className="m-0">
-            <div className="space-y-4">
-              {filteredNotes.length > 0 ? (
-                filteredNotes.map((note) => (
-                  <Card
-                    key={note.id}
-                    className="hover:shadow-md transition-shadow"
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 bg-purple-100 rounded-lg">
-                            <FileText className="h-5 w-5 text-purple-600" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-medium">{note.title}</h3>
-                              {note?.postCount > 0 && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-                                >
-                                  {note?.postCount}{" "}
-                                  {note?.postCount === 1 ? "Post" : "Posts"}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-slate-600 line-clamp-2 mb-2">
-                              {note.content}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-slate-500">
-                              <Calendar className="h-3 w-3" />
-                              <span>{formatDate(note.createdAt)}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {note.postCount === 0 && (
-                            <Link
-                              to={`/notes/$id/create-posts`}
-                              params={{ id: note.id }}
-                            >
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8"
-                              >
-                                <Wand2 className="h-3 w-3 mr-1" />
-                                Create Posts
-                              </Button>
-                            </Link>
-                          )}
-                          {note.postCount > 0 && (
-                            <Link
-                              to={`/notes/$id/posts`}
-                              params={{ id: note.id }}
-                            >
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8"
-                              >
-                                View Posts
-                              </Button>
-                            </Link>
-                          )}
-                          <Dialog
-                            open={deleteDialogs[note.id]}
-                            onOpenChange={(isOpen) =>
-                              handleDeleteDialog(note.id, isOpen)
-                            }
-                          >
-                            <DropdownMenu modal={false}>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <Link
-                                  to={`/notes/$id/edit`}
-                                  params={{ id: note.id }}
-                                >
-                                  <DropdownMenuItem>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Note
-                                  </DropdownMenuItem>
-                                </Link>
-                                {note.postCount === 0 && (
-                                  <Link
-                                    to={`/notes/$id/create-posts`}
-                                    params={{ id: note.id }}
-                                  >
-                                    <DropdownMenuItem>
-                                      <Wand2 className="h-4 w-4 mr-2" />
-                                      Create Posts
-                                    </DropdownMenuItem>
-                                  </Link>
-                                )}
-                                <DialogTrigger asChild>
-                                  <DropdownMenuItem className="text-red-600">
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete Note
-                                  </DropdownMenuItem>
-                                </DialogTrigger>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Are you absolutely sure?
-                                </DialogTitle>
-                                <DialogDescription>
-                                  This action cannot be undone. Are you sure you
-                                  want to delete this note?
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  onClick={() => {
-                                    deleteNote(note.id);
-                                  }}
-                                  variant={"gradient"}
-                                  size={"lg"}
-                                  loading={isDeletingNote}
-                                >
-                                  Confirm
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                  <h3 className="text-lg font-medium mb-2">No notes found</h3>
-                  <p>Try adjusting your search or filters</p>
-                </div>
-              )}
-            </div>
+            {renderNotes("list")}
           </TabsContent>
 
           <TabsContent value="grid" className="m-0">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredNotes?.map((note) => (
-                <Card
-                  key={note.id}
-                  className="hover:shadow-md transition-shadow h-full flex flex-col"
-                >
-                  <CardContent className="p-4 flex-1">
-                    <div className="flex items-start gap-2 mb-3">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <FileText className="h-4 w-4 text-purple-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium truncate">{note.title}</h3>
-                      </div>
-                      <Dialog
-                        open={deleteDialogs[note.id]}
-                        onOpenChange={(isOpen) =>
-                          handleDeleteDialog(note.id, isOpen)
-                        }
-                      >
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-7 w-7"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit Note
-                            </DropdownMenuItem>
-                            {note.postCount === 0 && (
-                              <Link
-                                to={`/notes/$id/create-posts`}
-                                params={{ id: note.id }}
-                              >
-                                <DropdownMenuItem>
-                                  <Wand2 className="h-4 w-4 mr-2" />
-                                  Create Posts
-                                </DropdownMenuItem>
-                              </Link>
-                            )}
-                            <DialogTrigger asChild>
-                              <DropdownMenuItem className="text-red-600">
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Note
-                              </DropdownMenuItem>
-                            </DialogTrigger>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Are you absolutely sure?</DialogTitle>
-                            <DialogDescription>
-                              This action cannot be undone. Are you sure you
-                              want to delete this note?
-                            </DialogDescription>
-                          </DialogHeader>
-                          <DialogFooter>
-                            <Button
-                              onClick={() => deleteNote(note.id)}
-                              variant={"gradient"}
-                              size={"lg"}
-                              loading={isDeletingNote}
-                            >
-                              Confirm
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-
-                    <div className="mb-3 flex gap-2">
-                      {note?.postCount > 0 && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-                        >
-                          {note?.postCount}{" "}
-                          {note?.postCount === 1 ? "Post" : "Posts"}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <p className="text-sm text-slate-600 line-clamp-3 mb-4">
-                      {note.content}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-auto text-xs text-slate-500">
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        <span>{formatDate(note.createdAt)}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-
-                  {note.postCount === 0 && (
-                    <Link
-                      to={`/notes/$id/create-posts`}
-                      params={{ id: note.id }}
-                    >
-                      <Button size="sm" variant="outline" className="h-8">
-                        <Wand2 className="h-3 w-3 mr-1" />
-                        Create Posts
-                      </Button>
-                    </Link>
-                  )}
-                  {note.postCount > 0 && (
-                    <Link to={`/notes/$id/posts`} params={{ id: note.id }}>
-                      <Button size="sm" variant="outline" className="h-8">
-                        View Posts
-                      </Button>
-                    </Link>
-                  )}
-                </Card>
-              ))}
-            </div>
+            {renderNotes("grid")}
           </TabsContent>
         </Tabs>
       )}
