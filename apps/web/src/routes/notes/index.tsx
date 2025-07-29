@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useDebounce } from "@/lib/hooks";
+import { useConfigStore } from "@/stores/config.store";
 
 export const Route = createFileRoute("/notes/")({
   component: RouteComponent,
@@ -260,6 +261,8 @@ function RouteComponent() {
   const { search } = Route.useSearch();
   const navigate = useNavigate();
 
+  const { notesView, setNotesView } = useConfigStore();
+
   const [sortBy, setSortBy] = useState("newest");
   const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
@@ -423,7 +426,13 @@ function RouteComponent() {
           <p>Try adjusting your search or filters</p>
         </div>
       ) : (
-        <Tabs defaultValue="list" className="mb-8">
+        <Tabs
+          defaultValue={notesView}
+          className="mb-8"
+          onValueChange={(value) =>
+            setNotesView(value as ConfigState["notesView"])
+          }
+        >
           <TabsList className="mb-4">
             <TabsTrigger value="list">List View</TabsTrigger>
             <TabsTrigger value="grid">Grid View</TabsTrigger>
