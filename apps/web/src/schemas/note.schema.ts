@@ -6,4 +6,5 @@ export const getNotesBodySchema = z.object({
       invalid_type_error: "Content must be a string",
     })
     .optional(),
+  orderBy: z.enum(["asc", "desc"]).optional(),
 });

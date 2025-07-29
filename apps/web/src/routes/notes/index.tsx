@@ -89,8 +89,12 @@ function RouteComponent() {
   }, [search]);
 
   const { data: notes, isLoading: isNotesLoading } = useQuery({
-    queryKey: ["notes", debouncedSearch],
-    queryFn: async () => getNotesService({ search: debouncedSearch }),
+    queryKey: ["notes", debouncedSearch, sortBy],
+    queryFn: async () =>
+      getNotesService({
+        search: debouncedSearch,
+        orderBy: sortBy !== "newest" ? "asc" : "desc",
+      }),
   });
 
   const { mutateAsync: deleteNote, isPending: isDeletingNote } = useMutation({
