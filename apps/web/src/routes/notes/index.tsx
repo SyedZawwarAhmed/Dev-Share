@@ -48,9 +48,9 @@ import { useConfigStore } from "@/stores/config.store";
 
 export const Route = createFileRoute("/notes/")({
   component: RouteComponent,
-  beforeLoad: ({ search }) => {
-    search;
-  },
+  // beforeLoad: ({ search }) => {
+  //   searcd/schedule`}h;
+  // },
   validateSearch: (search?: { search?: string }) => {
     if (!search?.search) return {};
     return {
@@ -307,7 +307,7 @@ function RouteComponent() {
     onError: (error) => {
       console.error(
         "\n\n ---> apps/web/src/routes/notes.tsx:100 -> error: ",
-        error,
+        error
       );
       toast.error("Failed to delete note. Please try again.");
     },
@@ -330,7 +330,7 @@ function RouteComponent() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchInput(e.target.value);
     },
-    [],
+    []
   );
 
   const renderNotes = (viewType: "list" | "grid") => {
