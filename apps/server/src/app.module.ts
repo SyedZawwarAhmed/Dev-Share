@@ -8,6 +8,7 @@ import { NotesModule } from './notes/notes.module';
 import { ConfigModule } from '@nestjs/config';
 import { GeminiModule } from './gemini/gemini.module';
 import { PostsModule } from './posts/posts.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PostsModule } from './posts/posts.module';
     NotesModule,
     GeminiModule,
     PostsModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

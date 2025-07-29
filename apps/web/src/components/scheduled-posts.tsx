@@ -8,6 +8,7 @@ import {
   Linkedin,
   MoreHorizontal,
   Twitter,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,64 +20,34 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
-
-// Mock data for posts
-const mockPosts = [
-  {
-    id: 101,
-    noteId: 1,
-    noteTitle: "Next.js Server Actions",
-    platform: "linkedin",
-    content:
-      "I recently explored Next.js Server Actions and discovered significant performance benefits.\n\nKey advantages include:\n• No need for API routes\n• Progressive enhancement\n• Works with and without JavaScript\n• Simplified form handling\n• Built-in CSRF protection\n\nThis approach represents a paradigm shift in how we build React applications, combining the best of server-rendered and client-side experiences.\n\nHave you integrated Server Actions into your workflow? I'd love to hear about your experience. #WebDevelopment #ReactJS #NextJS #FrontendDevelopment",
-    status: "scheduled",
-    scheduledFor: "2023-04-07T15:00:00Z",
-    createdAt: "2023-04-05T16:30:00Z",
-  },
-  {
-    id: 102,
-    noteId: 1,
-    noteTitle: "Next.js Server Actions",
-    platform: "twitter",
-    content:
-      "Just learned about Next.js Server Actions! 🚀\n\nThey let you define server functions that can be called directly from components - no API routes needed.\n\nForm handling is so much simpler now!\n\n#webdev #reactjs #nextjs",
-    status: "draft",
-    createdAt: "2023-04-05T16:30:00Z",
-  },
-  {
-    id: 105,
-    noteId: 4,
-    noteTitle: "CSS Container Queries",
-    platform: "linkedin",
-    content:
-      "CSS Container Queries are a game-changer for component-based design systems!\n\nUnlike media queries that look at the viewport size, container queries let you style elements based on their parent container's size.\n\nThis means you can create truly responsive components that adapt to their context, not just the screen size.\n\nHere's a simple example:\n\n.container {\n  container-type: inline-size;\n}\n\n@container (min-width: 400px) {\n  .component {\n    /* Styles for larger containers */\n  }\n}\n\nHave you started using container queries in production? #CSS #WebDevelopment #ResponsiveDesign",
-    status: "scheduled",
-    scheduledFor: "2023-04-08T10:00:00Z",
-    createdAt: "2023-04-02T14:30:00Z",
-  },
-  {
-    id: 106,
-    noteId: 4,
-    noteTitle: "CSS Container Queries",
-    platform: "bluesky",
-    content:
-      "CSS Container Queries are finally here and they're amazing! 🎉\n\nNow we can style elements based on their parent container's size instead of just the viewport.\n\nPerfect for component-based design systems where components need to adapt to their context.\n\n```css\n.container {\n  container-type: inline-size;\n}\n\n@container (min-width: 400px) {\n  .card {\n    display: flex;\n  }\n}\n```\n\n#CSS #WebDev #FrontEnd",
-    status: "scheduled",
-    scheduledFor: "2023-04-08T11:00:00Z",
-    createdAt: "2023-04-02T14:30:00Z",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getPostsService } from "@/api/post.service";
+import { formatDate } from "@/lib/date-time";
+import { POST_STATUSES } from "@/constants/post";
 
 export default function ScheduledPosts() {
   const [, setActiveTab] = useState("upcoming");
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-    }).format(date);
+  const scheduledParams = {
+    status: "scheduled" as (typeof POST_STATUSES)[number],
+    limit: 3,
   };
+  const draftParams = {
+    status: "draft" as (typeof POST_STATUSES)[number],
+    limit: 3,
+  };
+
+  const { data: scheduledPosts, isLoading: isScheduledLoading } = useQuery({
+    queryKey: ["posts", scheduledParams],
+    queryFn: () => getPostsService(scheduledParams),
+  });
+
+  const { data: draftPosts, isLoading: isDraftLoading } = useQuery({
+    queryKey: ["posts", draftParams],
+    queryFn: () => getPostsService(draftParams),
+  });
+
+  const isLoading = isScheduledLoading || isDraftLoading;
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -89,11 +60,11 @@ export default function ScheduledPosts() {
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
-      case "linkedin":
+      case "LINKEDIN":
         return <Linkedin className="h-3 w-3 mr-1 text-blue-600" />;
-      case "twitter":
+      case "TWITTER":
         return <Twitter className="h-3 w-3 mr-1 text-sky-500" />;
-      case "bluesky":
+      case "BLUESKY":
         return (
           <svg
             width="12"
@@ -111,29 +82,45 @@ export default function ScheduledPosts() {
     }
   };
 
-  const scheduledPosts = mockPosts.filter(
-    (post) => post.status === "scheduled",
-  );
-  const draftPosts = mockPosts.filter((post) => post.status === "draft");
+  if (isLoading) {
+    return (
+      <Card className="h-full flex flex-col">
+        <CardHeader>
+          <CardTitle>Your Posts</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <div className="text-center py-12 text-slate-500">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
+            <h3 className="text-lg font-medium mb-2">Loading...</h3>
+            <p>Please wait while we fetch your posts</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>Your Posts</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="upcoming" onValueChange={setActiveTab}>
+      <CardContent className="flex-1">
+        <Tabs
+          defaultValue="upcoming"
+          onValueChange={setActiveTab}
+          className="h-full flex flex-col"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upcoming">
-              Upcoming ({scheduledPosts.length})
+              Upcoming ({scheduledPosts?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="drafts">
-              Drafts ({draftPosts.length})
+              Drafts ({draftPosts?.length || 0})
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="upcoming" className="mt-4 space-y-4">
-            {scheduledPosts.length > 0 ? (
+          <TabsContent value="upcoming" className="mt-4 space-y-4 flex-1">
+            {scheduledPosts && scheduledPosts.length > 0 ? (
               scheduledPosts.map((post) => (
                 <div key={post.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
@@ -141,14 +128,14 @@ export default function ScheduledPosts() {
                       <div className="flex items-center gap-2">
                         <Badge className="bg-purple-600">
                           <Calendar className="h-3 w-3 mr-1" />
-                          {formatDate(post.scheduledFor)}
+                          {formatDate(post.scheduledFor.toString())}
                         </Badge>
                         <Badge
                           variant="outline"
                           className="text-blue-600 border-blue-200 bg-blue-50"
                         >
                           <Clock className="h-3 w-3 mr-1" />
-                          {formatTime(post.scheduledFor)}
+                          {formatTime(post.scheduledFor.toString())}
                         </Badge>
                       </div>
                     ) : null}
@@ -187,7 +174,7 @@ export default function ScheduledPosts() {
                     {post.content}
                   </p>
                   <p className="text-xs text-slate-500 mb-3">
-                    From note: {post.noteTitle}
+                    From note: {post.note?.title || "Unknown Note"}
                   </p>
 
                   <div className="flex justify-between items-center">
@@ -206,11 +193,11 @@ export default function ScheduledPosts() {
                         className="bg-slate-50 border-slate-200"
                       >
                         {getPlatformIcon(post.platform)}
-                        {post.platform === "linkedin"
+                        {post.platform === "LINKEDIN"
                           ? "LinkedIn"
-                          : post.platform === "twitter"
+                          : post.platform === "X"
                             ? "X"
-                            : post.platform === "bluesky"
+                            : post.platform === "BLUESKY"
                               ? "Bluesky"
                               : post.platform}
                       </Badge>
@@ -219,22 +206,24 @@ export default function ScheduledPosts() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-16 text-slate-500 min-h-[335px] flex items-center justify-center">
                 <p>No scheduled posts</p>
               </div>
             )}
 
-            <div className="text-center">
-              <Link to="/posts" search={{ status: "scheduled" }}>
-                <Button variant="link" size="sm" className="text-purple-600">
-                  View all scheduled posts
-                </Button>
-              </Link>
-            </div>
+            {scheduledPosts && scheduledPosts.length > 0 && (
+              <div className="text-center">
+                <Link to="/posts" search={{ status: "scheduled" }}>
+                  <Button variant="link" size="sm" className="text-purple-600">
+                    View all scheduled posts
+                  </Button>
+                </Link>
+              </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="drafts" className="mt-4 space-y-4">
-            {draftPosts.length > 0 ? (
+          <TabsContent value="drafts" className="mt-4 space-y-4 flex-1">
+            {draftPosts && draftPosts.length > 0 ? (
               draftPosts.map((post) => (
                 <div key={post.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
@@ -250,11 +239,11 @@ export default function ScheduledPosts() {
                         className="bg-slate-50 border-slate-200"
                       >
                         {getPlatformIcon(post.platform)}
-                        {post.platform === "linkedin"
+                        {post.platform === "LINKEDIN"
                           ? "LinkedIn"
-                          : post.platform === "twitter"
+                          : post.platform === "X"
                             ? "X"
-                            : post.platform === "bluesky"
+                            : post.platform === "BLUESKY"
                               ? "Bluesky"
                               : post.platform}
                       </Badge>
@@ -287,23 +276,25 @@ export default function ScheduledPosts() {
                     {post.content}
                   </p>
                   <p className="text-xs text-slate-500">
-                    From note: {post.noteTitle}
+                    From note: {post.note?.title || "Unknown Note"}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-16 text-slate-500 min-h-[335px] flex items-center justify-center">
                 <p>No draft posts</p>
               </div>
             )}
 
-            <div className="text-center">
-              <Link to="/posts" search={{ status: "draft" }}>
-                <Button variant="link" size="sm" className="text-purple-600">
-                  View all draft posts
-                </Button>
-              </Link>
-            </div>
+            {draftPosts && draftPosts.length > 0 && (
+              <div className="text-center">
+                <Link to="/posts" search={{ status: "draft" }}>
+                  <Button variant="link" size="sm" className="text-purple-600">
+                    View all draft posts
+                  </Button>
+                </Link>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>

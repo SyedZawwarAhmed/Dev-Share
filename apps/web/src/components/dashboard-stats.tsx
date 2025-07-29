@@ -1,8 +1,37 @@
-import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
+import { Calendar, MessageSquare, ThumbsUp, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardStatsService } from "@/api/stats.service";
 
 export default function DashboardStats() {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: getDashboardStatsService,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-slate-200 rounded-lg mr-4 animate-pulse">
+                  <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
+                </div>
+                <div>
+                  <div className="h-4 bg-slate-200 rounded animate-pulse mb-2 w-12"></div>
+                  <div className="h-7 bg-slate-200 rounded animate-pulse w-8"></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <Link to="/notes" search={{ search: "" }} className="block">
@@ -31,7 +60,7 @@ export default function DashboardStats() {
               </div>
               <div>
                 <p className="text-sm font-medium text-purple-600">Notes</p>
-                <h3 className="text-2xl font-bold text-purple-900">7</h3>
+                <h3 className="text-2xl font-bold text-purple-900">{stats?.totalNotes || 0}</h3>
               </div>
             </div>
           </CardContent>
@@ -47,7 +76,7 @@ export default function DashboardStats() {
               </div>
               <div>
                 <p className="text-sm font-medium text-blue-600">Posts</p>
-                <h3 className="text-2xl font-bold text-blue-900">12</h3>
+                <h3 className="text-2xl font-bold text-blue-900">{stats?.totalPosts || 0}</h3>
               </div>
             </div>
           </CardContent>
@@ -65,7 +94,7 @@ export default function DashboardStats() {
                 <p className="text-sm font-medium text-emerald-600">
                   Scheduled
                 </p>
-                <h3 className="text-2xl font-bold text-emerald-900">3</h3>
+                <h3 className="text-2xl font-bold text-emerald-900">{stats?.scheduledPosts || 0}</h3>
               </div>
             </div>
           </CardContent>

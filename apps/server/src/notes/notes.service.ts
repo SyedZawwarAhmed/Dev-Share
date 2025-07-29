@@ -7,10 +7,19 @@ export class NotesService {
 
   async getNotes(
     userId: string,
-    body: { search?: string; orderBy?: 'asc' | 'desc' },
+    body: {
+      search?: string;
+      orderBy?: 'asc' | 'desc';
+      page?: number;
+      limit?: number;
+    },
   ) {
-    return (
-      await this.prisma.note.findMany({
+    const page = body?.page || 1;
+    const limit = body?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [notes, total] = await Promise.all([
+      this.prisma.note.findMany({
         where: {
           userId,
           isDeleted: false,
@@ -37,8 +46,37 @@ export class NotesService {
             },
           },
         },
-      })
-    ).map((note) => ({ ...note, postCount: note._count.posts }));
+        skip,
+        take: limit,
+      }),
+      this.prisma.note.count({
+        where: {
+          userId,
+          isDeleted: false,
+          OR: [
+            {
+              content: {
+                contains: body?.search ?? '',
+              },
+            },
+            {
+              title: {
+                contains: body?.search ?? '',
+              },
+            },
+          ],
+        },
+      }),
+    ]);
+
+    const mappedNotes = notes.map((note) => ({ ...note, postCount: note._count.posts }));
+    const hasMore = skip + notes.length < total;
+
+    return {
+      notes: mappedNotes,
+      hasMore,
+      total,
+    };
   }
 
   addNote(userId: string, note) {

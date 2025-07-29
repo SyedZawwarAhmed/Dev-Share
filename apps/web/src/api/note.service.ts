@@ -6,7 +6,11 @@ export const getNotesService = async (
   body: z.infer<typeof getNotesBodySchema>,
 ) => {
   const validatedBody = getNotesBodySchema.parse(body);
-  const data = await apiService.post<Note[]>("/notes", validatedBody);
+  const data = await apiService.post<{
+    notes: Note[];
+    hasMore: boolean;
+    total: number;
+  }>("/notes", validatedBody);
   return data.data;
 };
 

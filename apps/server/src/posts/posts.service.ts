@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SocialMediaService } from './social-media.service';
 import { PostsSchedulerService } from './posts-scheduler.service';
-import { PostStatus } from 'generated/prisma';
 
 @Injectable()
 export class PostsService {
@@ -10,20 +9,69 @@ export class PostsService {
     private prisma: PrismaService,
     private socialMediaService: SocialMediaService,
     private postsSchedulerService: PostsSchedulerService,
-  ) { }
+  ) {}
 
-  async getPosts(userId: string) {
+  async getPosts(userId: string, filters?: { 
+    status?: string; 
+    search?: string; 
+    orderBy?: 'asc' | 'desc'; 
+    page?: number; 
+    limit?: number; 
+  }) {
+    const whereClause: any = {
+      userId,
+      isDeleted: false,
+    };
+
+    if (filters?.status) {
+      // Map frontend status values to PostStatus enum
+      const statusMap = {
+        scheduled: 'SCHEDULED',
+        draft: 'DRAFT',
+        published: 'PUBLISHED',
+      };
+      whereClause.status =
+        statusMap[filters.status.toLowerCase()] || filters.status.toUpperCase();
+    }
+
+    if (filters?.search) {
+      whereClause.OR = [
+        {
+          content: {
+            contains: filters.search,
+          },
+        },
+        {
+          note: {
+            title: {
+              contains: filters.search,
+            },
+          },
+        },
+        {
+          note: {
+            content: {
+              contains: filters.search,
+            },
+          },
+        },
+      ];
+    }
+
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
+
     return await this.prisma.post.findMany({
-      where: {
-        userId,
-        isDeleted: false,
-      },
+      where: whereClause,
       include: {
         note: true,
       },
       orderBy: {
-        updatedAt: 'desc',
+        updatedAt: filters?.orderBy || 'desc',
       },
+      skip,
+      take: limit,
     });
   }
 
@@ -69,7 +117,11 @@ export class PostsService {
     });
   }
 
-  async schedulePost(userId: string, postId: string, schedule: { scheduledFor: string }) {
+  async schedulePost(
+    userId: string,
+    postId: string,
+    schedule: { scheduledFor: string },
+  ) {
     const scheduledFor = new Date(schedule.scheduledFor);
     const now = new Date();
 

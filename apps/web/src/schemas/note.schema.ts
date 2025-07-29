@@ -7,4 +7,6 @@ export const getNotesBodySchema = z.object({
     })
     .optional(),
   orderBy: z.enum(["asc", "desc"]).optional(),
+  page: z.number().min(1).optional(),
+  limit: z.number().min(1).max(100).optional(),
 });

@@ -67,11 +67,11 @@ function RouteComponent() {
 
       <DashboardStats />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div className="md:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 md:items-start">
+        <div className="md:col-span-2 min-h-full">
           <ScheduledPosts />
         </div>
-        <div>
+        <div className="md:h-fit">
           <RecentNotes />
         </div>
       </div>

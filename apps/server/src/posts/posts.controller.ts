@@ -9,7 +9,7 @@ export class PostsController {
   @Post()
   @UseGuards(JwtOAuthGuard)
   getPosts(@Req() req) {
-    return this.postsService.getPosts(req.user.id);
+    return this.postsService.getPosts(req.user.id, req.body);
   }
 
   @UseGuards(JwtOAuthGuard)
