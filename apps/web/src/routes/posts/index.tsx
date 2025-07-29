@@ -38,10 +38,11 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Linkedin, Twitter } from "lucide-react";
-import { getPostsService, publishPostService } from "@/api/post.service";
+import { getPostsService, publishPostService, deletePostService } from "@/api/post.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
 import { toast } from "sonner";
+import { useConfigStore } from "@/stores/config.store";
 
 export const Route = createFileRoute("/posts/")({
   component: RouteComponent,
@@ -55,6 +56,7 @@ export const Route = createFileRoute("/posts/")({
 
 function RouteComponent() {
   const queryClient = useQueryClient();
+  const { postsView, setPostsView } = useConfigStore();
   const { data: posts, isPending: isPostsLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: getPostsService,
@@ -77,11 +79,32 @@ function RouteComponent() {
     },
   });
 
+  const { mutateAsync: deletePost, isPending: isDeletingPost } = useMutation({
+    mutationFn: deletePostService,
+    onSuccess: () => {
+      toast.success("Post deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete post. Please try again.");
+    },
+    onSettled: (_, __, variables) => {
+      setDeleteDialogs((prev) => ({
+        ...prev,
+        [variables]: false,
+      }));
+    },
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [postConfirmationDialogs, setPostConfirmationDialogs] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
   }>({});
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -167,6 +190,13 @@ function RouteComponent() {
     }));
   };
 
+  const handleDeleteDialog = (postId: string, isOpen: boolean) => {
+    setDeleteDialogs((prev) => ({
+      ...prev,
+      [postId]: isOpen,
+    }));
+  };
+
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
   };
@@ -240,7 +270,13 @@ function RouteComponent() {
           <p>Please wait while we fetch your posts</p>
         </div>
       ) : (
-        <Tabs defaultValue="list" className="mb-8">
+        <Tabs 
+          defaultValue={postsView} 
+          className="mb-8"
+          onValueChange={(value) =>
+            setPostsView(value as ConfigState["postsView"])
+          }
+        >
           <TabsList className="mb-4">
             <TabsTrigger value="list">List View</TabsTrigger>
             <TabsTrigger value="grid">Grid View</TabsTrigger>
@@ -319,51 +355,83 @@ function RouteComponent() {
                               handlePostConfirmationDialog(post.id, isOpen)
                             }
                           >
-                            <DropdownMenu modal={false}>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <Link
-                                  to={`/posts/$id/edit`}
-                                  params={{ id: post.id.toString() }}
-                                >
-                                  <DropdownMenuItem>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Post
-                                  </DropdownMenuItem>
-                                </Link>
-                                {post?.status === "DRAFT" && (
+                            <Dialog
+                              open={deleteDialogs[post.id]}
+                              onOpenChange={(isOpen) =>
+                                handleDeleteDialog(post.id, isOpen)
+                              }
+                            >
+                              <DropdownMenu modal={false}>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
                                   <Link
-                                    to={`/posts/$id/schedule`}
+                                    to={`/posts/$id/edit`}
                                     params={{ id: post.id.toString() }}
                                   >
                                     <DropdownMenuItem>
-                                      <Calendar className="h-4 w-4 mr-2" />
-                                      Schedule Post
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit Post
                                     </DropdownMenuItem>
                                   </Link>
-                                )}
-                                {post?.status === "DRAFT" && (
+                                  {post?.status === "DRAFT" && (
+                                    <Link
+                                      to={`/posts/$id/schedule`}
+                                      params={{ id: post.id.toString() }}
+                                    >
+                                      <DropdownMenuItem>
+                                        <Calendar className="h-4 w-4 mr-2" />
+                                        Schedule Post
+                                      </DropdownMenuItem>
+                                    </Link>
+                                  )}
+                                  {post?.status === "DRAFT" && (
+                                    <DialogTrigger asChild>
+                                      <DropdownMenuItem>
+                                        <Send className="h-4 w-4 mr-2" />
+                                        Post Now
+                                      </DropdownMenuItem>
+                                    </DialogTrigger>
+                                  )}
                                   <DialogTrigger asChild>
-                                    <DropdownMenuItem>
-                                      <Send className="h-4 w-4 mr-2" />
-                                      Post Now
+                                    <DropdownMenuItem className="text-red-600">
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete Post
                                     </DropdownMenuItem>
                                   </DialogTrigger>
-                                )}
-                                <DropdownMenuItem className="text-red-600">
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete Post
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Are you absolutely sure?
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    This action cannot be undone. Are you sure you
+                                    want to delete this post?
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button
+                                    onClick={() => {
+                                      deletePost(post.id);
+                                    }}
+                                    variant={"gradient"}
+                                    size={"lg"}
+                                    loading={isDeletingPost}
+                                  >
+                                    Confirm
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
                             <DialogContent>
                               <DialogHeader>
                                 <DialogTitle>
@@ -449,51 +517,83 @@ function RouteComponent() {
                             handlePostConfirmationDialog(post.id, isOpen)
                           }
                         >
-                          <DropdownMenu modal={false}>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-7 w-7"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <Link
-                                to={`/posts/$id/edit`}
-                                params={{ id: post.id.toString() }}
-                              >
-                                <DropdownMenuItem>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit Post
-                                </DropdownMenuItem>
-                              </Link>
-                              {post?.status === "DRAFT" && (
+                          <Dialog
+                            open={deleteDialogs[post.id]}
+                            onOpenChange={(isOpen) =>
+                              handleDeleteDialog(post.id, isOpen)
+                            }
+                          >
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
                                 <Link
-                                  to={`/posts/$id/schedule`}
+                                  to={`/posts/$id/edit`}
                                   params={{ id: post.id.toString() }}
                                 >
                                   <DropdownMenuItem>
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    Schedule Post
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit Post
                                   </DropdownMenuItem>
                                 </Link>
-                              )}
-                              {post?.status === "DRAFT" && (
+                                {post?.status === "DRAFT" && (
+                                  <Link
+                                    to={`/posts/$id/schedule`}
+                                    params={{ id: post.id.toString() }}
+                                  >
+                                    <DropdownMenuItem>
+                                      <Calendar className="h-4 w-4 mr-2" />
+                                      Schedule Post
+                                    </DropdownMenuItem>
+                                  </Link>
+                                )}
+                                {post?.status === "DRAFT" && (
+                                  <DialogTrigger asChild>
+                                    <DropdownMenuItem>
+                                      <Send className="h-4 w-4 mr-2" />
+                                      Post Now
+                                    </DropdownMenuItem>
+                                  </DialogTrigger>
+                                )}
                                 <DialogTrigger asChild>
-                                  <DropdownMenuItem>
-                                    <Send className="h-4 w-4 mr-2" />
-                                    Post Now
+                                  <DropdownMenuItem className="text-red-600">
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete Post
                                   </DropdownMenuItem>
                                 </DialogTrigger>
-                              )}
-                              <DropdownMenuItem className="text-red-600">
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Post
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Are you absolutely sure?
+                                </DialogTitle>
+                                <DialogDescription>
+                                  This action cannot be undone. Are you sure you
+                                  want to delete this post?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button
+                                  onClick={() => {
+                                    deletePost(post.id);
+                                  }}
+                                  variant={"gradient"}
+                                  size={"lg"}
+                                  loading={isDeletingPost}
+                                >
+                                  Confirm
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>
