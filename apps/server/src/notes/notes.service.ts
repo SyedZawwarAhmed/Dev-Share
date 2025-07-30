@@ -46,8 +46,11 @@ export class NotesService {
             },
           },
         },
-        skip,
-        take: limit,
+        ...(body?.page &&
+          body?.limit && {
+            skip: (body.page - 1) * body.limit,
+            take: body.limit,
+          }),
       }),
       this.prisma.note.count({
         where: {
@@ -69,7 +72,10 @@ export class NotesService {
       }),
     ]);
 
-    const mappedNotes = notes.map((note) => ({ ...note, postCount: note._count.posts }));
+    const mappedNotes = notes.map((note) => ({
+      ...note,
+      postCount: note._count.posts,
+    }));
     const hasMore = skip + notes.length < total;
 
     return {

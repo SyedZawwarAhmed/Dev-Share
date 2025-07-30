@@ -11,13 +11,16 @@ export class PostsService {
     private postsSchedulerService: PostsSchedulerService,
   ) {}
 
-  async getPosts(userId: string, filters?: { 
-    status?: string; 
-    search?: string; 
-    orderBy?: 'asc' | 'desc'; 
-    page?: number; 
-    limit?: number; 
-  }) {
+  async getPosts(
+    userId: string,
+    filters?: {
+      status?: string;
+      search?: string;
+      orderBy?: 'asc' | 'desc';
+      page?: number;
+      limit?: number;
+    },
+  ) {
     const whereClause: any = {
       userId,
       isDeleted: false,
@@ -58,9 +61,10 @@ export class PostsService {
       ];
     }
 
-    const page = filters?.page || 1;
-    const limit = filters?.limit || 10;
-    const skip = (page - 1) * limit;
+    if (filters?.page && filters?.limit) {
+      whereClause.skip = (filters.page - 1) * filters.limit;
+      whereClause.limit = filters.limit;
+    }
 
     return await this.prisma.post.findMany({
       where: whereClause,
@@ -70,8 +74,6 @@ export class PostsService {
       orderBy: {
         updatedAt: filters?.orderBy || 'desc',
       },
-      skip,
-      take: limit,
     });
   }
 
