@@ -289,7 +289,7 @@ function RouteComponent() {
     }
   }, [search]);
 
-  const { data: notes, isLoading: isNotesLoading } = useQuery({
+  const { data: notesData, isLoading: isNotesLoading } = useQuery({
     queryKey: ["notes", debouncedSearch, sortBy],
     queryFn: async () =>
       getNotesService({
@@ -334,7 +334,7 @@ function RouteComponent() {
   );
 
   const renderNotes = (viewType: "list" | "grid") => {
-    if (!notes || notes.length === 0) {
+    if (!notesData || notesData.notes.length === 0) {
       return (
         <div className="text-center py-12 text-slate-500">
           <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
@@ -352,7 +352,7 @@ function RouteComponent() {
             : "space-y-4"
         }
       >
-        {notes.map((note) => (
+        {notesData.notes.map((note) => (
           <NoteCard
             key={note.id}
             note={note}
@@ -419,7 +419,7 @@ function RouteComponent() {
           <h3 className="text-lg font-medium mb-2">Loading...</h3>
           <p>Please wait while we fetch your notes</p>
         </div>
-      ) : !notes ? (
+      ) : !notesData ? (
         <div className="text-center py-12 text-slate-500">
           <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
           <h3 className="text-lg font-medium mb-2">No notes found</h3>

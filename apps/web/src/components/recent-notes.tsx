@@ -8,9 +8,14 @@ import { getNotesService } from "@/api/note.service";
 import { formatDate } from "@/lib/date-time";
 
 export default function RecentNotes() {
-  const queryParams = { search: "", orderBy: "desc" as const, page: 1, limit: 3 };
-  
-  const { data: recentNotes, isLoading } = useQuery({
+  const queryParams = {
+    search: "",
+    orderBy: "desc" as const,
+    page: 1,
+    limit: 3,
+  };
+
+  const { data: recentNotesData, isLoading } = useQuery({
     queryKey: ["notes", queryParams],
     queryFn: async () => getNotesService(queryParams),
   });
@@ -38,9 +43,12 @@ export default function RecentNotes() {
         <CardTitle>Recent Learning Notes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {recentNotes && recentNotes.length > 0 ? (
-          recentNotes.map((note) => (
-            <div key={note.id} className="border rounded-lg p-3 hover:bg-slate-50 transition-colors">
+        {recentNotesData && recentNotesData.notes.length > 0 ? (
+          recentNotesData.notes.map((note) => (
+            <div
+              key={note.id}
+              className="border rounded-lg p-3 hover:bg-slate-50 transition-colors"
+            >
               <div className="flex items-center gap-2 mb-1">
                 <FileText className="h-4 w-4 text-purple-600" />
                 <span className="font-medium text-sm">{note.title}</span>
@@ -54,7 +62,7 @@ export default function RecentNotes() {
                 )}
               </div>
               <p className="text-xs text-slate-500 mb-2">
-                Added {formatDate(new Date(note.createdAt))}
+                Added {formatDate(note.createdAt)}
               </p>
               <div className="flex justify-end">
                 {note.postCount > 0 ? (
