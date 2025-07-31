@@ -48,7 +48,7 @@ function RouteComponent() {
 
   const { data: posts, isPending: isPostsLoading } = useQuery({
     queryKey: ["posts"],
-    queryFn: getPostsService,
+    queryFn: () => getPostsService(),
   });
 
 
@@ -94,7 +94,7 @@ function RouteComponent() {
     }).format(date);
   };
 
-  const filteredPosts = posts
+  const filteredPosts = posts || []
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {

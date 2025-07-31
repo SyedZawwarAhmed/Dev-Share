@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Linkedin, Twitter } from "lucide-react";
-import { getPostsService, publishPostService, deletePostService } from "@/api/post.service";
+import { getPostsService, publishPostService, deletePostService, markAsPublishedService } from "@/api/post.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
 import { toast } from "sonner";
@@ -59,7 +59,7 @@ function RouteComponent() {
   const { postsView, setPostsView } = useConfigStore();
   const { data: posts, isPending: isPostsLoading } = useQuery({
     queryKey: ["posts"],
-    queryFn: getPostsService,
+    queryFn: () => getPostsService(),
   });
 
   const { mutate: publishPost, isPending: isPublishing } = useMutation({
@@ -97,6 +97,24 @@ function RouteComponent() {
     },
   });
 
+  const { mutate: markAsPublished, isPending: isMarkingAsPublished } = useMutation({
+    mutationFn: markAsPublishedService,
+    onSuccess: () => {
+      toast.success("Post marked as published!");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("Error marking post as published:", error);
+      toast.error("Failed to mark post as published. Please try again.");
+    },
+    onSettled: (_, __, variables) => {
+      setMarkPublishedDialogs((prev) => ({
+        ...prev,
+        [variables]: false,
+      }));
+    },
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
@@ -104,12 +122,15 @@ function RouteComponent() {
   const [postConfirmationDialogs, setPostConfirmationDialogs] = useState<{
     [key: string]: boolean;
   }>({});
+  const [markPublishedDialogs, setMarkPublishedDialogs] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
   }>({});
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
-  const filteredPosts = posts;
+  const filteredPosts = posts || [];
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -192,6 +213,13 @@ function RouteComponent() {
 
   const handleDeleteDialog = (postId: string, isOpen: boolean) => {
     setDeleteDialogs((prev) => ({
+      ...prev,
+      [postId]: isOpen,
+    }));
+  };
+
+  const handleMarkPublishedDialog = (postId: string, isOpen: boolean) => {
+    setMarkPublishedDialogs((prev) => ({
       ...prev,
       [postId]: isOpen,
     }));
@@ -356,11 +384,17 @@ function RouteComponent() {
                             }
                           >
                             <Dialog
-                              open={deleteDialogs[post.id]}
+                              open={markPublishedDialogs[post.id]}
                               onOpenChange={(isOpen) =>
-                                handleDeleteDialog(post.id, isOpen)
+                                handleMarkPublishedDialog(post.id, isOpen)
                               }
                             >
+                              <Dialog
+                                open={deleteDialogs[post.id]}
+                                onOpenChange={(isOpen) =>
+                                  handleDeleteDialog(post.id, isOpen)
+                                }
+                              >
                               <DropdownMenu modal={false}>
                                 <DropdownMenuTrigger asChild>
                                   <Button
@@ -400,6 +434,14 @@ function RouteComponent() {
                                       </DropdownMenuItem>
                                     </DialogTrigger>
                                   )}
+                                  {post?.status !== "PUBLISHED" && (
+                                    <DialogTrigger asChild>
+                                      <DropdownMenuItem>
+                                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                                        Mark as Published
+                                      </DropdownMenuItem>
+                                    </DialogTrigger>
+                                  )}
                                   <DialogTrigger asChild>
                                     <DropdownMenuItem className="text-red-600">
                                       <Trash2 className="h-4 w-4 mr-2" />
@@ -426,6 +468,29 @@ function RouteComponent() {
                                     variant={"gradient"}
                                     size={"lg"}
                                     loading={isDeletingPost}
+                                  >
+                                    Confirm
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                              </Dialog>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Mark as Published
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    This will mark the post as published without actually posting it to social media. Are you sure you want to continue?
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button
+                                    onClick={() => {
+                                      markAsPublished(post.id);
+                                    }}
+                                    variant={"gradient"}
+                                    size={"lg"}
+                                    loading={isMarkingAsPublished}
                                   >
                                     Confirm
                                   </Button>
@@ -518,11 +583,17 @@ function RouteComponent() {
                           }
                         >
                           <Dialog
-                            open={deleteDialogs[post.id]}
+                            open={markPublishedDialogs[post.id]}
                             onOpenChange={(isOpen) =>
-                              handleDeleteDialog(post.id, isOpen)
+                              handleMarkPublishedDialog(post.id, isOpen)
                             }
                           >
+                            <Dialog
+                              open={deleteDialogs[post.id]}
+                              onOpenChange={(isOpen) =>
+                                handleDeleteDialog(post.id, isOpen)
+                              }
+                            >
                             <DropdownMenu modal={false}>
                               <DropdownMenuTrigger asChild>
                                 <Button
@@ -562,6 +633,14 @@ function RouteComponent() {
                                     </DropdownMenuItem>
                                   </DialogTrigger>
                                 )}
+                                {post?.status !== "PUBLISHED" && (
+                                  <DialogTrigger asChild>
+                                    <DropdownMenuItem>
+                                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                                      Mark as Published
+                                    </DropdownMenuItem>
+                                  </DialogTrigger>
+                                )}
                                 <DialogTrigger asChild>
                                   <DropdownMenuItem className="text-red-600">
                                     <Trash2 className="h-4 w-4 mr-2" />
@@ -588,6 +667,29 @@ function RouteComponent() {
                                   variant={"gradient"}
                                   size={"lg"}
                                   loading={isDeletingPost}
+                                >
+                                  Confirm
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                            </Dialog>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Mark as Published
+                                </DialogTitle>
+                                <DialogDescription>
+                                  This will mark the post as published without actually posting it to social media. Are you sure you want to continue?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button
+                                  onClick={() => {
+                                    markAsPublished(post.id);
+                                  }}
+                                  variant={"gradient"}
+                                  size={"lg"}
+                                  loading={isMarkingAsPublished}
                                 >
                                   Confirm
                                 </Button>

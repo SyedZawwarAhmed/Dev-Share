@@ -162,4 +162,32 @@ export class PostsService {
       result,
     };
   }
+
+  async markAsPublished(userId: string, postId: string) {
+    const post = await this.prisma.post.findFirst({
+      where: {
+        id: postId,
+        userId,
+        isDeleted: false,
+      },
+    });
+
+    if (!post) {
+      throw new BadRequestException('Post not found');
+    }
+
+    return await this.prisma.post.update({
+      where: {
+        id: postId,
+        userId,
+      },
+      data: {
+        status: 'PUBLISHED',
+        publishedAt: new Date(),
+      },
+      include: {
+        note: true,
+      },
+    });
+  }
 }

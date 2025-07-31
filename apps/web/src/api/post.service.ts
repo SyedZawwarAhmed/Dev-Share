@@ -58,3 +58,8 @@ export const schedulePostService = async (
   );
   return data.data;
 };
+
+export const markAsPublishedService = async (id: string) => {
+  const data = await apiService.post<Post>(`/posts/mark-published/${id}`);
+  return data.data;
+};

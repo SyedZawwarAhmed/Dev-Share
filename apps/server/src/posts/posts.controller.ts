@@ -47,4 +47,10 @@ export class PostsController {
   postNow(@Req() req) {
     return this.postsService.publishPostNow(req.user.id, req?.params.id);
   }
+
+  @UseGuards(JwtOAuthGuard)
+  @Post('mark-published/:id')
+  markAsPublished(@Req() req) {
+    return this.postsService.markAsPublished(req.user.id, req?.params.id);
+  }
 }
