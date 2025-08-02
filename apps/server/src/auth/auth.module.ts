@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GoogleModule } from './google/google.module';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { LinkedinModule } from './linkedin/linkedin.module';
+import { TwitterModule } from './twitter/twitter.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LinkedinModule } from './linkedin/linkedin.module';
     // JwtModule,
     GoogleModule,
     LinkedinModule,
+    TwitterModule,
   ],
   controllers: [AuthController],
   providers: [
