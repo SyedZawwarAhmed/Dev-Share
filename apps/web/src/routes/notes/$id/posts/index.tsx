@@ -26,7 +26,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
 import { getPostsService, publishPostService } from "@/api/post.service";
 import { getStatusBadge } from "@/components/status-badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -59,11 +60,13 @@ function RouteComponent() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: () => {
-      setIsPostConfirmationModalOpen(false)
       toast.error("Failed to publish post");
     },
-    onSettled: () => {
-      setIsPostConfirmationModalOpen(false)
+    onSettled: (_, __, variables) => {
+      setPostConfirmationDialogs((prev) => ({
+        ...prev,
+        [variables]: false,
+      }));
     }
   });
 
@@ -72,7 +75,9 @@ function RouteComponent() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [isPostConfirmationModalOpen, setIsPostConfirmationModalOpen] = useState(false)
+  const [postConfirmationDialogs, setPostConfirmationDialogs] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const formatDate = (dateString?: string) => {
@@ -137,7 +142,7 @@ function RouteComponent() {
     switch (platform) {
       case "LINKEDIN":
         return "LinkedIn";
-      case "X":
+      case "TWITTER":
         return "X (Twitter)";
       case "BLUESKY":
         return "Bluesky";
@@ -152,6 +157,13 @@ function RouteComponent() {
 
   const handlePostNow = (postId: string) => {
     publishPost(postId);
+  };
+
+  const handlePostConfirmationDialog = (postId: string, isOpen: boolean) => {
+    setPostConfirmationDialogs((prev) => ({
+      ...prev,
+      [postId]: isOpen,
+    }));
   };
 
   return (
@@ -336,80 +348,60 @@ function RouteComponent() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Dialog
-                            open={isPostConfirmationModalOpen}
-                            onOpenChange={setIsPostConfirmationModalOpen}
-                          >
-                            <DropdownMenu modal={false}>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
+                          <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <Link
+                                to={`/posts/$id/edit`}
+                                params={{ id: post.id.toString() }}
+                              >
+                                <DropdownMenuItem>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Post
+                                </DropdownMenuItem>
+                              </Link>
+                              {post?.status === "DRAFT" && (
                                 <Link
-                                  to={`/posts/$id/edit`}
+                                  to={`/posts/$id/schedule`}
                                   params={{ id: post.id.toString() }}
                                 >
                                   <DropdownMenuItem>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Post
+                                    <Calendar className="h-4 w-4 mr-2" />
+                                    Schedule Post
                                   </DropdownMenuItem>
                                 </Link>
-                                {post?.status === "DRAFT" && (
-                                  <Link
-                                    to={`/posts/$id/schedule`}
-                                    params={{ id: post.id.toString() }}
-                                  >
-                                    <DropdownMenuItem>
-                                      <Calendar className="h-4 w-4 mr-2" />
-                                      Schedule Post
-                                    </DropdownMenuItem>
-                                  </Link>
-                                )}
-                                {post?.status === "DRAFT" && (
-                                  <DialogTrigger asChild>
-                                    <DropdownMenuItem
-                                    >
-                                      <Send className="h-4 w-4 mr-2" />
-                                      Post Now
-                                    </DropdownMenuItem>
-                                  </DialogTrigger>
-                                )}
-                                <DropdownMenuItem className="text-red-600">
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete Post
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Are you absolutely sure?
-                                </DialogTitle>
-                                <DialogDescription>
-                                  This action cannot be undone. Are you sure
-                                  you want to publish this post?
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  onClick={() => {
-                                    handlePostNow(post.id);
-                                  }}
-                                  variant={"gradient"}
-                                  size={"lg"}
-                                  loading={isPublishing}
+                              )}
+                              {post?.status === "DRAFT" && (
+                                <DropdownMenuItem
+                                  onClick={() => handlePostConfirmationDialog(post.id, true)}
                                 >
-                                  Confirm
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Post Now
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem className="text-red-600">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Post
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          
+                          <ConfirmationDialog
+                            open={postConfirmationDialogs[post.id] || false}
+                            onOpenChange={(isOpen) => handlePostConfirmationDialog(post.id, isOpen)}
+                            title="Are you absolutely sure?"
+                            description="This action cannot be undone. Are you sure you want to publish this post?"
+                            onConfirm={() => handlePostNow(post.id)}
+                            loading={isPublishing}
+                          />
                         </div>
                       </div>
                     </CardContent>
@@ -498,23 +490,12 @@ function RouteComponent() {
                             )}
 
                             {post?.status === "DRAFT" && (
-                              <Link
-                                to={`/posts/$id/schedule`}
-                                params={{ id: post.id.toString() }}
+                              <DropdownMenuItem
+                                onClick={() => handlePostConfirmationDialog(post.id, true)}
                               >
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    handlePostNow(post.id);
-                                  }}
-                                >
-                                  <Send className="h-4 w-4 mr-2" />
-                                  {isPublishing ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    "Post Now"
-                                  )}
-                                </DropdownMenuItem>
-                              </Link>
+                                <Send className="h-4 w-4 mr-2" />
+                                Post Now
+                              </DropdownMenuItem>
                             )}
                             <DropdownMenuItem className="text-red-600">
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -535,6 +516,15 @@ function RouteComponent() {
                         </div>
                       </div>
                     </CardContent>
+                    
+                    <ConfirmationDialog
+                      open={postConfirmationDialogs[post.id] || false}
+                      onOpenChange={(isOpen) => handlePostConfirmationDialog(post.id, isOpen)}
+                      title="Are you absolutely sure?"
+                      description="This action cannot be undone. Are you sure you want to publish this post?"
+                      onConfirm={() => handlePostNow(post.id)}
+                      loading={isPublishing}
+                    />
                   </Card>
                 ))
               ) : (

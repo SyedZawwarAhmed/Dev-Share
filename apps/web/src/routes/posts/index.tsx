@@ -20,15 +20,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import {
   Select,
   SelectContent,
@@ -377,150 +370,90 @@ function RouteComponent() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Dialog
-                            open={postConfirmationDialogs[post.id]}
-                            onOpenChange={(isOpen) =>
-                              handlePostConfirmationDialog(post.id, isOpen)
-                            }
-                          >
-                            <Dialog
-                              open={markPublishedDialogs[post.id]}
-                              onOpenChange={(isOpen) =>
-                                handleMarkPublishedDialog(post.id, isOpen)
-                              }
-                            >
-                              <Dialog
-                                open={deleteDialogs[post.id]}
-                                onOpenChange={(isOpen) =>
-                                  handleDeleteDialog(post.id, isOpen)
-                                }
+                          <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8"
                               >
-                              <DropdownMenu modal={false}>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-8 w-8"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <Link
-                                    to={`/posts/$id/edit`}
-                                    params={{ id: post.id.toString() }}
-                                  >
-                                    <DropdownMenuItem>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      Edit Post
-                                    </DropdownMenuItem>
-                                  </Link>
-                                  {post?.status === "DRAFT" && (
-                                    <Link
-                                      to={`/posts/$id/schedule`}
-                                      params={{ id: post.id.toString() }}
-                                    >
-                                      <DropdownMenuItem>
-                                        <Calendar className="h-4 w-4 mr-2" />
-                                        Schedule Post
-                                      </DropdownMenuItem>
-                                    </Link>
-                                  )}
-                                  {post?.status === "DRAFT" && (
-                                    <DialogTrigger asChild>
-                                      <DropdownMenuItem>
-                                        <Send className="h-4 w-4 mr-2" />
-                                        Post Now
-                                      </DropdownMenuItem>
-                                    </DialogTrigger>
-                                  )}
-                                  {post?.status !== "PUBLISHED" && (
-                                    <DialogTrigger asChild>
-                                      <DropdownMenuItem>
-                                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                                        Mark as Published
-                                      </DropdownMenuItem>
-                                    </DialogTrigger>
-                                  )}
-                                  <DialogTrigger asChild>
-                                    <DropdownMenuItem className="text-red-600">
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Delete Post
-                                    </DropdownMenuItem>
-                                  </DialogTrigger>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Are you absolutely sure?
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    This action cannot be undone. Are you sure you
-                                    want to delete this post?
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button
-                                    onClick={() => {
-                                      deletePost(post.id);
-                                    }}
-                                    variant={"gradient"}
-                                    size={"lg"}
-                                    loading={isDeletingPost}
-                                  >
-                                    Confirm
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                              </Dialog>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Mark as Published
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    This will mark the post as published without actually posting it to social media. Are you sure you want to continue?
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button
-                                    onClick={() => {
-                                      markAsPublished(post.id);
-                                    }}
-                                    variant={"gradient"}
-                                    size={"lg"}
-                                    loading={isMarkingAsPublished}
-                                  >
-                                    Confirm
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Are you absolutely sure?
-                                </DialogTitle>
-                                <DialogDescription>
-                                  This action cannot be undone. Are you sure you
-                                  want to publish this post?
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  onClick={() => {
-                                    handlePostNow(post.id);
-                                  }}
-                                  variant={"gradient"}
-                                  size={"lg"}
-                                  loading={isPublishing}
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <Link
+                                to={`/posts/$id/edit`}
+                                params={{ id: post.id.toString() }}
+                              >
+                                <DropdownMenuItem>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Post
+                                </DropdownMenuItem>
+                              </Link>
+                              {post?.status === "DRAFT" && (
+                                <Link
+                                  to={`/posts/$id/schedule`}
+                                  params={{ id: post.id.toString() }}
                                 >
-                                  Confirm
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                                  <DropdownMenuItem>
+                                    <Calendar className="h-4 w-4 mr-2" />
+                                    Schedule Post
+                                  </DropdownMenuItem>
+                                </Link>
+                              )}
+                              {post?.status === "DRAFT" && (
+                                <DropdownMenuItem
+                                  onClick={() => handlePostConfirmationDialog(post.id, true)}
+                                >
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Post Now
+                                </DropdownMenuItem>
+                              )}
+                              {post?.status !== "PUBLISHED" && (
+                                <DropdownMenuItem
+                                  onClick={() => handleMarkPublishedDialog(post.id, true)}
+                                >
+                                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                                  Mark as Published
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem 
+                                className="text-red-600"
+                                onClick={() => handleDeleteDialog(post.id, true)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Post
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          
+                          <ConfirmationDialog
+                            open={postConfirmationDialogs[post.id] || false}
+                            onOpenChange={(isOpen) => handlePostConfirmationDialog(post.id, isOpen)}
+                            title="Are you absolutely sure?"
+                            description="This action cannot be undone. Are you sure you want to publish this post?"
+                            onConfirm={() => handlePostNow(post.id)}
+                            loading={isPublishing}
+                          />
+                          
+                          <ConfirmationDialog
+                            open={markPublishedDialogs[post.id] || false}
+                            onOpenChange={(isOpen) => handleMarkPublishedDialog(post.id, isOpen)}
+                            title="Mark as Published"
+                            description="This will mark the post as published without actually posting it to social media. Are you sure you want to continue?"
+                            onConfirm={() => markAsPublished(post.id)}
+                            loading={isMarkingAsPublished}
+                          />
+                          
+                          <ConfirmationDialog
+                            open={deleteDialogs[post.id] || false}
+                            onOpenChange={(isOpen) => handleDeleteDialog(post.id, isOpen)}
+                            title="Are you absolutely sure?"
+                            description="This action cannot be undone. Are you sure you want to delete this post?"
+                            confirmVariant="destructive"
+                            onConfirm={() => deletePost(post.id)}
+                            loading={isDeletingPost}
+                          />
                         </div>
                       </div>
                     </CardContent>
@@ -576,150 +509,62 @@ function RouteComponent() {
                             {post?.note?.title}
                           </p>
                         </div>
-                        <Dialog
-                          open={postConfirmationDialogs[post.id]}
-                          onOpenChange={(isOpen) =>
-                            handlePostConfirmationDialog(post.id, isOpen)
-                          }
-                        >
-                          <Dialog
-                            open={markPublishedDialogs[post.id]}
-                            onOpenChange={(isOpen) =>
-                              handleMarkPublishedDialog(post.id, isOpen)
-                            }
-                          >
-                            <Dialog
-                              open={deleteDialogs[post.id]}
-                              onOpenChange={(isOpen) =>
-                                handleDeleteDialog(post.id, isOpen)
-                              }
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
                             >
-                            <DropdownMenu modal={false}>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-7 w-7"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <Link
-                                  to={`/posts/$id/edit`}
-                                  params={{ id: post.id.toString() }}
-                                >
-                                  <DropdownMenuItem>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Post
-                                  </DropdownMenuItem>
-                                </Link>
-                                {post?.status === "DRAFT" && (
-                                  <Link
-                                    to={`/posts/$id/schedule`}
-                                    params={{ id: post.id.toString() }}
-                                  >
-                                    <DropdownMenuItem>
-                                      <Calendar className="h-4 w-4 mr-2" />
-                                      Schedule Post
-                                    </DropdownMenuItem>
-                                  </Link>
-                                )}
-                                {post?.status === "DRAFT" && (
-                                  <DialogTrigger asChild>
-                                    <DropdownMenuItem>
-                                      <Send className="h-4 w-4 mr-2" />
-                                      Post Now
-                                    </DropdownMenuItem>
-                                  </DialogTrigger>
-                                )}
-                                {post?.status !== "PUBLISHED" && (
-                                  <DialogTrigger asChild>
-                                    <DropdownMenuItem>
-                                      <CheckCircle2 className="h-4 w-4 mr-2" />
-                                      Mark as Published
-                                    </DropdownMenuItem>
-                                  </DialogTrigger>
-                                )}
-                                <DialogTrigger asChild>
-                                  <DropdownMenuItem className="text-red-600">
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete Post
-                                  </DropdownMenuItem>
-                                </DialogTrigger>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Are you absolutely sure?
-                                </DialogTitle>
-                                <DialogDescription>
-                                  This action cannot be undone. Are you sure you
-                                  want to delete this post?
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  onClick={() => {
-                                    deletePost(post.id);
-                                  }}
-                                  variant={"gradient"}
-                                  size={"lg"}
-                                  loading={isDeletingPost}
-                                >
-                                  Confirm
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                            </Dialog>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Mark as Published
-                                </DialogTitle>
-                                <DialogDescription>
-                                  This will mark the post as published without actually posting it to social media. Are you sure you want to continue?
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  onClick={() => {
-                                    markAsPublished(post.id);
-                                  }}
-                                  variant={"gradient"}
-                                  size={"lg"}
-                                  loading={isMarkingAsPublished}
-                                >
-                                  Confirm
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>
-                                Are you absolutely sure?
-                              </DialogTitle>
-                              <DialogDescription>
-                                This action cannot be undone. Are you sure you
-                                want to publish this post?
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button
-                                onClick={() => {
-                                  handlePostNow(post.id);
-                                }}
-                                variant={"gradient"}
-                                size={"lg"}
-                                loading={isPublishing}
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <Link
+                              to={`/posts/$id/edit`}
+                              params={{ id: post.id.toString() }}
+                            >
+                              <DropdownMenuItem>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit Post
+                              </DropdownMenuItem>
+                            </Link>
+                            {post?.status === "DRAFT" && (
+                              <Link
+                                to={`/posts/$id/schedule`}
+                                params={{ id: post.id.toString() }}
                               >
-                                Confirm
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
+                                <DropdownMenuItem>
+                                  <Calendar className="h-4 w-4 mr-2" />
+                                  Schedule Post
+                                </DropdownMenuItem>
+                              </Link>
+                            )}
+                            {post?.status === "DRAFT" && (
+                              <DropdownMenuItem
+                                onClick={() => handlePostConfirmationDialog(post.id, true)}
+                              >
+                                <Send className="h-4 w-4 mr-2" />
+                                Post Now
+                              </DropdownMenuItem>
+                            )}
+                            {post?.status !== "PUBLISHED" && (
+                              <DropdownMenuItem
+                                onClick={() => handleMarkPublishedDialog(post.id, true)}
+                              >
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                Mark as Published
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem 
+                              className="text-red-600"
+                              onClick={() => handleDeleteDialog(post.id, true)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Post
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
 
                       <p className="text-sm text-slate-600 line-clamp-6 mb-4">
@@ -733,6 +578,34 @@ function RouteComponent() {
                         </div>
                       </div>
                     </CardContent>
+                    
+                    <ConfirmationDialog
+                      open={postConfirmationDialogs[post.id] || false}
+                      onOpenChange={(isOpen) => handlePostConfirmationDialog(post.id, isOpen)}
+                      title="Are you absolutely sure?"
+                      description="This action cannot be undone. Are you sure you want to publish this post?"
+                      onConfirm={() => handlePostNow(post.id)}
+                      loading={isPublishing}
+                    />
+                    
+                    <ConfirmationDialog
+                      open={markPublishedDialogs[post.id] || false}
+                      onOpenChange={(isOpen) => handleMarkPublishedDialog(post.id, isOpen)}
+                      title="Mark as Published"
+                      description="This will mark the post as published without actually posting it to social media. Are you sure you want to continue?"
+                      onConfirm={() => markAsPublished(post.id)}
+                      loading={isMarkingAsPublished}
+                    />
+                    
+                    <ConfirmationDialog
+                      open={deleteDialogs[post.id] || false}
+                      onOpenChange={(isOpen) => handleDeleteDialog(post.id, isOpen)}
+                      title="Are you absolutely sure?"
+                      description="This action cannot be undone. Are you sure you want to delete this post?"
+                      confirmVariant="destructive"
+                      onConfirm={() => deletePost(post.id)}
+                      loading={isDeletingPost}
+                    />
                   </Card>
                 ))
               ) : (

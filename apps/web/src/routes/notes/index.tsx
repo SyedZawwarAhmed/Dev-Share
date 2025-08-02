@@ -33,15 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteNoteService, getNotesService } from "@/api/note.service";
 import { formatDate } from "@/lib/date-time";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { toast } from "sonner";
 import { useDebounce } from "@/lib/hooks";
 import { useConfigStore } from "@/stores/config.store";
@@ -142,68 +134,52 @@ function NoteCard({
                 </Button>
               </Link>
             )}
-            <Dialog
-              open={deleteDialogs[note.id]}
-              onOpenChange={(isOpen) => handleDeleteDialog(note.id, isOpen)}
-            >
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className={isGridView ? "h-7 w-7" : "h-8 w-8"}
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={isGridView ? "h-7 w-7" : "h-8 w-8"}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <Link to={`/notes/$id/edit`} params={{ id: note.id }}>
+                  <DropdownMenuItem>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Note
+                  </DropdownMenuItem>
+                </Link>
+                {note.postCount === 0 && (
+                  <Link
+                    to={`/notes/$id/create-posts`}
+                    params={{ id: note.id }}
                   >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <Link to={`/notes/$id/edit`} params={{ id: note.id }}>
                     <DropdownMenuItem>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Note
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Create Posts
                     </DropdownMenuItem>
                   </Link>
-                  {note.postCount === 0 && (
-                    <Link
-                      to={`/notes/$id/create-posts`}
-                      params={{ id: note.id }}
-                    >
-                      <DropdownMenuItem>
-                        <Wand2 className="h-4 w-4 mr-2" />
-                        Create Posts
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem className="text-red-600">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete Note
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you absolutely sure?</DialogTitle>
-                  <DialogDescription>
-                    This action cannot be undone. Are you sure you want to
-                    delete this note?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    onClick={() => {
-                      deleteNote(note.id);
-                    }}
-                    variant={"gradient"}
-                    size={"lg"}
-                    loading={isDeletingNote}
-                  >
-                    Confirm
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                )}
+                <DropdownMenuItem 
+                  className="text-red-600"
+                  onClick={() => handleDeleteDialog(note.id, true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Note
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <ConfirmationDialog
+              open={deleteDialogs[note.id] || false}
+              onOpenChange={(isOpen) => handleDeleteDialog(note.id, isOpen)}
+              title="Are you absolutely sure?"
+              description="This action cannot be undone. Are you sure you want to delete this note?"
+              onConfirm={() => deleteNote(note.id)}
+              loading={isDeletingNote}
+            />
           </div>
         </div>
 
