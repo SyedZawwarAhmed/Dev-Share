@@ -25,6 +25,7 @@ export class PostsService {
     filters?: {
       status?: string;
       search?: string;
+      platform?: string;
       orderBy?: 'asc' | 'desc';
       page?: number;
       limit?: number;
@@ -44,6 +45,17 @@ export class PostsService {
       };
       whereClause.status =
         statusMap[filters.status.toLowerCase()] || filters.status.toUpperCase();
+    }
+
+    if (filters?.platform) {
+      // Map frontend platform values to backend enum
+      const platformMap = {
+        linkedin: 'LINKEDIN',
+        twitter: 'TWITTER',
+        bluesky: 'BLUESKY',
+      };
+      whereClause.platform =
+        platformMap[filters.platform.toLowerCase()] || filters.platform.toUpperCase();
     }
 
     if (filters?.search) {

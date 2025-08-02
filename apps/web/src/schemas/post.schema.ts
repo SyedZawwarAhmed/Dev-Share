@@ -188,6 +188,12 @@ export const getPostsFiltersSchema = z.object({
       invalid_type_error: "Search must be a string",
     })
     .optional(),
+  platform: z
+    .enum(["linkedin", "twitter", "bluesky"], {
+      invalid_type_error:
+        "Platform must be either 'linkedin', 'twitter', or 'bluesky'",
+    })
+    .optional(),
   orderBy: z.enum(["asc", "desc"]).optional(),
   page: z.number().min(1).optional(),
   limit: z.number().min(1).max(100).optional(),
