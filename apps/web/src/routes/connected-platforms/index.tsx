@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Linkedin, Twitter, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Linkedin,
+  Twitter,
+  ExternalLink,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
 import PlatformAuthModal from "@/components/platform-auth-modal";
@@ -22,7 +28,8 @@ export const Route = createFileRoute("/connected-platforms/")({
 function RouteComponent() {
   const { user } = useAuthStore();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [selectedPlatform, setSelectedPlatform] = useState<Platform>("LINKEDIN");
+  const [selectedPlatform, setSelectedPlatform] =
+    useState<Platform>("LINKEDIN");
 
   const platforms = [
     {
@@ -30,16 +37,24 @@ function RouteComponent() {
       name: "LinkedIn",
       icon: <Linkedin className="h-6 w-6 text-blue-600" />,
       color: "bg-blue-50 border-blue-200",
-      isConnected: user?.accounts?.some(account => account.provider === "LINKEDIN") || false,
-      username: user?.accounts?.find(account => account.provider === "LINKEDIN")?.providerAccountId || "",
+      isConnected:
+        user?.accounts?.some((account) => account.provider === "LINKEDIN") ||
+        false,
+      username:
+        user?.accounts?.find((account) => account.provider === "LINKEDIN")
+          ?.providerAccountId || "",
     },
     {
       id: "X" as Platform,
       name: "X (Twitter)",
       icon: <Twitter className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
-      isConnected: user?.accounts?.some(account => account.provider === "X") || false,
-      username: user?.accounts?.find(account => account.provider === "X")?.providerAccountId || "",
+      isConnected:
+        user?.accounts?.some((account) => account.provider === "TWITTER") ||
+        false,
+      username:
+        user?.accounts?.find((account) => account.provider === "TWITTER")
+          ?.providerAccountId || "",
     },
     {
       id: "BLUESKY" as Platform,
@@ -56,8 +71,12 @@ function RouteComponent() {
         </svg>
       ),
       color: "bg-indigo-50 border-indigo-200",
-      isConnected: user?.accounts?.some(account => account.provider === "BLUESKY") || false,
-      username: user?.accounts?.find(account => account.provider === "BLUESKY")?.providerAccountId || "",
+      isConnected:
+        user?.accounts?.some((account) => account.provider === "BLUESKY") ||
+        false,
+      username:
+        user?.accounts?.find((account) => account.provider === "BLUESKY")
+          ?.providerAccountId || "",
     },
   ];
 
@@ -73,14 +92,17 @@ function RouteComponent() {
     setShowAuthModal(false);
   };
 
-  const connectedCount = platforms.filter(p => p.isConnected).length;
+  const connectedCount = platforms.filter((p) => p.isConnected).length;
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-purple-800 mb-2">Connected Platforms</h1>
+        <h1 className="text-3xl font-bold text-purple-800 mb-2">
+          Connected Platforms
+        </h1>
         <p className="text-slate-600">
-          Connect your social media accounts to automatically share your learning posts.
+          Connect your social media accounts to automatically share your
+          learning posts.
         </p>
       </div>
 
@@ -96,7 +118,8 @@ function RouteComponent() {
                   No platforms connected
                 </h3>
                 <p className="text-sm text-amber-700 mb-3">
-                  Connect at least one social media platform to start sharing your learning posts.
+                  Connect at least one social media platform to start sharing
+                  your learning posts.
                 </p>
               </div>
             </div>
@@ -121,12 +144,18 @@ function RouteComponent() {
                   </div>
                 </div>
                 {platform.isConnected ? (
-                  <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 border-green-200 text-green-700"
+                  >
                     <CheckCircle2 className="h-3 w-3 mr-1" />
                     Connected
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-slate-50 border-slate-200 text-slate-600">
+                  <Badge
+                    variant="outline"
+                    className="bg-slate-50 border-slate-200 text-slate-600"
+                  >
                     <XCircle className="h-3 w-3 mr-1" />
                     Not Connected
                   </Badge>
@@ -145,7 +174,9 @@ function RouteComponent() {
                     </Avatar>
                     <div>
                       <p className="text-sm font-medium">{platform.username}</p>
-                      <p className="text-xs text-slate-500">Connected account</p>
+                      <p className="text-xs text-slate-500">
+                        Connected account
+                      </p>
                     </div>
                   </div>
                   <Button
@@ -163,9 +194,7 @@ function RouteComponent() {
                     <div className="p-3 bg-slate-100 rounded-lg inline-block mb-2">
                       {platform.icon}
                     </div>
-                    <p className="text-sm text-slate-500">
-                      Not connected yet
-                    </p>
+                    <p className="text-sm text-slate-500">Not connected yet</p>
                   </div>
                   <Button
                     onClick={() => handleConnectPlatform(platform.id)}
@@ -181,7 +210,9 @@ function RouteComponent() {
       </div>
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
-        <h3 className="font-medium text-blue-800 mb-2">Why connect your platforms?</h3>
+        <h3 className="font-medium text-blue-800 mb-2">
+          Why connect your platforms?
+        </h3>
         <ul className="text-sm text-blue-700 space-y-1">
           <li>• Automatically share your learning notes as optimized posts</li>
           <li>• Schedule posts for optimal engagement times</li>
@@ -198,4 +229,4 @@ function RouteComponent() {
       />
     </main>
   );
-} 
+}
