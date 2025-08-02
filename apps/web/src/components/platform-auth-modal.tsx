@@ -30,7 +30,7 @@ export default function PlatformAuthModal({
 
   // Map frontend platform to backend provider
   const getProviderName = (platform: Platform) => {
-    if (platform === "X") return "TWITTER";
+    if (platform === "TWITTER") return "TWITTER";
     return platform;
   };
 
@@ -47,7 +47,7 @@ export default function PlatformAuthModal({
         "Connect your LinkedIn account to share professional content with your network.",
       permissions: ["Post on your behalf", "Access basic profile information"],
     },
-    X: {
+    TWITTER: {
       name: "X (Twitter)",
       icon: <Twitter className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
@@ -81,7 +81,7 @@ export default function PlatformAuthModal({
   const config = platformConfig[platform];
 
   const handleAuth = () => {
-    const userId = platform === "X" ? user?.id : undefined;
+    const userId = platform === "TWITTER" ? user?.id : undefined;
     window.location.href = getAuthUrl(platform, userId);
   };
 

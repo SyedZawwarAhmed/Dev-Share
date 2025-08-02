@@ -44,12 +44,12 @@ function RouteComponent() {
   const [activeTab, setActiveTab] = useState("LINKEDIN");
   const [selectedPlatforms, setSelectedPlatforms] = useState({
     LINKEDIN: false,
-    X: false,
+    TWITTER: false,
     BLUESKY: false,
   });
   const [generatedPosts, setGeneratedPosts] = useState({
     LINKEDIN: { post_content: "" },
-    X: { post_content: "" },
+    TWITTER: { post_content: "" },
     BLUESKY: { post_content: "" },
   });
 
@@ -59,7 +59,7 @@ function RouteComponent() {
       setActiveTab(Object.keys(data)[0] as Platform);
       setSelectedPlatforms({
         LINKEDIN: !!data?.LINKEDIN?.post_content,
-        X: !!data?.X?.post_content,
+        TWITTER: !!data?.TWITTER?.post_content,
         BLUESKY: !!data?.BLUESKY?.post_content,
       });
       setGeneratedPosts(data);
@@ -149,13 +149,30 @@ function RouteComponent() {
     }, 1500);
   };
 
-  const handlePostNow = () => {
-    setTimeout(() => {
+  const handlePostNow = async () => {
+    try {
+      // Create posts for all selected platforms and publish them immediately
+      const postPromises = Object.keys(selectedPlatforms).map(async (platform) => {
+        if (selectedPlatforms[platform as Platform] && generatedPosts[platform as Platform]?.post_content) {
+          const post = await addPostService({
+            content: generatedPosts[platform as Platform]?.post_content ?? "",
+            platform: platform as Platform,
+            published: true,
+            noteId: note?.id!,
+          });
+          return post;
+        }
+      });
+
+      await Promise.all(postPromises.filter(Boolean));
+      
       toast("Posts published", {
         description: "Your posts have been published successfully.",
       });
       window.location.href = `/notes/${params.id}/posts`;
-    }, 1500);
+    } catch (error) {
+      toast.error("Failed to publish posts. Please try again.");
+    }
   };
 
   const hasContent = Object.keys(selectedPlatforms).some(
@@ -236,21 +253,21 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="x"
-                    checked={selectedPlatforms.X}
+                    id="twitter"
+                    checked={selectedPlatforms.TWITTER}
                     onCheckedChange={(checked) =>
-                      handlePlatformChange("X", checked as boolean)
+                      handlePlatformChange("TWITTER", checked as boolean)
                     }
                     disabled={
                       !user?.accounts?.some(
-                        (account) => account.provider === "X"
+                        (account) => account.provider === "TWITTER"
                       )
                     }
                   />
                   <Label
-                    htmlFor="x"
+                    htmlFor="twitter"
                     className={`text-sm font-normal ${!user?.accounts?.some(
-                      (account) => account.provider === "X"
+                      (account) => account.provider === "TWITTER"
                     )
                       ? "text-slate-400 cursor-not-allowed"
                       : ""
@@ -258,7 +275,7 @@ function RouteComponent() {
                   >
                     X (Twitter)
                     {!user?.accounts?.some(
-                      (account) => account.provider === "X"
+                      (account) => account.provider === "TWITTER"
                     ) && (
                         <span className="text-xs text-slate-400 ml-1">
                           (Connect account first)
@@ -300,7 +317,7 @@ function RouteComponent() {
                 </div>
               </div>
               {!user?.accounts?.some((account) =>
-                ["LINKEDIN", "X", "BLUESKY"].includes(account.provider)
+                ["LINKEDIN", "TWITTER", "BLUESKY"].includes(account.provider)
               ) && (
                   <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
                     <p className="text-sm text-amber-700">
@@ -368,9 +385,9 @@ function RouteComponent() {
                   LinkedIn
                 </TabsTrigger>
                 <TabsTrigger
-                  value="x"
+                  value="TWITTER"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.X}
+                  disabled={!selectedPlatforms.TWITTER}
                 >
                   <Twitter className="h-4 w-4" />X
                 </TabsTrigger>
@@ -418,7 +435,7 @@ function RouteComponent() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="x" className="m-0">
+              <TabsContent value="TWITTER" className="m-0">
                 <div className="space-y-4">
                   <Badge
                     variant="outline"
@@ -430,11 +447,11 @@ function RouteComponent() {
                   <Textarea
                     placeholder="X post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts.X?.post_content || ""}
+                    value={generatedPosts.TWITTER?.post_content || ""}
                     onChange={(e) =>
-                      handlePostContentChange("X", e.target.value)
+                      handlePostContentChange("TWITTER", e.target.value)
                     }
-                    disabled={!selectedPlatforms.X || isGenerating}
+                    disabled={!selectedPlatforms.TWITTER || isGenerating}
                   />
                 </div>
               </TabsContent>
@@ -496,14 +513,19 @@ function RouteComponent() {
             </Button>
             {note?.id ? (
               <SavePostsButton
-                onSaveDraft={() =>
-                  createPost({
-                    content: generatedPosts.LINKEDIN?.post_content ?? "",
-                    platform: "LINKEDIN",
-                    published: false,
-                    noteId: note?.id,
-                  })
-                }
+                onSaveDraft={() => {
+                  // Create posts for all selected platforms
+                  Object.keys(selectedPlatforms).forEach((platform) => {
+                    if (selectedPlatforms[platform as Platform] && generatedPosts[platform as Platform]?.post_content) {
+                      createPost({
+                        content: generatedPosts[platform as Platform]?.post_content ?? "",
+                        platform: platform as Platform,
+                        published: false,
+                        noteId: note?.id!,
+                      });
+                    }
+                  });
+                }}
                 onSchedule={handleSchedule}
                 onPostNow={handlePostNow}
                 isLoading={isSaving}

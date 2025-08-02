@@ -113,7 +113,7 @@ function RouteComponent() {
   console.log('activeTab', activeTab)
   const [selectedPlatforms, setSelectedPlatforms] = useState({
     LINKEDIN: false,
-    X: false,
+    TWITTER: false,
     BLUESKY: false,
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -122,7 +122,7 @@ function RouteComponent() {
   const [notes] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState({
     LINKEDIN: { post_content: "" },
-    X: { post_content: "" },
+    TWITTER: { post_content: "" },
     BLUESKY: { post_content: "" },
   });
 
@@ -132,7 +132,7 @@ function RouteComponent() {
       setActiveTab(Object.keys(data)[0] as Platform);
       setSelectedPlatforms({
         LINKEDIN: !!data?.LINKEDIN?.post_content,
-        X: !!data?.X?.post_content,
+        TWITTER: !!data?.TWITTER?.post_content,
         BLUESKY: !!data?.BLUESKY?.post_content,
       });
       setGeneratedPosts(data);
@@ -278,22 +278,22 @@ function RouteComponent() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="x"
-                      checked={selectedPlatforms.X}
+                      id="twitter"
+                      checked={selectedPlatforms.TWITTER}
                       onCheckedChange={(checked) =>
-                        handlePlatformChange("X", checked as boolean)
+                        handlePlatformChange("TWITTER", checked as boolean)
                       }
-                      disabled={!user?.accounts?.some(account => account.provider === "X")}
+                      disabled={!user?.accounts?.some(account => account.provider === "TWITTER")}
                     />
                     <Label
-                      htmlFor="x"
-                      className={`text-sm font-normal ${!user?.accounts?.some(account => account.provider === "X")
+                      htmlFor="twitter"
+                      className={`text-sm font-normal ${!user?.accounts?.some(account => account.provider === "TWITTER")
                         ? "text-slate-400 cursor-not-allowed"
                         : ""
                         }`}
                     >
                       X (Twitter)
-                      {!user?.accounts?.some(account => account.provider === "X") && (
+                      {!user?.accounts?.some(account => account.provider === "TWITTER") && (
                         <span className="text-xs text-slate-400 ml-1">(Connect account first)</span>
                       )}
                     </Label>
@@ -403,9 +403,9 @@ function RouteComponent() {
                   LinkedIn
                 </TabsTrigger>
                 <TabsTrigger
-                  value="X"
+                  value="TWITTER"
                   className="flex items-center gap-1"
-                  disabled={!selectedPlatforms.X}
+                  disabled={!selectedPlatforms.TWITTER}
                 >
                   <Twitter className="h-4 w-4" />X
                 </TabsTrigger>
@@ -453,7 +453,7 @@ function RouteComponent() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="x" className="m-0">
+              <TabsContent value="TWITTER" className="m-0">
                 <div className="space-y-4">
                   <Badge
                     variant="outline"
@@ -465,11 +465,11 @@ function RouteComponent() {
                   <Textarea
                     placeholder="X post content will appear here"
                     className="min-h-[250px]"
-                    value={generatedPosts?.X?.post_content || ""}
+                    value={generatedPosts?.TWITTER?.post_content || ""}
                     onChange={(e) =>
-                      handlePostContentChange("X", e.target.value)
+                      handlePostContentChange("TWITTER", e.target.value)
                     }
-                    disabled={!selectedPlatforms.X || isGenerating}
+                    disabled={!selectedPlatforms.TWITTER || isGenerating}
                   />
                 </div>
               </TabsContent>
