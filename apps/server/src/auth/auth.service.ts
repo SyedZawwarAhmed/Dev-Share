@@ -146,6 +146,42 @@ export class AuthService {
     return this.login(user);
   }
 
+  async linkTwitterAccount(userId: string, twitterProfile: any) {
+    const { accessToken, refreshToken, id } = twitterProfile;
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        accounts: {
+          upsert: {
+            where: {
+              provider_providerAccountId: {
+                provider: AuthProvider.TWITTER,
+                providerAccountId: id,
+              },
+            },
+            create: {
+              type: 'oauth',
+              provider: AuthProvider.TWITTER,
+              providerAccountId: id,
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            },
+            update: {
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            },
+          },
+        },
+      },
+      include: {
+        accounts: true,
+      },
+    });
+
+    return this.login(user);
+  }
+
   async signup(
     email: string,
     password: string,

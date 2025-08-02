@@ -139,30 +139,42 @@ export class SocialMediaService {
     try {
       this.logger.log(`Posting to Twitter: ${post.id}`);
       
-      // TODO: Implement Twitter/X API posting
-      // You'll need to use the Twitter API v2 with the user's access token
-      // const twitterAccount = user.accounts.find(acc => acc.provider === 'TWITTER');
-      // if (!twitterAccount?.access_token) {
-      //   throw new Error('No Twitter access token found');
-      // }
-      
-      // Example Twitter API call:
-      // const response = await fetch('https://api.twitter.com/2/tweets', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${twitterAccount.access_token}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     text: post.content
-      //   })
-      // });
+      // Find Twitter account for the user
+      const twitterAccount = user.accounts.find(acc => acc.provider === 'TWITTER');
+      if (!twitterAccount?.access_token) {
+        throw new Error('No Twitter access token found. User needs to authenticate with Twitter first.');
+      }
 
-      // For now, just simulate success
-      await this.updatePostStatus(post.id, PostStatus.PUBLISHED);
-      this.logger.log(`Successfully posted to Twitter: ${post.id}`);
+      // Make the Twitter API call using OAuth 2.0 Bearer token
+      const response = await fetch('https://api.twitter.com/2/tweets', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${twitterAccount.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: post.content
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Twitter API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+
+      const responseData = await response.json();
+      const tweetId = responseData.data?.id;
       
-      return { success: true, platform: 'TWITTER' };
+      this.logger.log(`Successfully posted to Twitter. Tweet ID: ${tweetId}`);
+
+      await this.updatePostStatus(post.id, PostStatus.PUBLISHED);
+      
+      return { 
+        success: true, 
+        platform: 'TWITTER',
+        tweetId,
+        url: `https://twitter.com/i/web/status/${tweetId}`
+      };
     } catch (error) {
       this.logger.error(`Failed to post to Twitter: ${error.message}`);
       await this.updatePostStatus(post.id, PostStatus.DRAFT);

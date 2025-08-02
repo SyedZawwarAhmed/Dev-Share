@@ -11,6 +11,15 @@ export class PostsService {
     private postsSchedulerService: PostsSchedulerService,
   ) {}
 
+  private mapPlatform(frontendPlatform: string): string {
+    const platformMap = {
+      'X': 'TWITTER',
+      'LINKEDIN': 'LINKEDIN',
+      'BLUESKY': 'BLUESKY'
+    };
+    return platformMap[frontendPlatform.toUpperCase()] || frontendPlatform.toUpperCase();
+  }
+
   async getPosts(
     userId: string,
     filters?: {
@@ -79,7 +88,7 @@ export class PostsService {
 
   addPost(userId: string, post) {
     const newPost = this.prisma.post.create({
-      data: { ...post, platform: post.platform.toUpperCase(), userId },
+      data: { ...post, platform: this.mapPlatform(post.platform), userId },
     });
     return newPost;
   }

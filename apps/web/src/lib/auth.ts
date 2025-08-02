@@ -36,12 +36,12 @@ export async function logout() {
 }
 
 
-export const getAuthUrl = (platform: Platform) => {
+export const getAuthUrl = (platform: Platform, userId?: string) => {
   switch (platform) {
     case "LINKEDIN":
       return `${import.meta.env.VITE_API_URL}/auth/linkedin`;
     case "X":
-      return `${import.meta.env.VITE_API_URL}/auth/x`;
+      return `${import.meta.env.VITE_API_URL}/auth/twitter${userId ? `?userId=${userId}` : ''}`;
     case "BLUESKY":
       return `${import.meta.env.VITE_API_URL}/auth/bluesky`;
     default:

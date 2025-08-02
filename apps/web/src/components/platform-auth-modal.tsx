@@ -27,7 +27,16 @@ export default function PlatformAuthModal({
   onAuthComplete,
 }: PlatformAuthModalProps) {
   const { user } = useAuthStore();
-  const isAuthenticated = user?.accounts?.some(userAccount => userAccount.provider === platform)
+
+  // Map frontend platform to backend provider
+  const getProviderName = (platform: Platform) => {
+    if (platform === "X") return "TWITTER";
+    return platform;
+  };
+
+  const isAuthenticated = user?.accounts?.some(
+    (userAccount) => userAccount.provider === getProviderName(platform),
+  );
 
   const platformConfig = {
     LINKEDIN: {
@@ -72,7 +81,8 @@ export default function PlatformAuthModal({
   const config = platformConfig[platform];
 
   const handleAuth = () => {
-    window.location.href = getAuthUrl(platform);
+    const userId = platform === "X" ? user?.id : undefined;
+    window.location.href = getAuthUrl(platform, userId);
   };
 
   const handleContinue = () => {
