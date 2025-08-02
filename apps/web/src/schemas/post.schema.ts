@@ -194,6 +194,11 @@ export const getPostsFiltersSchema = z.object({
         "Platform must be either 'linkedin', 'twitter', or 'bluesky'",
     })
     .optional(),
+  noteId: z
+    .string({
+      invalid_type_error: "Note ID must be a string",
+    })
+    .optional(),
   orderBy: z.enum(["asc", "desc"]).optional(),
   page: z.number().min(1).optional(),
   limit: z.number().min(1).max(100).optional(),

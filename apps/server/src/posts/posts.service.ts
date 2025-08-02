@@ -26,6 +26,7 @@ export class PostsService {
       status?: string;
       search?: string;
       platform?: string;
+      noteId?: string;
       orderBy?: 'asc' | 'desc';
       page?: number;
       limit?: number;
@@ -56,6 +57,10 @@ export class PostsService {
       };
       whereClause.platform =
         platformMap[filters.platform.toLowerCase()] || filters.platform.toUpperCase();
+    }
+
+    if (filters?.noteId) {
+      whereClause.noteId = filters.noteId;
     }
 
     if (filters?.search) {
