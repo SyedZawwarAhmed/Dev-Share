@@ -37,17 +37,23 @@ import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { toast } from "sonner";
 import { useDebounce } from "@/lib/hooks";
 import { useConfigStore } from "@/stores/config.store";
+import { getNotesBodySchema } from "@/schemas/note.schema";
+import { z } from "zod";
 
 export const Route = createFileRoute("/notes/")({
   component: RouteComponent,
-  // beforeLoad: ({ search }) => {
-  //   searcd/schedule`}h;
-  // },
-  validateSearch: (search?: { search?: string }) => {
-    if (!search?.search) return {};
-    return {
-      search: search?.search || "",
-    };
+  validateSearch: (search?: { search?: string; sortBy?: string }) => {
+    const result: {
+      search?: string;
+      sortBy?: string;
+    } = {};
+    if (search?.search) {
+      result.search = search.search;
+    }
+    if (search?.sortBy) {
+      result.sortBy = search.sortBy;
+    }
+    return result;
   },
 });
 
@@ -151,18 +157,13 @@ function NoteCard({
                     Edit Note
                   </DropdownMenuItem>
                 </Link>
-                {note.postCount === 0 && (
-                  <Link
-                    to={`/notes/$id/create-posts`}
-                    params={{ id: note.id }}
-                  >
-                    <DropdownMenuItem>
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      Create Posts
-                    </DropdownMenuItem>
-                  </Link>
-                )}
-                <DropdownMenuItem 
+                <Link to={`/notes/$id/create-posts`} params={{ id: note.id }}>
+                  <DropdownMenuItem>
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Create Posts
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem
                   className="text-red-600"
                   onClick={() => handleDeleteDialog(note.id, true)}
                 >
@@ -171,7 +172,7 @@ function NoteCard({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
+
             <ConfirmationDialog
               open={deleteDialogs[note.id] || false}
               onOpenChange={(isOpen) => handleDeleteDialog(note.id, isOpen)}
@@ -234,44 +235,66 @@ function NoteCard({
 }
 
 function RouteComponent() {
-  const { search } = Route.useSearch();
+  const searchParams = Route.useSearch();
   const navigate = useNavigate();
 
   const { notesView, setNotesView } = useConfigStore();
 
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState(searchParams?.sortBy || "newest");
   const [deleteDialogs, setDeleteDialogs] = useState<{
     [key: string]: boolean;
   }>({});
-  const [searchInput, setSearchInput] = useState(search || "");
+  const [searchInput, setSearchInput] = useState(searchParams?.search || "");
 
   const debouncedSearch = useDebounce(searchInput, 300);
 
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (debouncedSearch !== search) {
+    const newSearch: {
+      search?: string;
+      sortBy?: string;
+    } = {};
+    
+    if (debouncedSearch) newSearch.search = debouncedSearch;
+    if (sortBy !== "newest") newSearch.sortBy = sortBy;
+
+    const currentSearch = searchParams || {};
+    const hasChanged = 
+      currentSearch.search !== (debouncedSearch || undefined) ||
+      currentSearch.sortBy !== (sortBy !== "newest" ? sortBy : undefined);
+
+    if (hasChanged) {
       navigate({
         to: ".",
-        search: { search: debouncedSearch },
+        search: newSearch,
         replace: true,
       });
     }
-  }, [debouncedSearch, search, navigate]);
+  }, [debouncedSearch, sortBy, searchParams, navigate]);
 
   useEffect(() => {
-    if (search !== searchInput) {
-      setSearchInput(search || "");
+    if (searchParams?.search !== searchInput) {
+      setSearchInput(searchParams?.search || "");
     }
-  }, [search]);
+    if (searchParams?.sortBy !== sortBy) {
+      setSortBy(searchParams?.sortBy || "newest");
+    }
+  }, [searchParams]);
 
   const { data: notesData, isLoading: isNotesLoading } = useQuery({
     queryKey: ["notes", debouncedSearch, sortBy],
-    queryFn: async () =>
-      getNotesService({
-        search: debouncedSearch,
+    queryFn: async () => {
+      const filters: z.infer<typeof getNotesBodySchema> = {
         orderBy: sortBy !== "newest" ? "asc" : "desc",
-      }),
+      };
+
+      if (debouncedSearch) {
+        filters.search = debouncedSearch;
+      }
+
+      return getNotesService(filters);
+    },
   });
 
   const { mutateAsync: deleteNote, isPending: isDeletingNote } = useMutation({
@@ -283,7 +306,7 @@ function RouteComponent() {
     onError: (error) => {
       console.error(
         "\n\n ---> apps/web/src/routes/notes.tsx:100 -> error: ",
-        error
+        error,
       );
       toast.error("Failed to delete note. Please try again.");
     },
@@ -306,7 +329,7 @@ function RouteComponent() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchInput(e.target.value);
     },
-    []
+    [],
   );
 
   const renderNotes = (viewType: "list" | "grid") => {

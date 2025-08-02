@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,24 +36,45 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
 import { toast } from "sonner";
 import { useConfigStore } from "@/stores/config.store";
+import { useDebounce } from "@/lib/hooks";
+import { getPostsFiltersSchema } from "@/schemas/post.schema";
+import { z } from "zod";
 
 export const Route = createFileRoute("/posts/")({
   component: RouteComponent,
-  validateSearch: (search?: { status?: "draft" | "scheduled" | "" }) => {
-    if (!search?.status) return {};
-    return {
-      status: search?.status,
-    };
+  validateSearch: (search?: { 
+    search?: string; 
+    status?: string; 
+    platform?: string; 
+    sortBy?: string; 
+  }) => {
+    const result: {
+      search?: string;
+      status?: string;
+      platform?: string;
+      sortBy?: string;
+    } = {};
+    if (search?.search) {
+      result.search = search.search;
+    }
+    if (search?.status) {
+      result.status = search.status;
+    }
+    if (search?.platform) {
+      result.platform = search.platform;
+    }
+    if (search?.sortBy) {
+      result.sortBy = search.sortBy;
+    }
+    return result;
   },
 });
 
 function RouteComponent() {
+  const searchParams = Route.useSearch();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { postsView, setPostsView } = useConfigStore();
-  const { data: posts, isPending: isPostsLoading } = useQuery({
-    queryKey: ["posts"],
-    queryFn: () => getPostsService(),
-  });
 
   const { mutate: publishPost, isPending: isPublishing } = useMutation({
     mutationFn: publishPostService,
@@ -108,10 +129,12 @@ function RouteComponent() {
     },
   });
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [platformFilter, setPlatformFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("newest");
+  const [searchInput, setSearchInput] = useState(searchParams?.search || "");
+  const [statusFilter, setStatusFilter] = useState(searchParams?.status || "all");
+  const [platformFilter, setPlatformFilter] = useState(searchParams?.platform || "all");
+  const [sortBy, setSortBy] = useState(searchParams?.sortBy || "newest");
+
+  const debouncedSearch = useDebounce(searchInput, 300);
   const [postConfirmationDialogs, setPostConfirmationDialogs] = useState<{
     [key: string]: boolean;
   }>({});
@@ -122,6 +145,73 @@ function RouteComponent() {
     [key: string]: boolean;
   }>({});
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
+  useEffect(() => {
+    const newSearch: {
+      search?: string;
+      status?: string;
+      platform?: string;
+      sortBy?: string;
+    } = {};
+    
+    if (debouncedSearch) newSearch.search = debouncedSearch;
+    if (statusFilter !== "all") newSearch.status = statusFilter;
+    if (platformFilter !== "all") newSearch.platform = platformFilter;
+    if (sortBy !== "newest") newSearch.sortBy = sortBy;
+
+    const currentSearch = searchParams || {};
+    const hasChanged = 
+      currentSearch.search !== (debouncedSearch || undefined) ||
+      currentSearch.status !== (statusFilter !== "all" ? statusFilter : undefined) ||
+      currentSearch.platform !== (platformFilter !== "all" ? platformFilter : undefined) ||
+      currentSearch.sortBy !== (sortBy !== "newest" ? sortBy : undefined);
+
+    if (hasChanged) {
+      navigate({
+        to: ".",
+        search: newSearch,
+        replace: true,
+      });
+    }
+  }, [debouncedSearch, statusFilter, platformFilter, sortBy, searchParams, navigate]);
+
+  useEffect(() => {
+    if (searchParams?.search !== searchInput) {
+      setSearchInput(searchParams?.search || "");
+    }
+    if (searchParams?.status !== statusFilter) {
+      setStatusFilter(searchParams?.status || "all");
+    }
+    if (searchParams?.platform !== platformFilter) {
+      setPlatformFilter(searchParams?.platform || "all");
+    }
+    if (searchParams?.sortBy !== sortBy) {
+      setSortBy(searchParams?.sortBy || "newest");
+    }
+  }, [searchParams]);
+
+  const { data: posts, isPending: isPostsLoading } = useQuery({
+    queryKey: ["posts", debouncedSearch, statusFilter, platformFilter, sortBy],
+    queryFn: async () => {
+      const filters: z.infer<typeof getPostsFiltersSchema> = {
+        orderBy: sortBy !== "newest" ? "asc" : "desc",
+      };
+
+      if (debouncedSearch) {
+        filters.search = debouncedSearch;
+      }
+
+      if (statusFilter !== "all") {
+        filters.status = statusFilter as z.infer<typeof getPostsFiltersSchema>["status"];
+      }
+
+      if (platformFilter !== "all") {
+        filters.platform = platformFilter as z.infer<typeof getPostsFiltersSchema>["platform"];
+      }
+
+      return getPostsService(filters);
+    },
+  });
 
   const filteredPosts = posts || [];
 
@@ -222,6 +312,13 @@ function RouteComponent() {
     setShowSuccessDialog(false);
   };
 
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchInput(e.target.value);
+    },
+    [],
+  );
+
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -241,8 +338,8 @@ function RouteComponent() {
               <Input
                 placeholder="Search posts..."
                 className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={handleSearchChange}
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
