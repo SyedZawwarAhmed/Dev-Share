@@ -195,7 +195,7 @@ export default function ScheduledPosts() {
                         {getPlatformIcon(post.platform)}
                         {post.platform === "LINKEDIN"
                           ? "LinkedIn"
-                          : post.platform === "X"
+                          : post.platform === "TWITTER"
                             ? "X"
                             : post.platform === "BLUESKY"
                               ? "Bluesky"
@@ -241,7 +241,7 @@ export default function ScheduledPosts() {
                         {getPlatformIcon(post.platform)}
                         {post.platform === "LINKEDIN"
                           ? "LinkedIn"
-                          : post.platform === "X"
+                          : post.platform === "TWITTER"
                             ? "X"
                             : post.platform === "BLUESKY"
                               ? "Bluesky"

@@ -51,22 +51,22 @@ export class GeminiService {
             properties: {
               post_content: {
                 type: 'string',
-                description: 'The formatted post content'
+                description: 'The formatted post content',
               },
               suggested_hashtags: {
                 type: 'array',
                 items: {
-                  type: 'string'
+                  type: 'string',
                 },
-                description: 'Array of suggested hashtags if applicable'
+                description: 'Array of suggested hashtags if applicable',
               },
               platform: {
                 type: 'string',
-                description: 'The platform identifier'
-              }
+                description: 'The platform identifier',
+              },
             },
-            required: ['post_content', 'platform']
-          }
+            required: ['post_content', 'platform'],
+          },
         },
         contents: prompt,
       });

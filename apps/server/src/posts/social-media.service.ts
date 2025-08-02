@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PostStatus } from 'generated/prisma';
 
@@ -6,7 +7,10 @@ import { PostStatus } from 'generated/prisma';
 export class SocialMediaService {
   private readonly logger = new Logger(SocialMediaService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigService,
+  ) {}
 
   async postToLinkedIn(post: any, user: any) {
     try {
@@ -135,6 +139,31 @@ export class SocialMediaService {
     }
   }
 
+  async refreshTwitterToken(refreshToken: string): Promise<string> {
+    const clientId = this.configService.get('TWITTER_CLIENT_ID');
+    const clientSecret = this.configService.get('TWITTER_CLIENT_SECRET');
+
+    const response = await fetch('https://api.twitter.com/2/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Token refresh failed: ${error}`);
+    }
+
+    const tokens = await response.json();
+    return tokens.access_token;
+  }
+
   async postToTwitter(post: any, user: any) {
     try {
       this.logger.log(`Posting to Twitter: ${post.id}`);
@@ -145,11 +174,30 @@ export class SocialMediaService {
         throw new Error('No Twitter access token found. User needs to authenticate with Twitter first.');
       }
 
+      let accessToken = twitterAccount.access_token;
+
+      // Try to refresh the token if we have a refresh token
+      if (twitterAccount.refresh_token) {
+        try {
+          accessToken = await this.refreshTwitterToken(twitterAccount.refresh_token);
+          
+          // Update the stored access token
+          await this.prisma.account.update({
+            where: { id: twitterAccount.id },
+            data: { access_token: accessToken },
+          });
+          
+          this.logger.log(`Refreshed Twitter access token for user ${user.id}`);
+        } catch (refreshError) {
+          this.logger.warn(`Token refresh failed, trying with existing token: ${refreshError.message}`);
+        }
+      }
+
       // Make the Twitter API call using OAuth 2.0 Bearer token
       const response = await fetch('https://api.twitter.com/2/tweets', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${twitterAccount.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
