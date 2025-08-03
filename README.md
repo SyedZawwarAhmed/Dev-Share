@@ -15,13 +15,15 @@ A full-stack social media content management application built with modern web t
 ## Tech Stack
 
 ### Backend
+
 - **NestJS** - Scalable Node.js framework
 - **Prisma ORM** - Type-safe database access
 - **PostgreSQL** - Primary database
 - **JWT** - Authentication tokens
 - **Gemini AI** - Content generation
 
-### Frontend  
+### Frontend
+
 - **React** - UI library
 - **Vite** - Build tool and dev server
 - **TanStack Router** - File-based routing
@@ -55,11 +57,13 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 1. Clone the repository
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 3. Set up environment variables:
+
    - Copy `.env.example` to `.env` in `apps/server/`
    - Configure database connection and OAuth credentials
 
@@ -83,7 +87,7 @@ To run individual applications:
 # Backend only
 pnpm dev --filter=server
 
-# Frontend only  
+# Frontend only
 pnpm dev --filter=web
 ```
 
@@ -108,6 +112,7 @@ pnpm build --filter=web
 ## Available Scripts
 
 ### Code Quality
+
 ```bash
 # Run ESLint across all packages
 pnpm lint
@@ -120,11 +125,12 @@ pnpm check-types
 ```
 
 ### Backend Development (apps/server/)
+
 ```bash
 # Run Jest unit tests
 pnpm test
 
-# Run end-to-end tests  
+# Run end-to-end tests
 pnpm test:e2e
 
 # Run tests in watch mode
@@ -135,6 +141,7 @@ pnpm test:cov
 ```
 
 ### Database Management (Prisma)
+
 ```bash
 # Generate Prisma client (runs automatically on install)
 npx prisma generate
@@ -151,14 +158,16 @@ npx prisma studio
 ### Key Modules
 
 **Backend (NestJS)**
+
 - `AuthModule` - Multi-provider OAuth and JWT authentication
-- `UsersModule` - User management and profiles  
+- `UsersModule` - User management and profiles
 - `NotesModule` - Draft content creation with pagination
 - `PostsModule` - Social media post scheduling with status filtering
 - `StatsModule` - Dashboard analytics and statistics
 - `GeminiModule` - AI content generation integration
 
 **Frontend (React)**
+
 - Context-based authentication with JWT tokens
 - File-based routing with TanStack Router
 - Server state management with TanStack Query
@@ -188,6 +197,6 @@ npx prisma studio
 4. Run tests and linting
 5. Submit a pull request
 
-## License
-
-[Add your license information here]
+<!-- ## License -->
+<!---->
+<!-- [Add your license information here] -->
