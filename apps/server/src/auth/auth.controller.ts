@@ -103,17 +103,8 @@ export class AuthController {
   }
 
   @Get('twitter')
-  async twitterAuth(@Req() req, @Res() res: Response) {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
-    }
-
-    const state = Math.random().toString(36).substring(7);
-    // Store user ID in state for callback
-    const stateWithUser = `${state}_${userId}`;
-    const authUrl = this.twitterStrategy.getAuthUrl(stateWithUser);
+  async twitterAuth(@Res() res: Response) {
+    const authUrl = this.twitterStrategy.getAuthUrl();
     res.redirect(authUrl);
   }
 
@@ -127,19 +118,15 @@ export class AuthController {
       }
 
       if (!code || !state) {
-        throw new Error('No authorization code or state received');
-      }
-
-      // Extract user ID from state
-      const [, userId] = (state as string).split('_');
-      if (!userId) {
-        throw new Error('Invalid state parameter');
+        throw new Error('Missing code or state parameter');
       }
 
       const twitterProfile = await this.twitterStrategy.exchangeCodeForToken(
         code as string,
+        state as string,
       );
-      const { token } = await this.authService.linkTwitterAccount(userId, twitterProfile);
+
+      const { token } = await this.authService.twitterLogin(twitterProfile);
 
       const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
       redirectUrl.searchParams.append('token', encodeURIComponent(token));
@@ -147,7 +134,7 @@ export class AuthController {
     } catch (error) {
       console.error('Twitter OAuth callback error:', error);
       res.redirect(
-        `${process.env.FRONTEND_URL}/connected-platforms?error=Twitter connection failed`,
+        `${process.env.FRONTEND_URL}/login?error=Twitter authentication failed`,
       );
     }
   }

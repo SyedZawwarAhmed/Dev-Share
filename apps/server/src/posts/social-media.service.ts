@@ -139,29 +139,47 @@ export class SocialMediaService {
     }
   }
 
-  async refreshTwitterToken(refreshToken: string): Promise<string> {
+  async refreshTwitterToken(refreshToken: string): Promise<{ access_token: string; refresh_token?: string }> {
     const clientId = this.configService.get('TWITTER_CLIENT_ID');
     const clientSecret = this.configService.get('TWITTER_CLIENT_SECRET');
 
-    const response = await fetch('https://api.twitter.com/2/oauth2/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
-      },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-      }),
-    });
+    try {
+      const response = await fetch('https://api.twitter.com/2/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }),
+      });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Token refresh failed: ${error}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorObj;
+        try {
+          errorObj = JSON.parse(errorText);
+        } catch {
+          errorObj = { error: 'unknown_error', error_description: errorText };
+        }
+        
+        this.logger.error(`Twitter token refresh failed: ${response.status} - ${JSON.stringify(errorObj)}`);
+        throw new Error(`Token refresh failed: ${JSON.stringify(errorObj)}`);
+      }
+
+      const tokens = await response.json();
+      this.logger.log('Twitter token refresh successful');
+      
+      return {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token || refreshToken,
+      };
+    } catch (error) {
+      this.logger.error(`Twitter token refresh error: ${error.message}`);
+      throw error;
     }
-
-    const tokens = await response.json();
-    return tokens.access_token;
   }
 
   async postToTwitter(post: any, user: any) {
@@ -179,12 +197,16 @@ export class SocialMediaService {
       // Try to refresh the token if we have a refresh token
       if (twitterAccount.refresh_token) {
         try {
-          accessToken = await this.refreshTwitterToken(twitterAccount.refresh_token);
+          const tokens = await this.refreshTwitterToken(twitterAccount.refresh_token);
+          accessToken = tokens.access_token;
           
-          // Update the stored access token
+          // Update the stored access token and refresh token
           await this.prisma.account.update({
             where: { id: twitterAccount.id },
-            data: { access_token: accessToken },
+            data: { 
+              access_token: tokens.access_token,
+              refresh_token: tokens.refresh_token,
+            },
           });
           
           this.logger.log(`Refreshed Twitter access token for user ${user.id}`);

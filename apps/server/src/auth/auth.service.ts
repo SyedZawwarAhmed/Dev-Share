@@ -182,6 +182,66 @@ export class AuthService {
     return this.login(user);
   }
 
+  async twitterLogin(profile: any) {
+    const { email, firstName, lastName, username, profileImage, accessToken, refreshToken, id } = profile;
+    
+    // First, try to find existing account
+    const existingAccount = await this.prisma.account.findUnique({
+      where: {
+        provider_providerAccountId: {
+          provider: AuthProvider.TWITTER,
+          providerAccountId: id,
+        },
+      },
+      include: {
+        user: {
+          include: {
+            accounts: true,
+          },
+        },
+      },
+    });
+
+    if (existingAccount) {
+      // Update existing account tokens
+      await this.prisma.account.update({
+        where: { id: existingAccount.id },
+        data: {
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        },
+      });
+
+      return this.login(existingAccount.user);
+    }
+
+    // Create new user with Twitter account
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        firstName,
+        lastName,
+        username,
+        profileImage,
+        isEmailVerified: false,
+        accounts: {
+          create: {
+            type: 'oauth',
+            provider: AuthProvider.TWITTER,
+            providerAccountId: id,
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          },
+        },
+      },
+      include: {
+        accounts: true,
+      },
+    });
+
+    return this.login(user);
+  }
+
   async signup(
     email: string,
     password: string,
