@@ -35,18 +35,12 @@ function RouteComponent() {
   const { mutate: saveDraft, isPending: isDraftSaving } = useMutation({
     mutationFn: async () => {
       if (!user) {
-        toast("Please login to save your note", {
-          description: "Please login to save your note.",
-        });
-        return;
+        throw new Error("Please login to save your note");
       }
       if (!note.title) {
-        toast("Missing title", {
-          description: "Please provide a title for your note before saving.",
-        });
-        return;
+        throw new Error("Please provide a title for your note before saving");
       }
-      await addNoteService(note);
+      return await addNoteService(note);
     },
     onSuccess: () => {
       toast("Note saved", {
@@ -55,27 +49,22 @@ function RouteComponent() {
 
       navigate({ to: "/notes", search: { search: "" } });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error(
         "\n\n ---> apps/web/src/routes/new-note.tsx:59 -> error: ",
         error,
       );
+      toast.error(error.message || "Failed to save note");
     },
   });
 
   const { mutate: createPost, isPending: isPostSaving } = useMutation({
     mutationFn: async () => {
       if (!user) {
-        toast("Please login to save your note", {
-          description: "Please login to save your note.",
-        });
-        return;
+        throw new Error("Please login to save your note");
       }
       if (!note.title) {
-        toast("Missing title", {
-          description: "Please provide a title for your note before saving.",
-        });
-        return;
+        throw new Error("Please provide a title for your note before saving");
       }
       const createdNote = await addNoteService(note);
 
@@ -100,7 +89,7 @@ function RouteComponent() {
         navigate({ to: `/notes/${posts[0].noteId}/posts` });
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error(
         "\n\n ---> apps/web/src/routes/new-note.tsx:96 -> error: ",
         error,
@@ -108,7 +97,7 @@ function RouteComponent() {
       if (error instanceof ZodError) {
         toast.error(fromZodError(error).message);
       } else {
-        toast.error(error.message);
+        toast.error(error.message || "Failed to create posts");
       }
     },
   });
