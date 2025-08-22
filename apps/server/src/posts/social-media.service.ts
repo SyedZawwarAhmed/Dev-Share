@@ -27,11 +27,6 @@ export class SocialMediaService {
       }
 
       let accessToken = linkedinAccount.access_token;
-      this.logger.log(
-        `Using LinkedIn token: ${accessToken.substring(0, 15)}... (length: ${accessToken.length})`,
-      );
-
-      // Skip token validation for now - let the actual post request handle token issues
 
       // Prepare the LinkedIn API request body for text-only post
       const requestBody = {
