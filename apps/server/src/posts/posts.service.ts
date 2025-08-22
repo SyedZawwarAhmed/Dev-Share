@@ -150,15 +150,19 @@ export class PostsService {
     postId: string,
     schedule: { scheduledFor: string },
   ) {
+    // Ensure the scheduled time is converted to UTC
     const scheduledFor = new Date(schedule.scheduledFor);
-    const now = new Date();
+    
+    // Convert to UTC explicitly to avoid timezone issues
+    const scheduledForUTC = new Date(scheduledFor.toISOString());
+    const nowUTC = new Date();
 
-    if (scheduledFor < now) {
+    if (scheduledForUTC < nowUTC) {
       throw new BadRequestException('Scheduled time must be in the future');
     }
 
-    // Use the scheduler service to properly schedule the post
-    await this.postsSchedulerService.schedulePost(userId, postId, scheduledFor);
+    // Use the scheduler service to properly schedule the post with UTC time
+    await this.postsSchedulerService.schedulePost(userId, postId, scheduledForUTC);
 
     return this.prisma.post.findFirst({
       where: {
