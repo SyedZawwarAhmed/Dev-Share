@@ -47,7 +47,10 @@ function RouteComponent() {
       if (!post) {
         throw new Error("Post not found.");
       }
-      await schedulePostService(post.id, { scheduledFor: `${date}T${time}` });
+      // Convert local datetime to UTC before sending to server
+      const localDateTime = new Date(`${date}T${time}`);
+      const utcDateTime = localDateTime.toISOString();
+      await schedulePostService(post.id, { scheduledFor: utcDateTime });
     },
     onSuccess: () => {
       toast("Post created", {

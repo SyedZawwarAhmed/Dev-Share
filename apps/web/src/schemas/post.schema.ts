@@ -67,11 +67,9 @@ export const createPostSchema = z
   .superRefine((data, ctx) => {
     if (data.scheduledFor) {
       const scheduledDate = new Date(data.scheduledFor);
-      // Convert both dates to UTC for proper comparison
-      const scheduledDateUTC = new Date(scheduledDate.toISOString());
-      const nowUTC = new Date();
+      const now = new Date();
 
-      if (scheduledDateUTC < nowUTC) {
+      if (scheduledDate < now) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Scheduled date must be in the future",
