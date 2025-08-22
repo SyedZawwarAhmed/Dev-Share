@@ -22,6 +22,11 @@ export class SocialMediaService {
         throw new Error('No LinkedIn access token found. User needs to authenticate with LinkedIn first.');
       }
 
+      let accessToken = linkedinAccount.access_token;
+      this.logger.log(`Using LinkedIn token: ${accessToken.substring(0, 15)}... (length: ${accessToken.length})`);
+
+      // Skip token validation for now - let the actual post request handle token issues
+
       // Prepare the LinkedIn API request body for text-only post
       const requestBody = {
         author: `urn:li:person:${linkedinAccount.providerAccountId}`,
@@ -49,7 +54,7 @@ export class SocialMediaService {
       const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${linkedinAccount.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
           'X-Restli-Protocol-Version': '2.0.0'
         },
@@ -58,6 +63,13 @@ export class SocialMediaService {
 
       if (!response.ok) {
         const errorText = await response.text();
+        
+        // Check if it's an authentication error (401 or 403)
+        if (response.status === 401 || response.status === 403) {
+          this.logger.error(`LinkedIn authentication error: ${response.status} - ${errorText}`);
+          throw new Error('LinkedIn access token has expired. Please re-authenticate with LinkedIn in your account settings.');
+        }
+        
         throw new Error(`LinkedIn API error: ${response.status} - ${errorText}`);
       }
 
@@ -136,6 +148,36 @@ export class SocialMediaService {
     } catch (error) {
       this.logger.error(`Failed to upload LinkedIn image: ${error.message}`);
       throw error;
+    }
+  }
+
+  async validateLinkedInToken(accessToken: string): Promise<boolean> {
+    try {
+      // Make a simple API call to validate the token
+      this.logger.log(`Validating LinkedIn token with /v2/me endpoint...`);
+      const response = await fetch('https://api.linkedin.com/v2/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      this.logger.log(`LinkedIn token validation response: ${response.status} ${response.statusText}`);
+
+      // If we get a 401 or 403, the token is expired or invalid
+      if (response.status === 401 || response.status === 403) {
+        const errorBody = await response.text();
+        this.logger.log(`LinkedIn ${response.status} response body: ${errorBody}`);
+        return false;
+      }
+
+      // Any other error or success means the token is still valid
+      return response.ok;
+    } catch (error) {
+      // If there's a network error, assume token is still valid to avoid false positives
+      this.logger.warn(`LinkedIn token validation failed due to network error: ${error.message}`);
+      return true;
     }
   }
 
@@ -308,29 +350,34 @@ export class SocialMediaService {
     try {
       const post = await this.prisma.post.findUnique({
         where: { id: postId },
-        include: {
-          user: {
-            include: {
-              accounts: true,
-            },
-          },
-        },
       });
 
       if (!post) {
         throw new Error(`Post not found: ${postId}`);
       }
 
+      // Get fresh user data to ensure we have the latest account tokens
+      const user = await this.prisma.user.findUnique({
+        where: { id: post.userId },
+        include: {
+          accounts: true,
+        },
+      });
+
+      if (!user) {
+        throw new Error(`User not found: ${post.userId}`);
+      }
+
       let result;
       switch (post.platform) {
         case 'LINKEDIN':
-          result = await this.postToLinkedIn(post, post.user);
+          result = await this.postToLinkedIn(post, user);
           break;
         case 'TWITTER':
-          result = await this.postToTwitter(post, post.user);
+          result = await this.postToTwitter(post, user);
           break;
         case 'BLUESKY':
-          result = await this.postToBluesky(post, post.user);
+          result = await this.postToBluesky(post, user);
           break;
         default:
           throw new Error(`Unsupported platform: ${post.platform}`);
@@ -338,6 +385,13 @@ export class SocialMediaService {
 
       return result;
     } catch (error) {
+      // Don't retry LinkedIn authentication errors - user needs to re-authenticate
+      if (error.message?.includes('LinkedIn access token has expired') || 
+          error.message?.includes('No LinkedIn access token found')) {
+        this.logger.error(`LinkedIn authentication error - no retry: ${error.message}`);
+        throw error;
+      }
+      
       if (retryCount < maxRetries) {
         this.logger.warn(`Retrying post ${postId} (attempt ${retryCount + 1}/${maxRetries})`);
         // Wait 5 seconds before retrying

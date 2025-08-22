@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
+import { LinkedInReauthDialog } from "@/components/linkedin-reauth-dialog";
 import {
   Select,
   SelectContent,
@@ -82,8 +83,16 @@ function RouteComponent() {
       setShowSuccessDialog(true);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
-    onError: () => {
-      toast.error("Failed to publish post");
+    onError: (error: any) => {
+      // Check if it's a LinkedIn authentication error based on 400 status + LinkedIn message
+      const isLinkedInAuthError = error?.response?.status === 400 && 
+        (error?.message?.includes('LinkedIn') || error?.response?.data?.message?.includes('LinkedIn'));
+      
+      if (isLinkedInAuthError) {
+        setShowLinkedInReauthDialog(true);
+      } else {
+        toast.error("Failed to publish post");
+      }
     },
     onSettled: (_, __, variables) => {
       setPostConfirmationDialogs((prev) => ({
@@ -145,6 +154,7 @@ function RouteComponent() {
     [key: string]: boolean;
   }>({});
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showLinkedInReauthDialog, setShowLinkedInReauthDialog] = useState(false);
 
   useEffect(() => {
     const newSearch: {
@@ -758,6 +768,11 @@ function RouteComponent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <LinkedInReauthDialog
+        open={showLinkedInReauthDialog}
+        onOpenChange={setShowLinkedInReauthDialog}
+      />
     </main>
   );
 }

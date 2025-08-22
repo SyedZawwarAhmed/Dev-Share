@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SocialMediaService } from './social-media.service';
 import { PostsSchedulerService } from './posts-scheduler.service';
@@ -181,12 +181,17 @@ export class PostsService {
       throw new BadRequestException('Post not found');
     }
 
-    const result = await this.socialMediaService.publishPost(postId);
+    try {
+      const result = await this.socialMediaService.publishPost(postId);
 
-    return {
-      post,
-      result,
-    };
+      return {
+        post,
+        result,
+      };
+    } catch (error) {
+      // Re-throw the specific error from social media service as BadRequest
+      throw new BadRequestException(error.message);
+    }
   }
 
   async markAsPublished(userId: string, postId: string) {
