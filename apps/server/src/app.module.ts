@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GeminiModule } from './gemini/gemini.module';
 import { PostsModule } from './posts/posts.module';
 import { StatsModule } from './stats/stats.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StatsModule } from './stats/stats.module';
     GeminiModule,
     PostsModule,
     StatsModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
