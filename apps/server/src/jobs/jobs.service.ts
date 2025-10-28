@@ -8,13 +8,13 @@ export class JobsService {
 
   constructor(private readonly configService: ConfigService) {}
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async checkScheduledPosts() {
     try {
       this.logger.log('Hitting the server to keep the instance running...');
 
       const BACKEND_URL = this.configService.get<string>('BACKEND_URL');
-      fetch(`${BACKEND_URL}/api`);
+      await fetch(`${BACKEND_URL}/api`);
     } catch (error) {
       this.logger.error(error);
     }
