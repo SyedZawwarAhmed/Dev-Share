@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteNoteService, getNotesService } from "@/api/note.service";
 import { formatDate } from "@/lib/date-time";
@@ -82,20 +82,44 @@ function NoteCard({
     <div
       className={cn(
         "rounded-2xl border bg-card",
-        isGridView ? "flex h-full flex-col" : "transition-colors hover:bg-accent/40"
+        isGridView
+          ? "flex h-full flex-col"
+          : "transition-colors hover:bg-accent/40",
       )}
     >
       <div className={cn("p-4 sm:p-5", isGridView ? "flex-1" : null)}>
-        <div className={cn("flex items-start justify-between gap-3", isGridView ? "mb-3" : null)}>
-          <div className={cn("flex items-start gap-3", isGridView ? "min-w-0 flex-1 gap-2" : null)}>
+        <div
+          className={cn(
+            "flex items-start justify-between gap-3",
+            isGridView ? "mb-3" : null,
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-start gap-3",
+              isGridView ? "min-w-0 flex-1 gap-2" : null,
+            )}
+          >
             <div className="rounded-xl border bg-muted p-2">
-              <FileText className={cn("text-cyan-600", isGridView ? "h-4 w-4" : "h-5 w-5")} />
+              <FileText
+                className={cn(
+                  "text-cyan-600",
+                  isGridView ? "h-4 w-4" : "h-5 w-5",
+                )}
+              />
             </div>
             <div className={cn(isGridView ? "min-w-0 flex-1" : null)}>
               <div className="mb-1 flex items-center gap-2">
-                <h3 className={cn("font-medium", isGridView ? "truncate" : null)}>{note.title}</h3>
+                <h3
+                  className={cn("font-medium", isGridView ? "truncate" : null)}
+                >
+                  {note.title}
+                </h3>
                 {!isGridView && note?.postCount > 0 ? (
-                  <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
+                  <Badge
+                    variant="outline"
+                    className="text-xs bg-blue-50 border-blue-200 text-blue-700"
+                  >
                     {note.postCount} {note.postCount === 1 ? "Post" : "Posts"}
                   </Badge>
                 ) : null}
@@ -134,7 +158,11 @@ function NoteCard({
 
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" className={isGridView ? "h-7 w-7" : "h-8 w-8"}>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={isGridView ? "h-7 w-7" : "h-8 w-8"}
+                >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -151,7 +179,10 @@ function NoteCard({
                     Create Posts
                   </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteDialog(note.id, true)}>
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={() => handleDeleteDialog(note.id, true)}
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Note
                 </DropdownMenuItem>
@@ -173,13 +204,18 @@ function NoteCard({
           <>
             <div className="mb-3 flex gap-2">
               {note?.postCount > 0 ? (
-                <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-blue-50 border-blue-200 text-blue-700"
+                >
                   {note.postCount} {note.postCount === 1 ? "Post" : "Posts"}
                 </Badge>
               ) : null}
             </div>
 
-            <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{note.content}</p>
+            <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
+              {note.content}
+            </p>
 
             <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center">
@@ -234,12 +270,12 @@ function RouteComponent() {
       search?: string;
       sortBy?: string;
     } = {};
-    
+
     if (debouncedSearch) newSearch.search = debouncedSearch;
     if (sortBy !== "newest") newSearch.sortBy = sortBy;
 
     const currentSearch = searchParams || {};
-    const hasChanged = 
+    const hasChanged =
       currentSearch.search !== (debouncedSearch || undefined) ||
       currentSearch.sortBy !== (sortBy !== "newest" ? sortBy : undefined);
 
@@ -387,7 +423,9 @@ function RouteComponent() {
 
               <Tabs
                 defaultValue={notesView}
-                onValueChange={(value) => setNotesView(value as ConfigState["notesView"])}
+                onValueChange={(value) =>
+                  setNotesView(value as ConfigState["notesView"])
+                }
               >
                 <TabsList>
                   <TabsTrigger value="list">List</TabsTrigger>
