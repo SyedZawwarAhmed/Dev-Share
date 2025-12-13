@@ -3,13 +3,11 @@ import ScheduledPosts from "@/components/scheduled-posts";
 import RecentNotes from "@/components/recent-notes";
 import { Button } from "@/components/ui/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ExternalLink, FileText, PlusCircle, Send } from "lucide-react";
+import { ExternalLink, PlusCircle } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import { Page } from "@/components/layout/Page";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/layout/EmptyState";
-import { SectionHeader } from "@/components/layout/SectionHeader";
-import { Divider } from "@/components/layout/Divider";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
@@ -17,9 +15,9 @@ export const Route = createFileRoute("/dashboard/")({
 
 function RouteComponent() {
   const { user } = useAuthStore();
-  
-  const hasConnectedPlatforms = user?.accounts?.some(account => 
-    ["LINKEDIN", "X", "BLUESKY"].includes(account.provider)
+
+  const hasConnectedPlatforms = user?.accounts?.some((account) =>
+    ["LINKEDIN", "X", "BLUESKY"].includes(account.provider),
   );
 
   return (
@@ -50,7 +48,8 @@ function RouteComponent() {
                     Connect your platforms to start publishing
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Connect LinkedIn, X, or Bluesky to generate and schedule posts straight from your notes.
+                    Connect LinkedIn, X, or Bluesky to generate and schedule
+                    posts straight from your notes.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Link to="/connected-platforms">
@@ -75,16 +74,16 @@ function RouteComponent() {
         </div>
 
         <div className="lg:col-span-4">
-            <RecentNotes />
+          <RecentNotes />
 
-            {!user ? (
-              <EmptyState
-                title="Sign in to personalize"
-                description="Your stats and recent notes will appear here once you’re logged in."
-              />
-            ) : null}
-          </div>
+          {!user ? (
+            <EmptyState
+              title="Sign in to personalize"
+              description="Your stats and recent notes will appear here once you’re logged in."
+            />
+          ) : null}
         </div>
+      </div>
     </Page>
   );
 }
