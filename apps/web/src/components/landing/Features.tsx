@@ -20,13 +20,13 @@ const features = [
   {
     title: "Generate platform-ready variations",
     description:
-      "Get versions tailored to each network’s tone and constraints—without rewriting.",
+      "Get versions tailored to each network’s tone and constraints without rewriting.",
     icon: Layers,
   },
   {
     title: "AI that keeps your voice",
     description:
-      "Drafts stay technical, accurate, and readable—designed for developer audiences.",
+      "Drafts stay technical, accurate, and readable designed for developer audiences.",
     icon: Sparkles,
   },
   {
@@ -55,7 +55,7 @@ export function Features() {
             Everything you need to ship your learning in public
           </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground sm:text-lg">
-            DevShare helps you turn daily progress into consistent posts—without
+            DevShare helps you turn daily progress into consistent posts without
             losing depth or authenticity.
           </p>
         </div>

@@ -16,7 +16,7 @@ const steps = [
   {
     title: "Schedule and ship",
     description:
-      "Pick timing, fine-tune the copy, and publish with confidence—consistently.",
+      "Pick timing, fine-tune the copy, and publish with confidence consistently.",
   },
 ];
 

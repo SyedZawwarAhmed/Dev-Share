@@ -27,7 +27,7 @@ export function Hero() {
           </h1>
           <p className="mt-5 mx-auto max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
             DevShare transforms your learning notes into platform-ready posts for
-            LinkedIn, X, and Bluesky—so you can stay consistent while you learn.
+            LinkedIn, X, and Bluesky so you can stay consistent while you learn.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-center">
