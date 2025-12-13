@@ -75,7 +75,7 @@ export default function ScheduleModal({
           <div className="space-y-2">
             <Label htmlFor="schedule-date">Date</Label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="schedule-date"
                 type="date"
@@ -91,7 +91,7 @@ export default function ScheduleModal({
           <div className="space-y-2">
             <Label htmlFor="schedule-time">Time</Label>
             <div className="relative">
-              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="schedule-time"
                 type="time"
@@ -133,7 +133,7 @@ export default function ScheduleModal({
             </Select>
           </div>
 
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm text-blue-800">
+          <div className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground">
             <p>
               <strong>Tip:</strong> Schedule your posts during peak engagement
               hours for your audience. For professional content, weekdays
@@ -148,7 +148,7 @@ export default function ScheduleModal({
           </Button>
           <Button
             onClick={handleSchedule}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+            variant="gradient"
             disabled={isLoading || !date || !time}
           >
             {isLoading ? (

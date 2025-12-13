@@ -116,7 +116,11 @@ function RouteComponent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-purple-50 p-4">
+    <div className="relative min-h-screen overflow-hidden bg-background p-4">
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-400/15 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 left-10 h-72 w-72 rounded-full bg-zinc-900/5 blur-3xl" />
+
+      <div className="relative flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-md">
         <Card className="w-full">
           <CardHeader className="space-y-1">
@@ -189,7 +193,7 @@ function RouteComponent() {
                   }
                   disabled={isLoading}
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Password must be at least 8 characters long
                 </p>
               </div>
@@ -212,7 +216,8 @@ function RouteComponent() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                variant="gradient"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -231,7 +236,7 @@ function RouteComponent() {
                 <span className="w-full border-t"></span>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-slate-500">
+                <span className="bg-card px-2 text-muted-foreground">
                   Or continue with
                 </span>
               </div>
@@ -265,17 +270,18 @@ function RouteComponent() {
             </Button>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="text-purple-600 hover:text-purple-800 font-medium"
+                className="font-medium text-cyan-700 hover:text-cyan-800"
               >
                 Sign in
               </Link>
             </p>
           </CardFooter>
         </Card>
+      </div>
       </div>
     </div>
   );

@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Calendar,
   Edit,
@@ -40,6 +39,11 @@ import { useConfigStore } from "@/stores/config.store";
 import { useDebounce } from "@/lib/hooks";
 import { getPostsFiltersSchema } from "@/schemas/post.schema";
 import { z } from "zod";
+import { Page } from "@/components/layout/Page";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { EmptyState } from "@/components/layout/EmptyState";
+import { Toolbar } from "@/components/layout/Toolbar";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/posts/")({
   component: RouteComponent,
@@ -247,19 +251,19 @@ function RouteComponent() {
     switch (platform) {
       case "linkedin":
         return (
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Linkedin className="h-5 w-5 text-blue-600" />
+          <div className="rounded-lg border bg-muted p-2">
+            <Linkedin className="h-5 w-5 text-cyan-700" />
           </div>
         );
       case "twitter":
         return (
-          <div className="p-2 bg-sky-100 rounded-lg">
-            <Twitter className="h-5 w-5 text-sky-500" />
+          <div className="rounded-lg border bg-muted p-2">
+            <Twitter className="h-5 w-5 text-cyan-700" />
           </div>
         );
       case "bluesky":
         return (
-          <div className="p-2 bg-indigo-100 rounded-lg">
+          <div className="rounded-lg border bg-muted p-2">
             <svg
               width="20"
               height="20"
@@ -270,7 +274,7 @@ function RouteComponent() {
             >
               <path
                 d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                fill="#0085FF"
+                fill="currentColor"
               />
             </svg>
           </div>
@@ -330,29 +334,25 @@ function RouteComponent() {
   );
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-purple-800">All Posts</h1>
-          <p className="text-slate-600">
-            Manage your social media posts across all platforms
-          </p>
-        </div>
-      </div>
+    <Page>
+      <PageHeader
+        title="Posts"
+        description="Review drafts, schedule, and publish across platforms."
+      />
 
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
+      <Toolbar sticky className="mb-6">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search posts..."
+                placeholder="Search posts…"
                 className="pl-8"
                 value={searchInput}
                 onChange={handleSearchChange}
               />
             </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Select value={platformFilter} onValueChange={setPlatformFilter}>
                 <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue placeholder="Platform" />
@@ -379,46 +379,50 @@ function RouteComponent() {
 
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-full sm:w-[140px]">
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
+                  <SelectItem value="newest">Newest first</SelectItem>
+                  <SelectItem value="oldest">Oldest first</SelectItem>
                 </SelectContent>
               </Select>
+
+              <Tabs
+                defaultValue={postsView}
+                onValueChange={(value) => setPostsView(value as ConfigState["postsView"])}
+              >
+                <TabsList>
+                  <TabsTrigger value="list">List</TabsTrigger>
+                  <TabsTrigger value="grid">Grid</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Toolbar>
 
       {isPostsLoading ? (
-        <div className="text-center py-12 text-slate-500">
-          <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
-          <h3 className="text-lg font-medium mb-2">Loading...</h3>
-          <p>Please wait while we fetch your posts</p>
+        <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground">
+          <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-muted-foreground/50" />
+          <p className="text-sm">Loading posts…</p>
         </div>
       ) : (
-        <Tabs 
-          defaultValue={postsView} 
-          className="mb-8"
-          onValueChange={(value) =>
-            setPostsView(value as ConfigState["postsView"])
-          }
+        <Tabs
+          defaultValue={postsView}
+          className="pb-8"
+          onValueChange={(value) => setPostsView(value as ConfigState["postsView"])}
         >
-          <TabsList className="mb-4">
-            <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="grid">Grid View</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="list" className="m-0">
             <div className="space-y-4">
               {(filteredPosts?.length ?? 0) > 0 ? (
                 filteredPosts?.map((post) => (
-                  <Card
+                  <div
                     key={post.id}
-                    className="hover:shadow-md transition-shadow"
+                    className={cn(
+                      "rounded-2xl border bg-card transition-colors hover:bg-accent/40"
+                    )}
                   >
-                    <CardContent className="p-4">
+                    <div className="p-4 sm:p-5">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-3">
                           {getPlatformIcon(post.platform)}
@@ -432,10 +436,10 @@ function RouteComponent() {
                                 {post?.note.title}
                               </Badge>
                             </div>
-                            <p className="text-sm text-slate-600 line-clamp-3">
+                            <p className="text-sm text-muted-foreground line-clamp-3">
                               {post.content}
                             </p>
-                            <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
                               <Calendar className="h-3 w-3" />
                               <span>Created: {formatDate(post.createdAt)}</span>
 
@@ -563,33 +567,14 @@ function RouteComponent() {
                           />
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))
               ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mx-auto mb-4 text-slate-300"
-                  >
-                    <path d="M17.5 22h.5c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <path d="M4 12a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H4Z" />
-                    <path d="M8 18v-4" />
-                    <path d="M12 18v-4" />
-                    <path d="M4 14h8" />
-                  </svg>
-                  <h3 className="text-lg font-medium mb-2">No posts found</h3>
-                  <p>Try adjusting your search or filters</p>
-                </div>
+                <EmptyState
+                  title="No posts found"
+                  description="Create posts from a note, or adjust your filters."
+                />
               )}
             </div>
           </TabsContent>
@@ -598,11 +583,11 @@ function RouteComponent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {(filteredPosts?.length ?? 0) > 0 ? (
                 filteredPosts?.map((post) => (
-                  <Card
+                  <div
                     key={post.id}
-                    className="hover:shadow-md transition-shadow h-full flex flex-col"
+                    className="rounded-2xl border bg-card transition-colors hover:bg-accent/40 h-full flex flex-col"
                   >
-                    <CardContent className="p-4 flex-1">
+                    <div className="p-4 sm:p-5 flex-1">
                       <div className="flex items-start gap-2 mb-3">
                         {getPlatformIcon(post.platform)}
                         <div className="flex-1 min-w-0">
@@ -612,7 +597,7 @@ function RouteComponent() {
                             </h3>
                             {getStatusBadge(post.status)}
                           </div>
-                          <p className="text-xs text-slate-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {post?.note?.title}
                           </p>
                         </div>
@@ -674,17 +659,17 @@ function RouteComponent() {
                         </DropdownMenu>
                       </div>
 
-                      <p className="text-sm text-slate-600 line-clamp-6 mb-4">
+                      <p className="text-sm text-muted-foreground line-clamp-6 mb-4">
                         {post.content}
                       </p>
 
-                      <div className="flex items-center justify-between mt-auto text-xs text-slate-500">
+                      <div className="flex items-center justify-between mt-auto text-xs text-muted-foreground">
                         <div className="flex items-center">
                           <Calendar className="h-3 w-3 mr-1" />
                           <span>{formatDate(post.createdAt)}</span>
                         </div>
                       </div>
-                    </CardContent>
+                    </div>
                     
                     <ConfirmationDialog
                       open={postConfirmationDialogs[post.id] || false}
@@ -713,31 +698,14 @@ function RouteComponent() {
                       onConfirm={() => deletePost(post.id)}
                       loading={isDeletingPost}
                     />
-                  </Card>
+                  </div>
                 ))
               ) : (
-                <div className="col-span-full text-center py-12 text-slate-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mx-auto mb-4 text-slate-300"
-                  >
-                    <path d="M17.5 22h.5c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <path d="M4 12a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H4Z" />
-                    <path d="M8 18v-4" />
-                    <path d="M12 18v-4" />
-                    <path d="M4 14h8" />
-                  </svg>
-                  <h3 className="text-lg font-medium mb-2">No posts found</h3>
-                  <p>Try adjusting your search or filters</p>
+                <div className="col-span-full">
+                  <EmptyState
+                    title="No posts found"
+                    description="Create posts from a note, or adjust your filters."
+                  />
                 </div>
               )}
             </div>
@@ -761,7 +729,8 @@ function RouteComponent() {
           <DialogFooter className="sm:justify-center mt-6">
             <Button
               onClick={handleSuccessDialogClose}
-              className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              variant="gradient"
+              className="w-full sm:w-auto"
             >
               Continue
             </Button>
@@ -773,6 +742,6 @@ function RouteComponent() {
         open={showLinkedInReauthDialog}
         onOpenChange={setShowLinkedInReauthDialog}
       />
-    </main>
+    </Page>
   );
 }

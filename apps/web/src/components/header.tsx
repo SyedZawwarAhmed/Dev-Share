@@ -46,13 +46,14 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="border-b bg-white">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-7xl">
+    <header className="sticky top-0 z-40 border-b bg-background/70 backdrop-blur">
+      <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center">
-          <Link to="/dashboard" className="flex items-center">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">
-              DevShare
-            </h1>
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border bg-white text-sm font-semibold">
+              DS
+            </span>
+            <span className="text-sm font-semibold tracking-tight">DevShare</span>
           </Link>
 
           <nav className="hidden md:flex ml-8 space-x-1">
@@ -109,7 +110,7 @@ export default function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-purple-600">
+                <Badge className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center bg-cyan-500 p-0 text-white">
                   <span className="text-[10px]">2</span>
                 </Badge>
               </Button>
@@ -118,27 +119,27 @@ export default function AppHeader() {
               <DropdownMenuLabel>Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="max-h-80 overflow-y-auto">
-                <div className="p-3 hover:bg-slate-50 cursor-pointer">
+                <div className="cursor-pointer p-3 hover:bg-zinc-50">
                   <p className="text-sm font-medium">
                     Your post is ready to be published
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     React Server Components post is scheduled for today at 3:00
                     PM
                   </p>
                 </div>
-                <div className="p-3 hover:bg-slate-50 cursor-pointer">
+                <div className="cursor-pointer p-3 hover:bg-zinc-50">
                   <p className="text-sm font-medium">
                     Post published successfully
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Your post about TypeScript 5.0 Features was published to
                     LinkedIn
                   </p>
                 </div>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="justify-center text-purple-600">
+              <DropdownMenuItem className="justify-center text-cyan-600">
                 View all notifications
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -166,7 +167,7 @@ export default function AppHeader() {
                   <p className="text-sm font-medium leading-none">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs leading-none text-slate-500">
+                  <p className="text-xs leading-none text-muted-foreground">
                     {user?.email}
                   </p>
                 </div>

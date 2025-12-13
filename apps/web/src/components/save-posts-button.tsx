@@ -21,7 +21,8 @@ export default function SavePostsButton({
     <div className="flex">
       <Button
         onClick={onSaveDraft}
-        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-md"
+        variant="gradient"
+        className="rounded-md"
         disabled={isLoading || disabled}
       >
         {isLoading ? (

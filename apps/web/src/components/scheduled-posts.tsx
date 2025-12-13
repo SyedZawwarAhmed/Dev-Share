@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar,
@@ -24,6 +23,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getPostsService } from "@/api/post.service";
 import { formatDate } from "@/lib/date-time";
 import { POST_STATUSES } from "@/constants/post";
+import { SectionHeader } from "@/components/layout/SectionHeader";
+import { Divider } from "@/components/layout/Divider";
 
 export default function ScheduledPosts() {
   const [, setActiveTab] = useState("upcoming");
@@ -84,49 +85,52 @@ export default function ScheduledPosts() {
 
   if (isLoading) {
     return (
-      <Card className="h-full flex flex-col">
-        <CardHeader>
-          <CardTitle>Your Posts</CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1">
-          <div className="text-center py-12 text-slate-500">
-            <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
-            <h3 className="text-lg font-medium mb-2">Loading...</h3>
-            <p>Please wait while we fetch your posts</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border bg-card">
+        <div className="px-6 py-5">
+          <SectionHeader
+            title="Your posts"
+            description="Upcoming scheduled posts and drafts."
+          />
+        </div>
+        <Divider />
+        <div className="px-6 py-12 text-center text-muted-foreground">
+          <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-muted-foreground/40" />
+          <p className="text-sm">Loading posts…</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader>
-        <CardTitle>Your Posts</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1">
+    <div className="rounded-2xl border bg-card">
+      <div className="px-6 py-5">
+        <SectionHeader
+          title="Your posts"
+          description="Upcoming scheduled posts and drafts."
+        />
+      </div>
+      <Divider />
+      <div className="px-6 py-5">
         <Tabs
           defaultValue="upcoming"
           onValueChange={setActiveTab}
-          className="h-full flex flex-col"
+          className="flex flex-col"
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upcoming">
               Upcoming ({scheduledPosts?.length || 0})
             </TabsTrigger>
-            <TabsTrigger value="drafts">
-              Drafts ({draftPosts?.length || 0})
-            </TabsTrigger>
+            <TabsTrigger value="drafts">Drafts ({draftPosts?.length || 0})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upcoming" className="mt-4 space-y-4 flex-1">
             {scheduledPosts && scheduledPosts.length > 0 ? (
               scheduledPosts.map((post) => (
-                <div key={post.id} className="border rounded-lg p-4">
+                <div key={post.id} className="rounded-xl border p-4">
                   <div className="flex justify-between items-start mb-3">
                     {post.scheduledFor ? (
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-purple-600">
+                        <Badge className="bg-zinc-950 text-white">
                           <Calendar className="h-3 w-3 mr-1" />
                           {formatDate(post.scheduledFor.toString())}
                         </Badge>
@@ -170,10 +174,10 @@ export default function ScheduledPosts() {
                     </div>
                   </div>
 
-                  <p className="text-slate-700 mb-2 line-clamp-3">
+                  <p className="mb-2 line-clamp-3 text-sm text-foreground">
                     {post.content}
                   </p>
-                  <p className="text-xs text-slate-500 mb-3">
+                  <p className="mb-3 text-xs text-muted-foreground">
                     From note: {post.note?.title || "Unknown Note"}
                   </p>
 
@@ -183,14 +187,14 @@ export default function ScheduledPosts() {
                         <AvatarImage src="/placeholder.svg?height=24&width=24" />
                         <AvatarFallback>U</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm text-slate-600">
+                      <span className="text-sm text-muted-foreground">
                         Your account
                       </span>
                     </div>
                     <div className="flex gap-2">
                       <Badge
                         variant="outline"
-                        className="bg-slate-50 border-slate-200"
+                        className="bg-muted/40"
                       >
                         {getPlatformIcon(post.platform)}
                         {post.platform === "LINKEDIN"
@@ -206,15 +210,19 @@ export default function ScheduledPosts() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-16 text-slate-500 min-h-[335px] flex items-center justify-center">
-                <p>No scheduled posts</p>
+              <div className="flex min-h-[240px] items-center justify-center rounded-xl border bg-muted/20 text-muted-foreground">
+                <p className="text-sm">No scheduled posts</p>
               </div>
             )}
 
             {scheduledPosts && scheduledPosts.length > 0 && (
               <div className="text-center">
                 <Link to="/posts" search={{ status: "scheduled" }}>
-                  <Button variant="link" size="sm" className="text-purple-600">
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-cyan-600 hover:text-cyan-700"
+                  >
                     View all scheduled posts
                   </Button>
                 </Link>
@@ -225,7 +233,7 @@ export default function ScheduledPosts() {
           <TabsContent value="drafts" className="mt-4 space-y-4 flex-1">
             {draftPosts && draftPosts.length > 0 ? (
               draftPosts.map((post) => (
-                <div key={post.id} className="border rounded-lg p-4">
+                <div key={post.id} className="rounded-xl border p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">
                       <Badge
@@ -236,7 +244,7 @@ export default function ScheduledPosts() {
                       </Badge>
                       <Badge
                         variant="outline"
-                        className="bg-slate-50 border-slate-200"
+                        className="bg-muted/40"
                       >
                         {getPlatformIcon(post.platform)}
                         {post.platform === "LINKEDIN"
@@ -264,7 +272,8 @@ export default function ScheduledPosts() {
                       >
                         <Button
                           size="sm"
-                          className="h-8 bg-purple-600 hover:bg-purple-700"
+                          variant="gradient"
+                          className="h-8"
                         >
                           Schedule
                         </Button>
@@ -272,24 +281,28 @@ export default function ScheduledPosts() {
                     </div>
                   </div>
 
-                  <p className="text-slate-700 mb-2 line-clamp-3">
+                  <p className="mb-2 line-clamp-3 text-sm text-foreground">
                     {post.content}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     From note: {post.note?.title || "Unknown Note"}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="text-center py-16 text-slate-500 min-h-[335px] flex items-center justify-center">
-                <p>No draft posts</p>
+              <div className="flex min-h-[240px] items-center justify-center rounded-xl border bg-muted/20 text-muted-foreground">
+                <p className="text-sm">No draft posts</p>
               </div>
             )}
 
             {draftPosts && draftPosts.length > 0 && (
               <div className="text-center">
                 <Link to="/posts" search={{ status: "draft" }}>
-                  <Button variant="link" size="sm" className="text-purple-600">
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-cyan-600 hover:text-cyan-700"
+                  >
                     View all draft posts
                   </Button>
                 </Link>
@@ -297,7 +310,7 @@ export default function ScheduledPosts() {
             )}
           </TabsContent>
         </Tabs>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

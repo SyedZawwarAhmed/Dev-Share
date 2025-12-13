@@ -45,26 +45,26 @@ function RouteComponent() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-purple-50 p-4">
-      <div className="w-full max-w-md text-center">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">
-            DevShare
-          </h1>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-400/15 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 left-10 h-72 w-72 rounded-full bg-zinc-900/5 blur-3xl" />
+
+      <div className="relative w-full max-w-md text-center">
+        <div className="mb-6 flex items-center justify-center gap-2">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border bg-background text-sm font-semibold">
+            DS
+          </span>
+          <span className="text-sm font-semibold tracking-tight">DevShare</span>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border p-8">
-          <>
-            <div className="flex justify-center mb-4">
-              <div className="h-12 w-12 rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin"></div>
-            </div>
-            <h2 className="text-xl font-semibold mb-2">
-              Processing your login
-            </h2>
-            <p className="text-slate-600">
-              Please wait while we authenticate your account...
-            </p>
-          </>
+        <div className="rounded-xl border bg-card p-8">
+          <div className="mb-4 flex justify-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 border-t-cyan-500"></div>
+          </div>
+          <h2 className="mb-2 text-xl font-semibold">Processing your login</h2>
+          <p className="text-muted-foreground">
+            Please wait while we authenticate your account...
+          </p>
         </div>
       </div>
     </div>

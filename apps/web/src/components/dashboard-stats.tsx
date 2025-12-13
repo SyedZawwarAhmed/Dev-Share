@@ -1,8 +1,50 @@
-import { Calendar, MessageSquare, ThumbsUp, Loader2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, MessageSquare, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatsService } from "@/api/stats.service";
+
+const items = [
+  {
+    key: "notes",
+    label: "Notes",
+    to: { to: "/notes" as const, search: { search: "" as const } },
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-5 w-5 text-cyan-600"
+      >
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <line x1="10" y1="9" x2="8" y2="9" />
+      </svg>
+    ),
+    value: (s?: DashboardStats) => s?.totalNotes ?? 0,
+  },
+  {
+    key: "posts",
+    label: "Posts",
+    to: { to: "/posts" as const },
+    icon: <MessageSquare className="h-5 w-5 text-cyan-600" />,
+    value: (s?: DashboardStats) => s?.totalPosts ?? 0,
+  },
+  {
+    key: "scheduled",
+    label: "Scheduled",
+    to: { to: "/posts" as const, search: { status: "scheduled" as const } },
+    icon: <Calendar className="h-5 w-5 text-cyan-600" />,
+    value: (s?: DashboardStats) => s?.scheduledPosts ?? 0,
+  },
+] as const;
 
 export default function DashboardStats() {
   const { data: stats, isLoading } = useQuery({
@@ -10,110 +52,49 @@ export default function DashboardStats() {
     queryFn: getDashboardStatsService,
   });
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-slate-200 rounded-lg mr-4 animate-pulse">
-                  <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
-                </div>
-                <div>
-                  <div className="h-4 bg-slate-200 rounded animate-pulse mb-2 w-12"></div>
-                  <div className="h-7 bg-slate-200 rounded animate-pulse w-8"></div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Link to="/notes" search={{ search: "" }} className="block">
-        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-100 hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg mr-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-6 w-6 text-purple-600"
-                >
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                  <line x1="10" y1="9" x2="8" y2="9" />
-                </svg>
+    <div className="rounded-2xl border bg-card">
+      <div className="grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
+        {items.map((item) => {
+          const content = (
+            <div className="flex items-center gap-3 p-5">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg border bg-muted">
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                ) : (
+                  item.icon
+                )}
               </div>
-              <div>
-                <p className="text-sm font-medium text-purple-600">Notes</p>
-                <h3 className="text-2xl font-bold text-purple-900">{stats?.totalNotes || 0}</h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-
-      <Link to="/posts" className="block">
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-100 hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg mr-4">
-                <MessageSquare className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-blue-600">Posts</p>
-                <h3 className="text-2xl font-bold text-blue-900">{stats?.totalPosts || 0}</h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-
-      <Link to="/posts" search={{ status: "scheduled" }} className="block">
-        <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-emerald-100 rounded-lg mr-4">
-                <Calendar className="h-6 w-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-emerald-600">
-                  Scheduled
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {item.label}
                 </p>
-                <h3 className="text-2xl font-bold text-emerald-900">{stats?.scheduledPosts || 0}</h3>
+                <div className="mt-0.5 text-2xl font-semibold tracking-tight">
+                  {isLoading ? (
+                    <span className="inline-block h-7 w-10 rounded bg-muted" />
+                  ) : (
+                    item.value(stats)
+                  )}
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </Link>
+          );
 
-      <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100">
-        <CardContent className="pt-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-amber-100 rounded-lg mr-4">
-              <ThumbsUp className="h-6 w-6 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-amber-600">Engagements</p>
-              <h3 className="text-2xl font-bold text-amber-900">1.2k</h3>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          return item.to ? (
+            <Link
+              key={item.key}
+              to={item.to.to}
+              // @ts-expect-error - different routes have different search shapes
+              search={item.to.search}
+              className="block transition-colors hover:bg-accent/40"
+            >
+              {content}
+            </Link>
+          ) : (
+            <div key={item.key}>{content}</div>
+          );
+        })}
+      </div>
     </div>
   );
 }

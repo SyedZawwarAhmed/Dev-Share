@@ -8,13 +8,13 @@ export class StatsService {
   async getDashboardStats(userId: string) {
     const [totalNotes, totalPosts, scheduledPosts] = await Promise.all([
       this.prisma.note.count({
-        where: { 
+        where: {
           userId,
           isDeleted: false,
         },
       }),
       this.prisma.post.count({
-        where: { 
+        where: {
           userId,
           isDeleted: false,
         },
@@ -35,3 +35,4 @@ export class StatsService {
     };
   }
 }
+

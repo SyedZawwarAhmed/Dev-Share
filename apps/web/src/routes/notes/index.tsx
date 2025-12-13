@@ -3,7 +3,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Calendar,
   Edit,
@@ -39,6 +38,11 @@ import { useDebounce } from "@/lib/hooks";
 import { useConfigStore } from "@/stores/config.store";
 import { getNotesBodySchema } from "@/schemas/note.schema";
 import { z } from "zod";
+import { Page } from "@/components/layout/Page";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { EmptyState } from "@/components/layout/EmptyState";
+import { Toolbar } from "@/components/layout/Toolbar";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/notes/")({
   component: RouteComponent,
@@ -75,99 +79,80 @@ function NoteCard({
   const isGridView = viewType === "grid";
 
   return (
-    <Card
-      className={`hover:shadow-md transition-shadow ${
-        isGridView ? "h-full flex flex-col" : ""
-      }`}
+    <div
+      className={cn(
+        "rounded-2xl border bg-card",
+        isGridView ? "flex h-full flex-col" : "transition-colors hover:bg-accent/40"
+      )}
     >
-      <CardContent className={`p-4 ${isGridView ? "flex-1" : ""}`}>
-        <div
-          className={`flex justify-between items-start ${
-            isGridView ? "mb-3" : ""
-          }`}
-        >
-          <div
-            className={`flex items-start gap-3 ${
-              isGridView ? "gap-2 flex-1 min-w-0" : ""
-            }`}
-          >
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <FileText
-                className={`text-purple-600 ${isGridView ? "h-4 w-4" : "h-5 w-5"}`}
-              />
+      <div className={cn("p-4 sm:p-5", isGridView ? "flex-1" : null)}>
+        <div className={cn("flex items-start justify-between gap-3", isGridView ? "mb-3" : null)}>
+          <div className={cn("flex items-start gap-3", isGridView ? "min-w-0 flex-1 gap-2" : null)}>
+            <div className="rounded-xl border bg-muted p-2">
+              <FileText className={cn("text-cyan-600", isGridView ? "h-4 w-4" : "h-5 w-5")} />
             </div>
-            <div className={isGridView ? "flex-1 min-w-0" : ""}>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className={`font-medium ${isGridView ? "truncate" : ""}`}>
-                  {note.title}
-                </h3>
-                {!isGridView && note?.postCount > 0 && (
-                  <Badge
-                    variant="outline"
-                    className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-                  >
-                    {note?.postCount} {note?.postCount === 1 ? "Post" : "Posts"}
+            <div className={cn(isGridView ? "min-w-0 flex-1" : null)}>
+              <div className="mb-1 flex items-center gap-2">
+                <h3 className={cn("font-medium", isGridView ? "truncate" : null)}>{note.title}</h3>
+                {!isGridView && note?.postCount > 0 ? (
+                  <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
+                    {note.postCount} {note.postCount === 1 ? "Post" : "Posts"}
                   </Badge>
-                )}
+                ) : null}
               </div>
-              {!isGridView && (
+
+              {!isGridView ? (
                 <>
-                  <p className="text-sm text-slate-600 line-clamp-2 mb-2">
+                  <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
                     {note.content}
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Calendar className="h-3 w-3" />
                     <span>{formatDate(note.createdAt)}</span>
                   </div>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
 
-          <div className={`flex items-center gap-2 ${isGridView ? "" : ""}`}>
-            {!isGridView && note.postCount === 0 && (
+          <div className="flex items-center gap-2">
+            {!isGridView && note.postCount === 0 ? (
               <Link to={`/notes/$id/create-posts`} params={{ id: note.id }}>
                 <Button size="sm" variant="outline" className="h-8">
-                  <Wand2 className="h-3 w-3 mr-1" />
+                  <Wand2 className="mr-1 h-3 w-3" />
                   Create Posts
                 </Button>
               </Link>
-            )}
-            {!isGridView && note.postCount > 0 && (
+            ) : null}
+            {!isGridView && note.postCount > 0 ? (
               <Link to={`/notes/$id/posts`} params={{ id: note.id }}>
                 <Button size="sm" variant="outline" className="h-8">
                   View Posts
                 </Button>
               </Link>
-            )}
+            ) : null}
+
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className={isGridView ? "h-7 w-7" : "h-8 w-8"}
-                >
+                <Button size="icon" variant="ghost" className={isGridView ? "h-7 w-7" : "h-8 w-8"}>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <Link to={`/notes/$id/edit`} params={{ id: note.id }}>
                   <DropdownMenuItem>
-                    <Edit className="h-4 w-4 mr-2" />
+                    <Edit className="mr-2 h-4 w-4" />
                     Edit Note
                   </DropdownMenuItem>
                 </Link>
                 <Link to={`/notes/$id/create-posts`} params={{ id: note.id }}>
                   <DropdownMenuItem>
-                    <Wand2 className="h-4 w-4 mr-2" />
+                    <Wand2 className="mr-2 h-4 w-4" />
                     Create Posts
                   </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem
-                  className="text-red-600"
-                  onClick={() => handleDeleteDialog(note.id, true)}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteDialog(note.id, true)}>
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete Note
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -184,40 +169,34 @@ function NoteCard({
           </div>
         </div>
 
-        {isGridView && (
+        {isGridView ? (
           <>
             <div className="mb-3 flex gap-2">
-              {note?.postCount > 0 && (
-                <Badge
-                  variant="outline"
-                  className="text-xs bg-blue-50 border-blue-200 text-blue-700"
-                >
-                  {note?.postCount} {note?.postCount === 1 ? "Post" : "Posts"}
+              {note?.postCount > 0 ? (
+                <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
+                  {note.postCount} {note.postCount === 1 ? "Post" : "Posts"}
                 </Badge>
-              )}
+              ) : null}
             </div>
 
-            <p className="text-sm text-slate-600 line-clamp-3 mb-4">
-              {note.content}
-            </p>
+            <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{note.content}</p>
 
-            <div className="flex items-center justify-between mt-auto text-xs text-slate-500">
+            <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center">
-                <Calendar className="h-3 w-3 mr-1" />
+                <Calendar className="mr-1 h-3 w-3" />
                 <span>{formatDate(note.createdAt)}</span>
               </div>
             </div>
           </>
-        )}
-      </CardContent>
+        ) : null}
+      </div>
 
-      {/* Grid view action buttons */}
-      {isGridView && (
-        <div className="p-4 pt-0">
+      {isGridView ? (
+        <div className="border-t p-4 sm:p-5">
           {note.postCount === 0 ? (
             <Link to={`/notes/$id/create-posts`} params={{ id: note.id }}>
               <Button size="sm" variant="outline" className="h-8 w-full">
-                <Wand2 className="h-3 w-3 mr-1" />
+                <Wand2 className="mr-1 h-3 w-3" />
                 Create Posts
               </Button>
             </Link>
@@ -229,8 +208,8 @@ function NoteCard({
             </Link>
           )}
         </div>
-      )}
-    </Card>
+      ) : null}
+    </div>
   );
 }
 
@@ -335,11 +314,13 @@ function RouteComponent() {
   const renderNotes = (viewType: "list" | "grid") => {
     if (!notesData || notesData.notes.length === 0) {
       return (
-        <div className="text-center py-12 text-slate-500">
-          <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-          <h3 className="text-lg font-medium mb-2">No notes found</h3>
-          <p>Try adjusting your search or filters</p>
-        </div>
+        <EmptyState
+          icon={<FileText className="h-6 w-6" />}
+          title="No notes found"
+          description="Try adjusting your search or create a new learning note."
+          actionLabel="Create a note"
+          onAction={() => navigate({ to: "/new-note" })}
+        />
       );
     }
 
@@ -367,85 +348,73 @@ function RouteComponent() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-purple-800">
-            Your Learning Notes
-          </h1>
-          <p className="text-slate-600">
-            Manage and organize your developer knowledge
-          </p>
-        </div>
-        <Link to="/new-note">
-          <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Note
-          </Button>
-        </Link>
-      </div>
+    <Page>
+      <PageHeader
+        title="Notes"
+        description="Capture learning, generate posts, and stay consistent."
+        actions={
+          <Link to="/new-note">
+            <Button variant="gradient">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              New note
+            </Button>
+          </Link>
+        }
+      />
 
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
+      <Toolbar sticky className="mb-6">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search notes..."
+                placeholder="Search notes…"
                 className="pl-8"
                 value={searchInput}
                 onChange={handleSearchChange}
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Sort by" />
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
+                  <SelectItem value="newest">Newest first</SelectItem>
+                  <SelectItem value="oldest">Oldest first</SelectItem>
                 </SelectContent>
               </Select>
+
+              <Tabs
+                defaultValue={notesView}
+                onValueChange={(value) => setNotesView(value as ConfigState["notesView"])}
+              >
+                <TabsList>
+                  <TabsTrigger value="list">List</TabsTrigger>
+                  <TabsTrigger value="grid">Grid</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Toolbar>
 
       {isNotesLoading ? (
-        <div className="text-center py-12 text-slate-500">
-          <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
-          <h3 className="text-lg font-medium mb-2">Loading...</h3>
-          <p>Please wait while we fetch your notes</p>
+        <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground">
+          <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-muted-foreground/50" />
+          <p className="text-sm">Loading notes…</p>
         </div>
       ) : !notesData ? (
-        <div className="text-center py-12 text-slate-500">
-          <FileText className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-          <h3 className="text-lg font-medium mb-2">No notes found</h3>
-          <p>Try adjusting your search or filters</p>
-        </div>
+        <EmptyState
+          icon={<FileText className="h-6 w-6" />}
+          title="No notes yet"
+          description="Create your first learning note to start generating posts."
+          actionLabel="Create a note"
+          onAction={() => navigate({ to: "/new-note" })}
+        />
       ) : (
-        <Tabs
-          defaultValue={notesView}
-          className="mb-8"
-          onValueChange={(value) =>
-            setNotesView(value as ConfigState["notesView"])
-          }
-        >
-          <TabsList className="mb-4">
-            <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="grid">Grid View</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="list" className="m-0">
-            {renderNotes("list")}
-          </TabsContent>
-
-          <TabsContent value="grid" className="m-0">
-            {renderNotes("grid")}
-          </TabsContent>
-        </Tabs>
+        <div className="pb-8">{renderNotes(notesView)}</div>
       )}
-    </main>
+    </Page>
   );
 }

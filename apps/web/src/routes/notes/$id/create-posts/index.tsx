@@ -1,12 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2, Wand2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,6 +19,10 @@ import { addPostService } from "@/api/post.service";
 import { fromZodError } from "zod-validation-error";
 import { ZodError } from "zod";
 import { useAuthStore } from "@/stores/auth.store";
+import { Page } from "@/components/layout/Page";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Divider } from "@/components/layout/Divider";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 export const Route = createFileRoute("/notes/$id/create-posts/")({
   component: RouteComponent,
@@ -182,194 +179,171 @@ function RouteComponent() {
   );
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-5xl">
+    <Page>
       <div className="mb-6">
         <Link
           to="/notes"
           search={{
             search: ''
           }}
-          className="flex items-center text-purple-600 hover:text-purple-800"
+          className="flex items-center text-cyan-700 hover:text-cyan-800"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Notes
+          Back to notes
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-purple-800">Create Posts</h1>
-          <p className="text-slate-600">
-            Generate platform-specific posts from your note
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Create posts"
+        description="Generate platform-specific posts from your note."
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Source Note */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Source Note: {note?.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col justify-between">
-            <div className="p-4 bg-slate-50 rounded-lg border">
-              <div className="whitespace-pre-line">{note?.content}</div>
+      <div className="grid gap-8 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <div className="rounded-2xl border bg-card">
+            <div className="px-6 py-5">
+              <SectionHeader
+                title="Source note"
+                description={note?.title ? `From: ${note.title}` : "Loading…"}
+              />
             </div>
-
-            <div className="space-y-2">
-              <Label>Target Platforms</Label>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="LINKEDIN"
-                    checked={selectedPlatforms.LINKEDIN}
-                    onCheckedChange={(checked) =>
-                      handlePlatformChange("LINKEDIN", checked as boolean)
-                    }
-                    disabled={
-                      !user?.accounts?.some(
-                        (account) => account.provider === "LINKEDIN"
-                      )
-                    }
-                  />
-                  <Label
-                    htmlFor="LINKEDIN"
-                    className={`text-sm font-normal ${!user?.accounts?.some(
-                      (account) => account.provider === "LINKEDIN"
-                    )
-                      ? "text-slate-400 cursor-not-allowed"
-                      : ""
-                      }`}
-                  >
-                    LinkedIn
-                    {!user?.accounts?.some(
-                      (account) => account.provider === "LINKEDIN"
-                    ) && (
-                        <span className="text-xs text-slate-400 ml-1">
-                          (Connect account first)
-                        </span>
-                      )}
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="twitter"
-                    checked={selectedPlatforms.TWITTER}
-                    onCheckedChange={(checked) =>
-                      handlePlatformChange("TWITTER", checked as boolean)
-                    }
-                    disabled={
-                      !user?.accounts?.some(
-                        (account) => account.provider === "TWITTER"
-                      )
-                    }
-                  />
-                  <Label
-                    htmlFor="twitter"
-                    className={`text-sm font-normal ${!user?.accounts?.some(
-                      (account) => account.provider === "TWITTER"
-                    )
-                      ? "text-slate-400 cursor-not-allowed"
-                      : ""
-                      }`}
-                  >
-                    X (Twitter)
-                    {!user?.accounts?.some(
-                      (account) => account.provider === "TWITTER"
-                    ) && (
-                        <span className="text-xs text-slate-400 ml-1">
-                          (Connect account first)
-                        </span>
-                      )}
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="BLUESKY"
-                    checked={selectedPlatforms.BLUESKY}
-                    onCheckedChange={(checked) =>
-                      handlePlatformChange("BLUESKY", checked as boolean)
-                    }
-                    disabled={
-                      !user?.accounts?.some(
-                        (account) => account.provider === "BLUESKY"
-                      )
-                    }
-                  />
-                  <Label
-                    htmlFor="BLUESKY"
-                    className={`text-sm font-normal ${!user?.accounts?.some(
-                      (account) => account.provider === "BLUESKY"
-                    )
-                      ? "text-slate-400 cursor-not-allowed"
-                      : ""
-                      }`}
-                  >
-                    Bluesky
-                    {!user?.accounts?.some(
-                      (account) => account.provider === "BLUESKY"
-                    ) && (
-                        <span className="text-xs text-slate-400 ml-1">
-                          (Connect account first)
-                        </span>
-                      )}
-                  </Label>
+            <Divider />
+            <div className="px-6 py-5 space-y-5">
+              <div className="rounded-xl border bg-muted/20 p-4">
+                <div className="whitespace-pre-line text-sm text-foreground">
+                  {note?.content}
                 </div>
               </div>
-              {!user?.accounts?.some((account) =>
-                ["LINKEDIN", "TWITTER", "BLUESKY"].includes(account.provider)
-              ) && (
-                  <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                    <p className="text-sm text-amber-700">
+
+              <div className="space-y-2">
+                <Label>Target platforms</Label>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="LINKEDIN"
+                      checked={selectedPlatforms.LINKEDIN}
+                      onCheckedChange={(checked) => handlePlatformChange("LINKEDIN", checked as boolean)}
+                      disabled={!user?.accounts?.some((account) => account.provider === "LINKEDIN")}
+                    />
+                    <Label
+                      htmlFor="LINKEDIN"
+                      className={`text-sm font-normal ${
+                        !user?.accounts?.some((account) => account.provider === "LINKEDIN")
+                          ? "text-muted-foreground cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      LinkedIn{" "}
+                      {!user?.accounts?.some((account) => account.provider === "LINKEDIN") ? (
+                        <span className="ml-1 text-xs text-muted-foreground">(Connect account first)</span>
+                      ) : null}
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="twitter"
+                      checked={selectedPlatforms.TWITTER}
+                      onCheckedChange={(checked) => handlePlatformChange("TWITTER", checked as boolean)}
+                      disabled={!user?.accounts?.some((account) => account.provider === "TWITTER")}
+                    />
+                    <Label
+                      htmlFor="twitter"
+                      className={`text-sm font-normal ${
+                        !user?.accounts?.some((account) => account.provider === "TWITTER")
+                          ? "text-muted-foreground cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      X (Twitter){" "}
+                      {!user?.accounts?.some((account) => account.provider === "TWITTER") ? (
+                        <span className="ml-1 text-xs text-muted-foreground">(Connect account first)</span>
+                      ) : null}
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="BLUESKY"
+                      checked={selectedPlatforms.BLUESKY}
+                      onCheckedChange={(checked) => handlePlatformChange("BLUESKY", checked as boolean)}
+                      disabled={!user?.accounts?.some((account) => account.provider === "BLUESKY")}
+                    />
+                    <Label
+                      htmlFor="BLUESKY"
+                      className={`text-sm font-normal ${
+                        !user?.accounts?.some((account) => account.provider === "BLUESKY")
+                          ? "text-muted-foreground cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      Bluesky{" "}
+                      {!user?.accounts?.some((account) => account.provider === "BLUESKY") ? (
+                        <span className="ml-1 text-xs text-muted-foreground">(Connect account first)</span>
+                      ) : null}
+                    </Label>
+                  </div>
+                </div>
+
+                {!user?.accounts?.some((account) =>
+                  ["LINKEDIN", "TWITTER", "BLUESKY"].includes(account.provider)
+                ) ? (
+                  <div className="mt-2 rounded-xl border bg-amber-50 p-3">
+                    <p className="text-sm text-amber-800">
                       <strong>No platforms connected.</strong>{" "}
                       <Link
                         to="/connected-platforms"
-                        className="text-amber-800 underline hover:text-amber-900"
+                        className="underline underline-offset-2 hover:text-amber-900"
                       >
                         Connect your social media accounts
                       </Link>{" "}
                       to start generating and posting content.
                     </p>
                   </div>
-                )}
+                ) : null}
+              </div>
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              onClick={() =>
-                generatePosts({
-                  content: note?.content ?? "",
-                  platforms: Object.keys(selectedPlatforms).filter(
-                    (platform) => selectedPlatforms[platform as Platform]
-                  ) as Platform[],
-                })
-              }
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-              disabled={
-                isGenerating || !Object.values(selectedPlatforms).some(Boolean)
-              }
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Generate Platform Posts
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
+            <Divider />
+            <div className="px-6 py-5">
+              <Button
+                onClick={() =>
+                  generatePosts({
+                    content: note?.content ?? "",
+                    platforms: Object.keys(selectedPlatforms).filter(
+                      (platform) => selectedPlatforms[platform as Platform]
+                    ) as Platform[],
+                  })
+                }
+                variant="gradient"
+                className="w-full"
+                disabled={isGenerating || !Object.values(selectedPlatforms).some(Boolean)}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating…
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Generate drafts
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
 
-        {/* Generated Posts */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Generated Posts</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="lg:col-span-7">
+          <div className="rounded-2xl border bg-card">
+            <div className="px-6 py-5">
+              <SectionHeader
+                title="Generated drafts"
+                description="Edit drafts, then save, schedule, or publish."
+              />
+            </div>
+            <Divider />
+            <div className="px-6 py-5">
             <Tabs
               defaultValue="LINKEDIN"
               value={activeTab}
@@ -460,7 +434,7 @@ function RouteComponent() {
                 <div className="space-y-4">
                   <Badge
                     variant="outline"
-                    className="mb-2 bg-indigo-50 border-indigo-200"
+                    className="mb-2 bg-zinc-50 border-zinc-200"
                   >
                     <svg
                       width="12"
@@ -490,8 +464,9 @@ function RouteComponent() {
                 </div>
               </TabsContent>
             </Tabs>
-          </CardContent>
-          <CardFooter className="flex justify-between gap-4">
+            </div>
+            <Divider />
+            <div className="px-6 py-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button
               variant="outline"
               onClick={() =>
@@ -533,8 +508,9 @@ function RouteComponent() {
                 hasContent={hasContent}
               />
             ) : null}
-          </CardFooter>
-        </Card>
+            </div>
+          </div>
+        </div>
       </div>
       <ScheduleModal
         isOpen={showScheduleModal}
@@ -542,6 +518,6 @@ function RouteComponent() {
         onSchedule={handleScheduleConfirm}
         isLoading={isSaving}
       />
-    </main>
+    </Page>
   );
 }

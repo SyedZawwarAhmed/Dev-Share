@@ -2,13 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +11,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { updatePostSchema } from "@/schemas/post.schema";
 import { z } from "zod";
+import { Page } from "@/components/layout/Page";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Divider } from "@/components/layout/Divider";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 export const Route = createFileRoute("/posts/$id/edit/")({
   component: RouteComponent,
@@ -79,7 +76,7 @@ function RouteComponent() {
         return (
           <Badge
             variant="outline"
-            className="mb-2 bg-indigo-50 border-indigo-200"
+            className="mb-2 bg-zinc-50 border-zinc-200"
           >
             <svg
               width="12"
@@ -103,72 +100,70 @@ function RouteComponent() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-3xl">
+    <Page className="max-w-3xl">
       <div className="mb-6">
         <Link
           to="/posts"
-          className="flex items-center text-purple-600 hover:text-purple-800"
+          className="flex items-center text-cyan-700 hover:text-cyan-800"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Posts
+          Back to posts
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-purple-800">Edit Post</h1>
-          <p className="text-slate-600">
+      <PageHeader
+        title="Edit post"
+        description={
+          <>
             Editing post for note:{" "}
-            {isLoadingPost ? "Loading..." : post?.note?.title}
-          </p>
+            {isLoadingPost ? "Loading…" : post?.note?.title}
+          </>
+        }
+      />
+
+      <div className="rounded-2xl border bg-card">
+        <div className="px-6 py-5">
+          <SectionHeader
+            title="Edit content"
+            description="Make edits, then save changes."
+          />
         </div>
-      </div>
+        <Divider />
+        <div className="px-6 py-5 space-y-4">
+          {post?.platform ? getPlatformIcon(post?.platform) : null}
+          <Textarea
+            placeholder="Enter your post content"
+            className="min-h-[320px]"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Post Content</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {post?.platform ? getPlatformIcon(post?.platform) : null}
-            <Textarea
-              placeholder={`Enter your post content`}
-              className="min-h-[300px]"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-
-            <div className="text-sm text-slate-500">
-              <p>
-                <strong>Note:</strong> This post is for the platform. Make sure
-                your content is optimized for this platform's audience and
-                format.
-              </p>
-            </div>
+          <div className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground">
+            <p>
+              <strong>Note:</strong> This post is platform-specific. Keep the tone and length appropriate for the selected network.
+            </p>
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-between">
+        </div>
+        <Divider />
+        <div className="flex items-center justify-between px-6 py-5">
           <Link to="/posts">
             <Button variant="outline">Cancel</Button>
           </Link>
-          <Button
-            onClick={handleSave}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-          >
+          <Button onClick={handleSave} variant="gradient">
             {isUpdatingPost ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                Saving…
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Save Changes
+                Save changes
               </>
             )}
           </Button>
-        </CardFooter>
-      </Card>
-    </main>
+        </div>
+      </div>
+    </Page>
   );
 }

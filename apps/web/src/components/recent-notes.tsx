@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, FileText, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,8 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getNotesService } from "@/api/note.service";
 import { formatDate } from "@/lib/date-time";
+import { Divider } from "@/components/layout/Divider";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 export default function RecentNotes() {
   const queryParams = {
@@ -22,35 +23,34 @@ export default function RecentNotes() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Learning Notes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12 text-slate-500">
-            <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
-            <h3 className="text-lg font-medium mb-2">Loading...</h3>
-            <p>Please wait while we fetch your notes</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border bg-card">
+        <div className="px-6 py-5">
+          <SectionHeader title="Recent notes" description="Your latest learning notes." />
+        </div>
+        <Divider />
+        <div className="px-6 py-12 text-center text-muted-foreground">
+          <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-muted-foreground/40" />
+          <p className="text-sm">Loading notes…</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Learning Notes</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="rounded-2xl border bg-card">
+      <div className="px-6 py-5">
+        <SectionHeader title="Recent notes" description="Your latest learning notes." />
+      </div>
+      <Divider />
+      <div className="px-6 py-5 space-y-4">
         {recentNotesData && recentNotesData.notes.length > 0 ? (
           recentNotesData.notes.map((note) => (
             <div
               key={note.id}
-              className="border rounded-lg p-3 hover:bg-slate-50 transition-colors"
+              className="rounded-xl border p-3 transition-colors hover:bg-accent/40"
             >
               <div className="flex items-center gap-2 mb-1">
-                <FileText className="h-4 w-4 text-purple-600" />
+                <FileText className="h-4 w-4 text-cyan-600" />
                 <span className="font-medium text-sm">{note.title}</span>
                 {note.postCount > 0 && (
                   <Badge
@@ -61,7 +61,7 @@ export default function RecentNotes() {
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mb-2">
+              <p className="mb-2 text-xs text-muted-foreground">
                 Added {formatDate(note.createdAt)}
               </p>
               <div className="flex justify-end">
@@ -84,17 +84,17 @@ export default function RecentNotes() {
             </div>
           ))
         ) : (
-          <div className="text-center py-8 text-slate-500">
-            <p>No notes yet</p>
+          <div className="flex min-h-[160px] items-center justify-center rounded-xl border bg-muted/20 text-muted-foreground">
+            <p className="text-sm">No notes yet</p>
           </div>
         )}
 
         <Link to="/notes" className="block text-center">
-          <Button variant="link" size="sm" className="text-purple-600">
+          <Button variant="link" size="sm" className="text-cyan-600 hover:text-cyan-700">
             View all notes
           </Button>
         </Link>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

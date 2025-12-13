@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowLeft,
   Calendar,
@@ -36,6 +35,11 @@ import { toast } from "sonner";
 import { useDebounce } from "@/lib/hooks";
 import { getPostsFiltersSchema } from "@/schemas/post.schema";
 import { z } from "zod";
+import { Page } from "@/components/layout/Page";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Toolbar } from "@/components/layout/Toolbar";
+import { Divider } from "@/components/layout/Divider";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 export const Route = createFileRoute("/notes/$id/posts/")({
   component: RouteComponent,
@@ -221,7 +225,7 @@ function RouteComponent() {
         );
       case "bluesky":
         return (
-          <div className="p-2 bg-indigo-100 rounded-lg">
+          <div className="p-2 bg-sky-100 rounded-lg">
             <svg
               width="20"
               height="20"
@@ -278,61 +282,58 @@ function RouteComponent() {
   );
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-7xl">
+    <Page>
       <div className="mb-6">
         <Link
           to="/notes"
           search={{
             search: ''
           }}
-          className="flex items-center text-purple-600 hover:text-purple-800"
+          className="flex items-center text-cyan-700 hover:text-cyan-800"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Notes
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-purple-800">
-            Posts for: {note?.title}
-          </h1>
-          <p className="text-slate-600">
-            Manage your social media posts for this note
-          </p>
+      <PageHeader
+        title={`Posts: ${note?.title ?? ""}`}
+        description="Manage your social media posts for this note."
+        actions={
+          <Link
+            to={"/notes/$id/create-posts"}
+            params={{
+              id: params.id,
+            }}
+          >
+            <Button variant="gradient">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create more posts
+            </Button>
+          </Link>
+        }
+      />
+
+      <div className="mb-6 rounded-2xl border bg-card">
+        <div className="px-6 py-5">
+          <SectionHeader
+            title="Source note"
+            description={note?.createdAt ? `Created ${formatDate(note.createdAt)}` : undefined}
+          />
         </div>
-        <Link
-          to={"/notes/$id/create-posts"}
-          params={{
-            id: params.id,
-          }}
-        >
-          <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create More Posts
-          </Button>
-        </Link>
+        <Divider />
+        <div className="px-6 py-5">
+          <div className="rounded-xl border bg-muted/20 p-4">
+            <p className="whitespace-pre-line text-sm text-foreground">{note?.content}</p>
+          </div>
+        </div>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Source Note</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="p-4 bg-slate-50 rounded-lg border">
-            <p>{note?.content}</p>
-            <div className="mt-2 text-sm text-slate-500">
-              Created on {formatDate(note?.createdAt)}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
+      <Toolbar sticky className="mb-8">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search posts..."
                 className="pl-8"
@@ -340,7 +341,7 @@ function RouteComponent() {
                 onChange={handleSearchChange}
               />
             </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Select value={platformFilter} onValueChange={setPlatformFilter}>
                 <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue placeholder="Platform" />
@@ -376,14 +377,13 @@ function RouteComponent() {
               </Select>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Toolbar>
 
       {isPostsLoading ? (
-        <div className="text-center py-12 text-slate-500">
-          <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
-          <h3 className="text-lg font-medium mb-2">Loading...</h3>
-          <p>Please wait while we fetch your posts</p>
+        <div className="rounded-2xl border bg-card p-8 text-center text-muted-foreground">
+          <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-muted-foreground/50" />
+          <p className="text-sm">Loading posts…</p>
         </div>
       ) : (
         <Tabs defaultValue="list" className="mb-8">
@@ -396,11 +396,11 @@ function RouteComponent() {
             <div className="space-y-4">
               {(filteredPosts?.length ?? 0) > 0 ? (
                 filteredPosts?.map((post) => (
-                  <Card
+                  <div
                     key={post.id}
-                    className="hover:shadow-md transition-shadow"
+                    className="rounded-2xl border bg-card transition-colors hover:bg-accent/40"
                   >
-                    <CardContent className="p-4">
+                    <div className="p-4 sm:p-5">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-3">
                           {getPlatformIcon(post.platform)}
@@ -414,10 +414,10 @@ function RouteComponent() {
                                 {post?.note.title}
                               </Badge>
                             </div>
-                            <p className="text-sm text-slate-600 line-clamp-3">
+                            <p className="text-sm text-muted-foreground line-clamp-3">
                               {post.content}
                             </p>
-                            <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
                               <Calendar className="h-3 w-3" />
                               <span>Created: {formatDate(post.createdAt)}</span>
 
@@ -515,11 +515,11 @@ function RouteComponent() {
                           />
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))
               ) : (
-                <div className="text-center py-12 text-slate-500">
+                <div className="text-center py-12 text-muted-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="48"
@@ -530,7 +530,7 @@ function RouteComponent() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="mx-auto mb-4 text-slate-300"
+                    className="mx-auto mb-4 text-muted-foreground/50"
                   >
                     <path d="M17.5 22h.5c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3" />
                     <polyline points="14 2 14 8 20 8" />
@@ -550,11 +550,11 @@ function RouteComponent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {(filteredPosts?.length ?? 0) > 0 ? (
                 filteredPosts?.map((post) => (
-                  <Card
+                  <div
                     key={post.id}
-                    className="hover:shadow-md transition-shadow h-full flex flex-col"
+                    className="rounded-2xl border bg-card transition-colors hover:bg-accent/40 h-full flex flex-col"
                   >
-                    <CardContent className="p-4 flex-1">
+                    <div className="p-4 sm:p-5 flex-1">
                       <div className="flex items-start gap-2 mb-3">
                         {getPlatformIcon(post.platform)}
                         <div className="flex-1 min-w-0">
@@ -564,7 +564,7 @@ function RouteComponent() {
                             </h3>
                             {getStatusBadge(post.status)}
                           </div>
-                          <p className="text-xs text-slate-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {post?.note?.title}
                           </p>
                         </div>
@@ -616,17 +616,17 @@ function RouteComponent() {
                         </DropdownMenu>
                       </div>
 
-                      <p className="text-sm text-slate-600 line-clamp-6 mb-4">
+                      <p className="text-sm text-muted-foreground line-clamp-6 mb-4">
                         {post.content}
                       </p>
 
-                      <div className="flex items-center justify-between mt-auto text-xs text-slate-500">
+                      <div className="flex items-center justify-between mt-auto text-xs text-muted-foreground">
                         <div className="flex items-center">
                           <Calendar className="h-3 w-3 mr-1" />
                           <span>{formatDate(post.createdAt)}</span>
                         </div>
                       </div>
-                    </CardContent>
+                    </div>
                     
                     <ConfirmationDialog
                       open={postConfirmationDialogs[post.id] || false}
@@ -636,10 +636,10 @@ function RouteComponent() {
                       onConfirm={() => handlePostNow(post.id)}
                       loading={isPublishing}
                     />
-                  </Card>
+                  </div>
                 ))
               ) : (
-                <div className="col-span-full text-center py-12 text-slate-500">
+                <div className="col-span-full text-center py-12 text-muted-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="48"
@@ -650,7 +650,7 @@ function RouteComponent() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="mx-auto mb-4 text-slate-300"
+                    className="mx-auto mb-4 text-muted-foreground/50"
                   >
                     <path d="M17.5 22h.5c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3" />
                     <polyline points="14 2 14 8 20 8" />
@@ -683,7 +683,8 @@ function RouteComponent() {
           <DialogFooter className="sm:justify-center mt-6">
             <Button
               onClick={handleSuccessDialogClose}
-              className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              variant="gradient"
+              className="w-full sm:w-auto"
             >
               Continue
             </Button>
@@ -695,6 +696,6 @@ function RouteComponent() {
         open={showLinkedInReauthDialog}
         onOpenChange={setShowLinkedInReauthDialog}
       />
-    </main>
+    </Page>
   );
 }

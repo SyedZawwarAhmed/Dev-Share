@@ -3,9 +3,13 @@ import ScheduledPosts from "@/components/scheduled-posts";
 import RecentNotes from "@/components/recent-notes";
 import { Button } from "@/components/ui/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PlusCircle, ExternalLink } from "lucide-react";
+import { ExternalLink, FileText, PlusCircle, Send } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
-import { Card, CardContent } from "@/components/ui/card";
+import { Page } from "@/components/layout/Page";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { EmptyState } from "@/components/layout/EmptyState";
+import { SectionHeader } from "@/components/layout/SectionHeader";
+import { Divider } from "@/components/layout/Divider";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
@@ -19,62 +23,68 @@ function RouteComponent() {
   );
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1
-            className="text-3xl font-bold text-purple-800 cursor-pointer"
-            onClick={() => (window.location.href = "/")}
-          >
-            DevShare
-          </h1>
-          <p className="text-slate-600">
-            Automate your developer learning posts
-          </p>
-        </div>
-        <Link to="/new-note">
-          <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Learning Note
-          </Button>
-        </Link>
-      </div>
+    <Page>
+      <PageHeader
+        title="Dashboard"
+        description="Automate your developer learning posts"
+        actions={
+          <Link to="/new-note">
+            <Button variant="gradient">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              New learning note
+            </Button>
+          </Link>
+        }
+      />
 
-      {!hasConnectedPlatforms && (
-        <Card className="mb-6 border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <ExternalLink className="h-5 w-5 text-amber-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-amber-800 mb-1">
-                  Connect your social media accounts
-                </h3>
-                <p className="text-sm text-amber-700 mb-3">
-                  To start sharing your learning posts automatically, connect at least one social media platform.
-                </p>
-                <Link to="/connected-platforms">
-                  <Button size="sm" className="bg-amber-600 hover:bg-amber-700">
-                    Connect Platforms
-                  </Button>
-                </Link>
+      <div className="grid gap-8 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          {!hasConnectedPlatforms ? (
+            <div className="rounded-2xl border bg-card p-6">
+              <div className="flex items-start gap-4">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl border bg-muted">
+                  <ExternalLink className="h-5 w-5 text-cyan-700" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-semibold">
+                    Connect your platforms to start publishing
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Connect LinkedIn, X, or Bluesky to generate and schedule posts straight from your notes.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link to="/connected-platforms">
+                      <Button variant="outline">Connect platforms</Button>
+                    </Link>
+                    <Link to="/new-note">
+                      <Button variant="gradient">Create a note</Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : null}
 
-      <DashboardStats />
+          <div className={hasConnectedPlatforms ? "" : "mt-6"}>
+            <DashboardStats />
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 md:items-start">
-        <div className="md:col-span-2 min-h-full">
-          <ScheduledPosts />
+          <div className="mt-6">
+            <ScheduledPosts />
+          </div>
         </div>
-        <div className="md:h-fit">
-          <RecentNotes />
+
+        <div className="lg:col-span-4">
+            <RecentNotes />
+
+            {!user ? (
+              <EmptyState
+                title="Sign in to personalize"
+                description="Your stats and recent notes will appear here once you’re logged in."
+              />
+            ) : null}
+          </div>
         </div>
-      </div>
-    </main>
+    </Page>
   );
 }

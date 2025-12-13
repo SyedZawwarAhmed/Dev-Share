@@ -71,7 +71,7 @@ export default function PlatformAuthModal({
           <path d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z" fill="#0085FF" />
         </svg>
       ),
-      color: "bg-indigo-50 border-indigo-200",
+      color: "bg-zinc-50 border-zinc-200",
       description:
         "Connect your Bluesky account to share content on the decentralized social network.",
       permissions: ["Post on your behalf", "Access basic profile information"],
@@ -142,7 +142,7 @@ export default function PlatformAuthModal({
                 </div>
               </div>
 
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+              <div className="rounded-lg border bg-zinc-50 p-3 text-sm text-zinc-700">
                 <p>
                   <strong>Secure:</strong> We use OAuth 2.0 for secure
                   authentication. We never store your password and you can
@@ -168,7 +168,7 @@ export default function PlatformAuthModal({
             <Button
               onClick={handleAuth}
               // disabled={isAuthenticating}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              variant="gradient"
             >
               {/* {isAuthenticating ? ( */}
               {/*   <> */}

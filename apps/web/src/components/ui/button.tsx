@@ -22,8 +22,11 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        brand:
+          "bg-zinc-950 text-white hover:bg-zinc-900 shadow-[0_0_0_1px_rgba(34,211,238,0.22),0_18px_70px_-30px_rgba(34,211,238,0.35)] dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200",
+        // Back-compat: old name used around the app. Intentionally not a purple gradient.
         gradient:
-          "bg-gradient-to-r from-purple-600 to-indigo-600 text-primary-foreground hover:from-purple-700 hover:to-indigo-700",
+          "bg-zinc-950 text-white hover:bg-zinc-900 shadow-[0_0_0_1px_rgba(34,211,238,0.22),0_18px_70px_-30px_rgba(34,211,238,0.35)] dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
