@@ -16,9 +16,7 @@ export function Reveal({ children, delay = 0, ...props }: RevealProps) {
   return (
     <motion.div
       initial={
-        shouldReduceMotion
-          ? false
-          : { y: -10, opacity: 0, filter: "blur(10px)" }
+        shouldReduceMotion ? false : { y: 20, opacity: 0, filter: "blur(10px)" }
       }
       whileInView={
         shouldReduceMotion
