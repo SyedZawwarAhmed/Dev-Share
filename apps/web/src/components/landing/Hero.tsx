@@ -18,7 +18,9 @@ export function Hero() {
 
         <div className="mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground">
-            <span className={cn("h-1.5 w-1.5 rounded-full", landingTheme.accentBg)} />
+            <span
+              className={cn("h-1.5 w-1.5 rounded-full", landingTheme.accentBg)}
+            />
             Turn notes into posts. Keep your voice.
           </div>
 
@@ -26,8 +28,9 @@ export function Hero() {
             Share your developer journey without the busywork.
           </h1>
           <p className="mt-5 mx-auto max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-            DevShare transforms your learning notes into platform-ready posts for
-            LinkedIn, X, and Bluesky so you can stay consistent while you learn.
+            DevShare transforms your learning notes into platform-ready posts
+            for LinkedIn, X, and Bluesky so you can stay consistent while you
+            learn.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-center">
@@ -36,7 +39,7 @@ export function Hero() {
                 size="lg"
                 className={cn(
                   "w-full bg-zinc-950 text-white hover:bg-zinc-900 sm:w-auto dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200",
-                  landingTheme.accentRing
+                  landingTheme.accentRing,
                 )}
               >
                 {isAuthenticated ? "Go to dashboard" : "Get started"}
@@ -49,7 +52,7 @@ export function Hero() {
                 variant="outline"
                 className={cn(
                   "w-full border-zinc-200 bg-white/60 text-zinc-900 hover:bg-white sm:w-auto",
-                  landingTheme.accentRing
+                  landingTheme.accentRing,
                 )}
               >
                 See how it works
@@ -76,9 +79,19 @@ export function Hero() {
             </li>
           </ul> */}
         </div>
+
+        <div className="mt-10">
+          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl  border-2 border-gray-100 bg-background shadow-sm sm:rounded-3xl">
+            <img
+              src="/dashboard-screenshot.png"
+              alt="DevShare dashboard preview"
+              className="h-auto w-full"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        </div>
       </Container>
     </section>
   );
 }
-
-
