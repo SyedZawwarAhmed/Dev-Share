@@ -28,7 +28,7 @@ export function HowItWorks() {
           <p className={cn("text-xs font-medium tracking-wide", landingTheme.accentText)}>
             How it works
           </p>
-          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
             A simple workflow that scales with you
           </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground sm:text-lg">

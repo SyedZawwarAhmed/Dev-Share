@@ -21,7 +21,7 @@ export function FinalCTA() {
                 <p className={cn("text-xs font-medium", landingTheme.accentText)}>
                   Ready when you are
                 </p>
-                <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
                   Make sharing your learning effortless.
                 </h2>
                 <p className="mt-4 max-w-2xl text-pretty text-base text-white/70 sm:text-lg">

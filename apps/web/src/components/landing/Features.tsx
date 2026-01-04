@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import {
   CalendarClock,
   FileText,
+  FolderKanban,
   Layers,
   Sparkles,
   Wand2,
@@ -14,32 +15,38 @@ const features = [
   {
     title: "Write notes the way you already do",
     description:
-      "Capture what you learned without polishing. DevShare turns it into shareable drafts.",
+      "Capture what you learned. DevShare turns it into shareable drafts.",
     icon: FileText,
   },
   {
     title: "Generate platform-ready variations",
     description:
-      "Get versions tailored to each network’s tone and constraints without rewriting.",
+      "Get tailored versions for each platform without rewriting.",
     icon: Layers,
   },
   {
     title: "AI that keeps your voice",
     description:
-      "Drafts stay technical, accurate, and readable designed for developer audiences.",
+      "Drafts stay technical, accurate, and in your tone.",
     icon: Sparkles,
   },
   {
     title: "Review, edit, and approve",
     description:
-      "You’re in control: tweak the draft, adjust structure, and publish when it’s right.",
+      "You’re in control: tweak the draft and publish when it’s right.",
     icon: Wand2,
   },
   {
     title: "Smart scheduling",
     description:
-      "Plan posts ahead and keep a steady cadence while you focus on learning.",
+      "Plan posts ahead and keep a steady cadence.",
     icon: CalendarClock,
+  },
+  {
+    title: "Draft library, always organized",
+    description:
+      "Keep drafts grouped by note and platform for easy revisits.",
+    icon: FolderKanban,
   },
 ];
 
@@ -51,7 +58,7 @@ export function Features() {
           <p className={cn("text-xs font-medium tracking-wide", landingTheme.accentText)}>
             Features
           </p>
-          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
             Everything you need to ship your learning in public
           </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground sm:text-lg">

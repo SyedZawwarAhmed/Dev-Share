@@ -34,9 +34,9 @@ export function SocialProof() {
           </div>
           <div className="rounded-xl border bg-background p-4">
             <p className="text-xs text-muted-foreground">
-              Platform-specific versions
+              Your voice, preserved
             </p>
-            <p className="mt-1 text-2xl font-semibold tracking-tight">2</p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight">Consistent</p>
           </div>
           <div className="rounded-xl border bg-background p-4">
             <p className="text-xs text-muted-foreground">Review before posting</p>

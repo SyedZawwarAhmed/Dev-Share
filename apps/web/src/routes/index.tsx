@@ -6,6 +6,7 @@ import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { SocialProof } from "@/components/landing/SocialProof";
+import { Reveal } from "@/components/motion/Reveal";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -16,13 +17,25 @@ function RouteComponent() {
     <div className="min-h-screen bg-background text-foreground">
       <LandingHeader />
       <main>
-        <Hero />
-        <SocialProof />
-        <Features />
-        <HowItWorks />
-        <FinalCTA />
+        <Reveal>
+          <Hero />
+        </Reveal>
+        <Reveal>
+          <SocialProof />
+        </Reveal>
+        <Reveal>
+          <Features />
+        </Reveal>
+        <Reveal>
+          <HowItWorks />
+        </Reveal>
+        <Reveal>
+          <FinalCTA />
+        </Reveal>
       </main>
-      <Footer />
+      <Reveal>
+        <Footer />
+      </Reveal>
     </div>
   );
 }
