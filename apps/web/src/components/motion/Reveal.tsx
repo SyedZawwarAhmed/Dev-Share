@@ -1,7 +1,9 @@
-import * as React from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, type HTMLMotionProps } from "motion/react";
 
-type RevealProps = React.ComponentPropsWithoutRef<"div"> & {
+type RevealProps = Omit<
+  HTMLMotionProps<"div">,
+  "initial" | "whileInView" | "viewport" | "transition"
+> & {
   /**
    * Optional transition delay (seconds). Useful if you want to stagger sections.
    */
@@ -11,21 +13,27 @@ type RevealProps = React.ComponentPropsWithoutRef<"div"> & {
 export function Reveal({ children, delay = 0, ...props }: RevealProps) {
   const shouldReduceMotion = useReducedMotion();
 
-  if (shouldReduceMotion) {
-    return <div {...props}>{children}</div>;
-  }
-
   return (
     <motion.div
-      initial={{ y: -10, opacity: 0, filter: "blur(10px)" }}
-      whileInView={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, ease: "easeOut", delay }}
+      initial={
+        shouldReduceMotion
+          ? false
+          : { y: -10, opacity: 0, filter: "blur(10px)" }
+      }
+      whileInView={
+        shouldReduceMotion
+          ? undefined
+          : { y: 0, opacity: 1, filter: "blur(0px)" }
+      }
+      viewport={shouldReduceMotion ? undefined : { once: true, amount: 0.2 }}
+      transition={
+        shouldReduceMotion
+          ? undefined
+          : { duration: 0.6, ease: "easeOut", delay }
+      }
       {...props}
     >
       {children}
     </motion.div>
   );
 }
-
-
