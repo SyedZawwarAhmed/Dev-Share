@@ -11,7 +11,7 @@ export function SocialProof() {
             Works great for sharing on
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            {["LinkedIn", "X", "Bluesky"].map((name) => (
+            {["LinkedIn", "X"].map((name) => (
               <span
                 key={name}
                 className={cn(
@@ -36,7 +36,7 @@ export function SocialProof() {
             <p className="text-xs text-muted-foreground">
               Platform-specific versions
             </p>
-            <p className="mt-1 text-2xl font-semibold tracking-tight">3</p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight">2</p>
           </div>
           <div className="rounded-xl border bg-background p-4">
             <p className="text-xs text-muted-foreground">Review before posting</p>

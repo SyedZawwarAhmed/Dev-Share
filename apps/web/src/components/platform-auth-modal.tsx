@@ -35,7 +35,7 @@ export default function PlatformAuthModal({
   };
 
   const isAuthenticated = user?.accounts?.some(
-    (userAccount) => userAccount.provider === getProviderName(platform),
+    (userAccount) => userAccount.provider === getProviderName(platform)
   );
 
   const platformConfig = {
@@ -57,24 +57,6 @@ export default function PlatformAuthModal({
         "Post tweets on your behalf",
         "Access basic profile information",
       ],
-    },
-    BLUESKY: {
-      name: "Bluesky",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z" fill="#0085FF" />
-        </svg>
-      ),
-      color: "bg-zinc-50 border-zinc-200",
-      description:
-        "Connect your Bluesky account to share content on the decentralized social network.",
-      permissions: ["Post on your behalf", "Access basic profile information"],
     },
   };
 

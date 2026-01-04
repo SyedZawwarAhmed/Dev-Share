@@ -32,7 +32,6 @@ type User = {
   // Social media profiles
   linkedinUrl?: string;
   twitterUrl?: string;
-  blueskyUrl?: string;
   githubUrl?: string;
 };
 

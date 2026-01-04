@@ -42,7 +42,7 @@ function RouteComponent() {
           ?.providerAccountId || "",
     },
     {
-      id: "X" as Platform,
+      id: "TWITTER" as Platform,
       name: "X (Twitter)",
       icon: <Twitter className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
@@ -51,28 +51,6 @@ function RouteComponent() {
         false,
       username:
         user?.accounts?.find((account) => account.provider === "TWITTER")
-          ?.providerAccountId || "",
-    },
-    {
-      id: "BLUESKY" as Platform,
-      name: "Bluesky",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z" fill="#0085FF" />
-        </svg>
-      ),
-      color: "bg-zinc-50 border-zinc-200",
-      isConnected:
-        user?.accounts?.some((account) => account.provider === "BLUESKY") ||
-        false,
-      username:
-        user?.accounts?.find((account) => account.provider === "BLUESKY")
           ?.providerAccountId || "",
     },
   ];

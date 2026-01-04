@@ -261,24 +261,6 @@ function RouteComponent() {
             <Twitter className="h-5 w-5 text-cyan-700" />
           </div>
         );
-      case "bluesky":
-        return (
-          <div className="rounded-lg border bg-muted p-2">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-            >
-              <path
-                d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-        );
       default:
         return null;
     }
@@ -290,10 +272,8 @@ function RouteComponent() {
         return "LinkedIn";
       case "twitter":
         return "X (Twitter)";
-      case "bluesky":
-        return "Bluesky";
       default:
-        return platform;
+        return "Unsupported platform";
     }
   };
 
@@ -361,7 +341,6 @@ function RouteComponent() {
                   <SelectItem value="all">All Platforms</SelectItem>
                   <SelectItem value="linkedin">LinkedIn</SelectItem>
                   <SelectItem value="twitter">X (Twitter)</SelectItem>
-                  <SelectItem value="bluesky">Bluesky</SelectItem>
                 </SelectContent>
               </Select>
 

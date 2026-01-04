@@ -109,24 +109,25 @@ function RouteComponent() {
   const [selectedPlatforms, setSelectedPlatforms] = useState({
     LINKEDIN: false,
     TWITTER: false,
-    BLUESKY: false,
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [generatedPosts, setGeneratedPosts] = useState({
     LINKEDIN: { post_content: "" },
     TWITTER: { post_content: "" },
-    BLUESKY: { post_content: "" },
   });
 
   const { mutateAsync: generatePosts, isPending: isGenerating } = useMutation({
     mutationFn: generatePostsService,
     onSuccess: (data) => {
-      setActiveTab(Object.keys(data)[0] as Platform);
+      // Ensure we land on a supported platform tab even if the backend returns extra keys
+      const nextActive =
+        (Object.keys(data) as string[]).find((key) => key === "LINKEDIN" || key === "TWITTER") ??
+        "LINKEDIN";
+      setActiveTab(nextActive as Platform);
       setSelectedPlatforms({
         LINKEDIN: !!data?.LINKEDIN?.post_content,
         TWITTER: !!data?.TWITTER?.post_content,
-        BLUESKY: !!data?.BLUESKY?.post_content,
       });
       setGeneratedPosts(data);
     },
@@ -332,44 +333,10 @@ function RouteComponent() {
                     </Label>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="BLUESKY"
-                      checked={selectedPlatforms.BLUESKY}
-                      onCheckedChange={(checked) =>
-                        handlePlatformChange("BLUESKY", checked as boolean)
-                      }
-                      disabled={
-                        !user?.accounts?.some(
-                          (account) => account.provider === "BLUESKY",
-                        )
-                      }
-                    />
-                    <Label
-                      htmlFor="BLUESKY"
-                      className={cn(
-                        "text-sm font-normal",
-                        !user?.accounts?.some(
-                          (account) => account.provider === "BLUESKY",
-                        )
-                          ? "text-muted-foreground cursor-not-allowed"
-                          : null,
-                      )}
-                    >
-                      Bluesky{" "}
-                      {!user?.accounts?.some(
-                        (account) => account.provider === "BLUESKY",
-                      ) ? (
-                        <span className="ml-1 text-xs text-muted-foreground">
-                          (Connect account first)
-                        </span>
-                      ) : null}
-                    </Label>
-                  </div>
                 </div>
 
                 {!user?.accounts?.some((account) =>
-                  ["LINKEDIN", "X", "BLUESKY"].includes(account.provider),
+                  ["LINKEDIN", "TWITTER"].includes(account.provider),
                 ) ? (
                   <div className="mt-2 rounded-xl border bg-amber-50 p-3">
                     <p className="text-sm text-amber-800">
@@ -453,7 +420,7 @@ function RouteComponent() {
                 value={activeTab}
                 onValueChange={(value) => setActiveTab(value as Platform)}
               >
-                <TabsList className="grid grid-cols-3 mb-4">
+                <TabsList className="grid grid-cols-2 mb-4">
                   <TabsTrigger
                     value="LINKEDIN"
                     className="flex items-center gap-1"
@@ -468,26 +435,6 @@ function RouteComponent() {
                     disabled={!selectedPlatforms.TWITTER}
                   >
                     <Twitter className="h-4 w-4" />X
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="BLUESKY"
-                    className="flex items-center gap-1"
-                    disabled={!selectedPlatforms.BLUESKY}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                    >
-                      <path
-                        d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                    Bluesky
                   </TabsTrigger>
                 </TabsList>
 
@@ -528,39 +475,6 @@ function RouteComponent() {
                         handlePostContentChange("TWITTER", e.target.value)
                       }
                       disabled={!selectedPlatforms.TWITTER || isGenerating}
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="BLUESKY" className="m-0">
-                  <div className="space-y-4">
-                    <Badge
-                      variant="outline"
-                      className="mb-2 bg-zinc-50 border-zinc-200"
-                    >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="mr-1 h-3 w-3"
-                      >
-                        <path
-                          d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                          fill="#0085FF"
-                        />
-                      </svg>
-                      Bluesky format
-                    </Badge>
-                    <Textarea
-                      placeholder="Bluesky post content will appear here"
-                      className="min-h-[260px]"
-                      value={generatedPosts?.BLUESKY?.post_content || ""}
-                      onChange={(e) =>
-                        handlePostContentChange("BLUESKY", e.target.value)
-                      }
-                      disabled={!selectedPlatforms.BLUESKY || isGenerating}
                     />
                   </div>
                 </TabsContent>

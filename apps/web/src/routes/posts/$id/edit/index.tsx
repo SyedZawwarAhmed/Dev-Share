@@ -72,28 +72,6 @@ function RouteComponent() {
             <Twitter className="h-3 w-3 mr-1 text-sky-500" />X Format
           </Badge>
         );
-      case "bluesky":
-        return (
-          <Badge
-            variant="outline"
-            className="mb-2 bg-zinc-50 border-zinc-200"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3 w-3 mr-1"
-            >
-              <path
-                d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                fill="#0085FF"
-              />
-            </svg>
-            Bluesky Format
-          </Badge>
-        );
       default:
         return null;
     }

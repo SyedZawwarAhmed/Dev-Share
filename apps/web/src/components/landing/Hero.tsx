@@ -29,8 +29,7 @@ export function Hero() {
           </h1>
           <p className="mt-5 mx-auto max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
             DevShare transforms your learning notes into platform-ready posts
-            for LinkedIn, X, and Bluesky so you can stay consistent while you
-            learn.
+            for LinkedIn and X so you can stay consistent while you learn.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-center">
@@ -39,7 +38,7 @@ export function Hero() {
                 size="lg"
                 className={cn(
                   "w-full bg-zinc-950 text-white hover:bg-zinc-900 sm:w-auto dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200",
-                  landingTheme.accentRing,
+                  landingTheme.accentRing
                 )}
               >
                 {isAuthenticated ? "Go to dashboard" : "Get started"}
@@ -52,7 +51,7 @@ export function Hero() {
                 variant="outline"
                 className={cn(
                   "w-full border-zinc-200 bg-white/60 text-zinc-900 hover:bg-white sm:w-auto",
-                  landingTheme.accentRing,
+                  landingTheme.accentRing
                 )}
               >
                 See how it works

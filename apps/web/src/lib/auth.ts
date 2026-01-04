@@ -42,8 +42,6 @@ export const getAuthUrl = (platform: Platform, userId?: string) => {
       return `${import.meta.env.VITE_API_URL}/auth/linkedin`;
     case "TWITTER":
       return `${import.meta.env.VITE_API_URL}/auth/twitter${userId ? `?userId=${userId}` : ''}`;
-    case "BLUESKY":
-      return `${import.meta.env.VITE_API_URL}/auth/bluesky`;
     default:
       return "#";
   }

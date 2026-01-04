@@ -17,7 +17,7 @@ function RouteComponent() {
   const { user } = useAuthStore();
 
   const hasConnectedPlatforms = user?.accounts?.some((account) =>
-    ["LINKEDIN", "X", "BLUESKY"].includes(account.provider),
+    ["LINKEDIN", "TWITTER"].includes(account.provider),
   );
 
   return (
@@ -48,7 +48,7 @@ function RouteComponent() {
                     Connect your platforms to start publishing
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Connect LinkedIn, X, or Bluesky to generate and schedule
+                    Connect LinkedIn or X to generate and schedule
                     posts straight from your notes.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">

@@ -80,30 +80,19 @@ function RouteComponent() {
             <Twitter className="h-3 w-3 mr-1 text-sky-500" />X
           </Badge>
         );
-      case "bluesky":
-        return (
-          <Badge
-            variant="outline"
-            className="mb-2 bg-zinc-50 border-zinc-200"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3 w-3 mr-1"
-            >
-              <path
-                d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                fill="#0085FF"
-              />
-            </svg>
-            Bluesky
-          </Badge>
-        );
       default:
         return null;
+    }
+  };
+
+  const getPlatformLabel = (platform?: string) => {
+    switch (platform) {
+      case "linkedin":
+        return "LinkedIn";
+      case "twitter":
+        return "X (Twitter)";
+      default:
+        return "Unsupported platform";
     }
   };
 
@@ -124,7 +113,7 @@ function RouteComponent() {
 
       <PageHeader
         title="Schedule post"
-        description={`Schedule your ${post?.platform} post for note: ${post?.note?.title ?? ""}`}
+        description={`Schedule your ${getPlatformLabel(post?.platform)} post for note: ${post?.note?.title ?? ""}`}
       />
 
       <div className="grid gap-8 lg:grid-cols-12">

@@ -223,39 +223,19 @@ function RouteComponent() {
             <Twitter className="h-5 w-5 text-sky-500" />
           </div>
         );
-      case "bluesky":
-        return (
-          <div className="p-2 bg-sky-100 rounded-lg">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-            >
-              <path
-                d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z"
-                fill="#0085FF"
-              />
-            </svg>
-          </div>
-        );
       default:
         return null;
     }
   };
 
-  const getPlatformName = (platform: Platform) => {
+  const getPlatformName = (platform: string) => {
     switch (platform) {
-      case "LINKEDIN":
+      case "linkedin":
         return "LinkedIn";
-      case "TWITTER":
+      case "twitter":
         return "X (Twitter)";
-      case "BLUESKY":
-        return "Bluesky";
       default:
-        return platform;
+        return "Unsupported platform";
     }
   };
 
@@ -350,7 +330,6 @@ function RouteComponent() {
                   <SelectItem value="all">All Platforms</SelectItem>
                   <SelectItem value="linkedin">LinkedIn</SelectItem>
                   <SelectItem value="twitter">X (Twitter)</SelectItem>
-                  <SelectItem value="bluesky">Bluesky</SelectItem>
                 </SelectContent>
               </Select>
 

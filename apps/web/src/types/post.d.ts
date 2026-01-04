@@ -1,4 +1,4 @@
-type Platform = "LINKEDIN" | "TWITTER" | "BLUESKY";
+type Platform = "LINKEDIN" | "TWITTER";
 
 type GeneratedPost = {
   post_content: string;

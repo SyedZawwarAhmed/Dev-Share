@@ -65,21 +65,19 @@ export default function ScheduledPosts() {
         return <Linkedin className="h-3 w-3 mr-1 text-blue-600" />;
       case "TWITTER":
         return <Twitter className="h-3 w-3 mr-1 text-sky-500" />;
-      case "BLUESKY":
-        return (
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-3 w-3 mr-1"
-          >
-            <path d="M8 0L14.9282 4V12L8 16L1.0718 12V4L8 0Z" fill="#0085FF" />
-          </svg>
-        );
       default:
         return null;
+    }
+  };
+
+  const getPlatformLabel = (platform: string) => {
+    switch (platform) {
+      case "LINKEDIN":
+        return "LinkedIn";
+      case "TWITTER":
+        return "X";
+      default:
+        return "Unsupported platform";
     }
   };
 
@@ -197,13 +195,7 @@ export default function ScheduledPosts() {
                         className="bg-muted/40"
                       >
                         {getPlatformIcon(post.platform)}
-                        {post.platform === "LINKEDIN"
-                          ? "LinkedIn"
-                          : post.platform === "TWITTER"
-                            ? "X"
-                            : post.platform === "BLUESKY"
-                              ? "Bluesky"
-                              : post.platform}
+                        {getPlatformLabel(post.platform)}
                       </Badge>
                     </div>
                   </div>
@@ -247,13 +239,7 @@ export default function ScheduledPosts() {
                         className="bg-muted/40"
                       >
                         {getPlatformIcon(post.platform)}
-                        {post.platform === "LINKEDIN"
-                          ? "LinkedIn"
-                          : post.platform === "TWITTER"
-                            ? "X"
-                            : post.platform === "BLUESKY"
-                              ? "Bluesky"
-                              : post.platform}
+                        {getPlatformLabel(post.platform)}
                       </Badge>
                     </div>
                     <div className="flex gap-2">

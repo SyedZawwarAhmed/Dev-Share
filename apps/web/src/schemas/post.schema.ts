@@ -10,10 +10,10 @@ export const createPostSchema = z
       })
       .min(1, "Content cannot be empty"),
 
-    platform: z.enum(["LINKEDIN", "TWITTER", "BLUESKY"], {
+    platform: z.enum(["LINKEDIN", "TWITTER"], {
       required_error: "Platform is required",
       invalid_type_error:
-        "Platform must be either 'linkedin', 'twitter', or 'bluesky'",
+        "Platform must be either 'LINKEDIN' or 'TWITTER'",
     }),
 
     published: z.boolean({
@@ -95,9 +95,9 @@ export const updatePostSchema = z.object({
     })
     .min(1, "Content cannot be empty"),
 
-  platform: z.enum(["LINKEDIN", "TWITTER", "BLUESKY"], {
+  platform: z.enum(["LINKEDIN", "TWITTER"], {
     required_error: "Platform is required",
-    invalid_type_error: "Platform must be either 'linkedin', 'twitter', or 'bluesky'",
+    invalid_type_error: "Platform must be either 'LINKEDIN' or 'TWITTER'",
   }),
 
   published: z.boolean({
@@ -189,9 +189,9 @@ export const getPostsFiltersSchema = z.object({
     })
     .optional(),
   platform: z
-    .enum(["linkedin", "twitter", "bluesky"], {
+    .enum(["linkedin", "twitter"], {
       invalid_type_error:
-        "Platform must be either 'linkedin', 'twitter', or 'bluesky'",
+        "Platform must be either 'linkedin' or 'twitter'",
     })
     .optional(),
   noteId: z
