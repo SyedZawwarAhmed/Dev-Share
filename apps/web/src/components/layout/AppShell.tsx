@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
-  Bell,
   LayoutDashboard,
   LogOut,
   Menu,
