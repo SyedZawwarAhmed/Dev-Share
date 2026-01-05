@@ -45,7 +45,7 @@ export function Hero() {
 
           <Reveal delay={0.15}>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:items-center">
-              <Link to={primaryTo}>
+              <Link to={primaryTo} className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   className={cn(
