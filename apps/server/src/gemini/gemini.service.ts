@@ -43,7 +43,7 @@ export class GeminiService {
     const prompt = this.buildPrompt(content, platform);
     try {
       const response = await this.ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash-lite',
         config: {
           responseMimeType: 'application/json',
           responseSchema: {
