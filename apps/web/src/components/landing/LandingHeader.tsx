@@ -18,7 +18,7 @@ export function LandingHeader() {
           <span className="text-sm font-semibold tracking-tight">DevShare</span>
         </Link>
 
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-4">
           <a
             href="#features"
             className={cn(
@@ -64,5 +64,3 @@ export function LandingHeader() {
     </header>
   );
 }
-
-
