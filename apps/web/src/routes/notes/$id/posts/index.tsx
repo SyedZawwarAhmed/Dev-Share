@@ -20,7 +20,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
 import { getPostsService, publishPostService } from "@/api/post.service";
@@ -220,7 +221,7 @@ function RouteComponent() {
       case "twitter":
         return (
           <div className="p-2 bg-sky-100 rounded-lg">
-            <Twitter className="h-5 w-5 text-sky-500" />
+            <XIcon className="h-5 w-5 text-slate-900" />
           </div>
         );
       default:

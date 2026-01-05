@@ -30,7 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { getPostsService, publishPostService, deletePostService, markAsPublishedService } from "@/api/post.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
@@ -258,7 +259,7 @@ function RouteComponent() {
       case "twitter":
         return (
           <div className="rounded-lg border bg-muted p-2">
-            <Twitter className="h-5 w-5 text-cyan-700" />
+            <XIcon className="h-5 w-5 text-slate-900" />
           </div>
         );
       default:

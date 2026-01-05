@@ -13,7 +13,8 @@ import { useAuthStore } from "@/stores/auth.store";
 import { Label } from "@radix-ui/react-label";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Linkedin, Loader2, Save, Twitter, Wand2 } from "lucide-react";
+import { Linkedin, Loader2, Save, Wand2 } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
@@ -434,7 +435,7 @@ function RouteComponent() {
                     className="flex items-center gap-1"
                     disabled={!selectedPlatforms.TWITTER}
                   >
-                    <Twitter className="h-4 w-4" />X
+                    <XIcon className="h-4 w-4" />X
                   </TabsTrigger>
                 </TabsList>
 
@@ -465,7 +466,7 @@ function RouteComponent() {
                       variant="outline"
                       className="mb-2 bg-sky-50 border-sky-200"
                     >
-                      <Twitter className="mr-1 h-3 w-3 text-sky-500" />X format
+                      <XIcon className="mr-1 h-3 w-3 text-slate-900" />X format
                     </Badge>
                     <Textarea
                       placeholder="X post content will appear here"

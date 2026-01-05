@@ -4,6 +4,8 @@ import {
   Body,
   UseGuards,
   Get,
+  Delete,
+  Param,
   Req,
   Res,
 } from '@nestjs/common';
@@ -143,5 +145,11 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtOAuthGuard)
+  @Delete('disconnect/:provider')
+  async disconnectAccount(@Req() req, @Param('provider') provider: string) {
+    return this.authService.disconnectAccount(req.user.id, provider);
   }
 }

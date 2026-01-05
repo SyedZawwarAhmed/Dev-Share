@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -77,7 +78,7 @@ function RouteComponent() {
       case "twitter":
         return (
           <Badge variant="outline" className="mb-2 bg-sky-50 border-sky-200">
-            <Twitter className="h-3 w-3 mr-1 text-sky-500" />X
+            <XIcon className="h-3 w-3 mr-1 text-slate-900" />X
           </Badge>
         );
       default:

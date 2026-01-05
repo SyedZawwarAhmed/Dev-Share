@@ -301,4 +301,22 @@ export class AuthService {
     const { password: _, ...result } = user;
     return { user: result, token };
   }
+
+  async disconnectAccount(userId: string, provider: string) {
+    await this.prisma.account.deleteMany({
+      where: {
+        userId,
+        provider,
+      },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        accounts: true,
+      },
+    });
+
+    return user;
+  }
 }

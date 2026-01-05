@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { getPostService, updatePostService } from "@/api/post.service";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -69,7 +70,7 @@ function RouteComponent() {
       case "twitter":
         return (
           <Badge variant="outline" className="mb-2 bg-sky-50 border-sky-200">
-            <Twitter className="h-3 w-3 mr-1 text-sky-500" />X Format
+            <XIcon className="h-3 w-3 mr-1 text-slate-900" />X Format
           </Badge>
         );
       default:

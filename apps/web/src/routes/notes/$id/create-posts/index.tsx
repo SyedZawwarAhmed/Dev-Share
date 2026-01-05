@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -343,7 +344,7 @@ function RouteComponent() {
                   className="flex items-center gap-1"
                   disabled={!selectedPlatforms.TWITTER}
                 >
-                  <Twitter className="h-4 w-4" />X
+                  <XIcon className="h-4 w-4" />X
                 </TabsTrigger>
               </TabsList>
 
@@ -375,7 +376,7 @@ function RouteComponent() {
                     variant="outline"
                     className="mb-2 bg-sky-50 border-sky-200"
                   >
-                    <Twitter className="h-3 w-3 mr-1 text-sky-500" />X Format
+                    <XIcon className="h-3 w-3 mr-1 text-slate-900" />X Format
                   </Badge>
 
                   <Textarea

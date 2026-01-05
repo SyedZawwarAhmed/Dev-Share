@@ -5,14 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Linkedin,
-  Twitter,
   ExternalLink,
   CheckCircle2,
   XCircle,
+  RefreshCw,
+  Unlink,
 } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { useAuthStore } from "@/stores/auth.store";
 import { toast } from "sonner";
 import PlatformAuthModal from "@/components/platform-auth-modal";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { disconnectAccountService } from "@/api/auth.service";
+import { getAuthUrl } from "@/lib/auth";
 import { Page } from "@/components/layout/Page";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Divider } from "@/components/layout/Divider";
@@ -23,10 +29,59 @@ export const Route = createFileRoute("/connected-platforms/")({
 });
 
 function RouteComponent() {
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedPlatform, setSelectedPlatform] =
     useState<Platform>("LINKEDIN");
+  const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
+  const [showReconnectDialog, setShowReconnectDialog] = useState(false);
+  const [actionPlatform, setActionPlatform] = useState<Platform | null>(null);
+  const queryClient = useQueryClient();
+
+  const { mutate: disconnectAccount, isPending: isDisconnecting } = useMutation(
+    {
+      mutationFn: (provider: string) => disconnectAccountService(provider),
+      onSuccess: (updatedUser) => {
+        setUser(updatedUser);
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        toast.success("Account disconnected successfully");
+        setShowDisconnectDialog(false);
+        setActionPlatform(null);
+      },
+      onError: () => {
+        toast.error("Failed to disconnect account");
+      },
+    }
+  );
+
+  const openDisconnectDialog = (platform: Platform) => {
+    setActionPlatform(platform);
+    setShowDisconnectDialog(true);
+  };
+
+  const openReconnectDialog = (platform: Platform) => {
+    setActionPlatform(platform);
+    setShowReconnectDialog(true);
+  };
+
+  const handleDisconnect = () => {
+    if (actionPlatform) {
+      disconnectAccount(actionPlatform);
+    }
+  };
+
+  const handleReconnect = () => {
+    if (actionPlatform) {
+      const userId = actionPlatform === "TWITTER" ? user?.id : undefined;
+      window.location.href = getAuthUrl(actionPlatform, userId);
+    }
+  };
+
+  const getPlatformName = (platform: Platform | null) => {
+    if (platform === "LINKEDIN") return "LinkedIn";
+    if (platform === "TWITTER") return "X (Twitter)";
+    return "";
+  };
 
   const platforms = [
     {
@@ -44,7 +99,7 @@ function RouteComponent() {
     {
       id: "TWITTER" as Platform,
       name: "X (Twitter)",
-      icon: <Twitter className="h-6 w-6 text-slate-900" />,
+      icon: <XIcon className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
       isConnected:
         user?.accounts?.some((account) => account.provider === "TWITTER") ||
@@ -157,14 +212,34 @@ function RouteComponent() {
               </div>
 
               <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-                <Button
-                  onClick={() => handleConnectPlatform(platform.id)}
-                  variant={platform.isConnected ? "outline" : "gradient"}
-                >
-                  {platform.isConnected
-                    ? "Reconnect"
-                    : `Connect ${platform.name}`}
-                </Button>
+                {platform.isConnected ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openReconnectDialog(platform.id)}
+                    >
+                      <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                      Reconnect
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => openDisconnectDialog(platform.id)}
+                    >
+                      <Unlink className="mr-1.5 h-3.5 w-3.5" />
+                      Disconnect
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => handleConnectPlatform(platform.id)}
+                    variant="gradient"
+                  >
+                    Connect {platform.name}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -191,6 +266,27 @@ function RouteComponent() {
         onClose={() => setShowAuthModal(false)}
         platform={selectedPlatform}
         onAuthComplete={handleAuthComplete}
+      />
+
+      <ConfirmationDialog
+        open={showDisconnectDialog}
+        onOpenChange={setShowDisconnectDialog}
+        title={`Disconnect ${getPlatformName(actionPlatform)}?`}
+        description={`Are you sure you want to disconnect your ${getPlatformName(actionPlatform)} account? You won't be able to post to this platform until you reconnect.`}
+        confirmText="Disconnect"
+        confirmVariant="destructive"
+        onConfirm={handleDisconnect}
+        loading={isDisconnecting}
+      />
+
+      <ConfirmationDialog
+        open={showReconnectDialog}
+        onOpenChange={setShowReconnectDialog}
+        title={`Reconnect ${getPlatformName(actionPlatform)}?`}
+        description={`You will be redirected to ${getPlatformName(actionPlatform)} to re-authorize your account. This will refresh your access tokens.`}
+        confirmText="Reconnect"
+        confirmVariant="gradient"
+        onConfirm={handleReconnect}
       />
     </Page>
   );

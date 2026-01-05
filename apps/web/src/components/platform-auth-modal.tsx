@@ -8,10 +8,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ExternalLink, Shield } from "lucide-react";
-import { Linkedin, Twitter } from "lucide-react";
+import {
+  CheckCircle2,
+  ExternalLink,
+  Shield,
+  Loader2,
+  Unlink,
+} from "lucide-react";
+import { Linkedin } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { useAuthStore } from "@/stores/auth.store";
 import { getAuthUrl } from "@/lib/auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { disconnectAccountService } from "@/api/auth.service";
+import { toast } from "sonner";
 
 interface PlatformAuthModalProps {
   isOpen: boolean;
@@ -25,7 +35,8 @@ export default function PlatformAuthModal({
   onClose,
   platform,
 }: PlatformAuthModalProps) {
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
+  const queryClient = useQueryClient();
 
   // Map frontend platform to backend provider
   const getProviderName = (platform: Platform) => {
@@ -35,6 +46,21 @@ export default function PlatformAuthModal({
 
   const isAuthenticated = user?.accounts?.some(
     (userAccount) => userAccount.provider === getProviderName(platform)
+  );
+
+  const { mutate: disconnectAccount, isPending: isDisconnecting } = useMutation(
+    {
+      mutationFn: () => disconnectAccountService(getProviderName(platform)),
+      onSuccess: (updatedUser) => {
+        setUser(updatedUser);
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        toast.success(`${platformConfig[platform].name} account disconnected`);
+        onClose();
+      },
+      onError: () => {
+        toast.error("Failed to disconnect account");
+      },
+    }
   );
 
   const platformConfig = {
@@ -48,7 +74,7 @@ export default function PlatformAuthModal({
     },
     TWITTER: {
       name: "X (Twitter)",
-      icon: <Twitter className="h-6 w-6 text-slate-900" />,
+      icon: <XIcon className="h-6 w-6 text-slate-900" />,
       color: "bg-slate-50 border-slate-200",
       description:
         "Connect your X account to share quick updates and engage with the developer community.",
@@ -134,10 +160,24 @@ export default function PlatformAuthModal({
             Cancel
           </Button>
           {isAuthenticated ? (
-            <Button onClick={handleAuth} variant="gradient">
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Reconnect {config.name}
-            </Button>
+            <>
+              <Button
+                variant="destructive"
+                onClick={() => disconnectAccount()}
+                disabled={isDisconnecting}
+              >
+                {isDisconnecting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Unlink className="mr-2 h-4 w-4" />
+                )}
+                Disconnect
+              </Button>
+              <Button onClick={handleAuth} variant="gradient">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Reconnect
+              </Button>
+            </>
           ) : (
             <Button onClick={handleAuth} variant="gradient">
               <ExternalLink className="mr-2 h-4 w-4" />

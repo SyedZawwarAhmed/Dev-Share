@@ -6,9 +6,9 @@ import {
   Edit,
   Linkedin,
   MoreHorizontal,
-  Twitter,
   Loader2,
 } from "lucide-react";
+import { XIcon } from "@/components/ui/x-icon";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +64,7 @@ export default function ScheduledPosts() {
       case "LINKEDIN":
         return <Linkedin className="h-3 w-3 mr-1 text-blue-600" />;
       case "TWITTER":
-        return <Twitter className="h-3 w-3 mr-1 text-sky-500" />;
+        return <XIcon className="h-3 w-3 mr-1 text-slate-900" />;
       default:
         return null;
     }
