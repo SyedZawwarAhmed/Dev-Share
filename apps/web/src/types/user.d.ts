@@ -4,6 +4,7 @@ type Account = {
   type: string; // oauth, email, etc
   provider: string; // google, github, email, etc
   providerAccountId: string;
+  username?: string;
   refresh_token?: string;
   access_token?: string;
   expires_at?: number;
@@ -20,15 +21,15 @@ type User = {
   lastName?: string;
   username?: string;
   profileImage?: string;
-  role: 'USER' | 'ADMIN' | 'MODERATOR';
+  role: "USER" | "ADMIN" | "MODERATOR";
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
-  
+
   // Authentication related fields
   accounts?: Account[];
-  
+
   // Social media profiles
   linkedinUrl?: string;
   twitterUrl?: string;

@@ -52,6 +52,7 @@ model Account {
   type              String // oauth, email, etc
   provider          String // google, github, email, etc
   providerAccountId String
+  username          String?
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?

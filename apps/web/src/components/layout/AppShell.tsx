@@ -57,7 +57,8 @@ const navItems: NavItem[] = [
     to: "/connected-platforms",
     label: "Platforms",
     icon: Plug,
-    isActive: (p) => p === "/connected-platforms" || p.startsWith("/connected-platforms/"),
+    isActive: (p) =>
+      p === "/connected-platforms" || p.startsWith("/connected-platforms/"),
   },
 ];
 
@@ -109,7 +110,15 @@ function AppSidebar({ pathname }: { pathname: string }) {
   );
 }
 
-function MobileNav({ open, onOpenChange, pathname }: { open: boolean; onOpenChange: (v: boolean) => void; pathname: string }) {
+function MobileNav({
+  open,
+  onOpenChange,
+  pathname,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  pathname: string;
+}) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 sm:max-w-sm">
@@ -194,7 +203,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Menu className="h-5 w-5" />
               </Button>
               <div className="hidden sm:block">
-                <p className="text-sm font-medium text-foreground">Welcome back</p>
+                <p className="text-sm font-medium text-foreground">
+                  Welcome back
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {user?.firstName
                     ? `${user.firstName} ${user.lastName ?? ""}`.trim()
@@ -203,16 +214,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Link to="/new-note">
                 <Button variant="gradient" className="hidden sm:inline-flex">
                   New note
                 </Button>
               </Link>
 
-              <Button variant="ghost" size="icon" aria-label="Notifications">
+              {/* <Button variant="ghost" size="icon" aria-label="Notifications">
                 <Bell className="h-5 w-5" />
-              </Button>
+              </Button> */}
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -231,10 +242,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <p className="text-sm font-medium leading-none">
                       {user?.firstName} {user?.lastName}
                     </p>
-                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
+                  <DropdownMenuItem
+                    className="text-red-600"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Log out
                   </DropdownMenuItem>
@@ -244,7 +260,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <MobileNav open={mobileOpen} onOpenChange={setMobileOpen} pathname={pathname} />
+        <MobileNav
+          open={mobileOpen}
+          onOpenChange={setMobileOpen}
+          pathname={pathname}
+        />
 
         {/* Content */}
         <div className="flex-1">{children}</div>
@@ -252,5 +272,3 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
-

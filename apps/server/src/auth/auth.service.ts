@@ -113,7 +113,10 @@ export class AuthService {
   }
 
   async linkedinLogin(profile: any) {
-    const { email, accessToken, id } = profile;
+    console.log('linkedinLogin', profile);
+    const { email, accessToken, id, firstName, lastName } = profile;
+    const displayName =
+      [firstName, lastName].filter(Boolean).join(' ') || undefined;
 
     const user = await this.prisma.user.update({
       where: { email },
@@ -131,9 +134,11 @@ export class AuthService {
               provider: AuthProvider.LINKEDIN,
               providerAccountId: id,
               access_token: accessToken,
+              username: displayName,
             },
             update: {
               access_token: accessToken,
+              username: displayName,
             },
           },
         },
@@ -147,7 +152,7 @@ export class AuthService {
   }
 
   async linkTwitterAccount(userId: string, twitterProfile: any) {
-    const { accessToken, refreshToken, id } = twitterProfile;
+    const { accessToken, refreshToken, id, username } = twitterProfile;
 
     const user = await this.prisma.user.update({
       where: { id: userId },
@@ -166,10 +171,12 @@ export class AuthService {
               providerAccountId: id,
               access_token: accessToken,
               refresh_token: refreshToken,
+              username: username,
             },
             update: {
               access_token: accessToken,
               refresh_token: refreshToken,
+              username: username,
             },
           },
         },
@@ -183,8 +190,18 @@ export class AuthService {
   }
 
   async twitterLogin(profile: any) {
-    const { email, firstName, lastName, username, profileImage, accessToken, refreshToken, id } = profile;
-    
+    console.log('twitterLogin', profile);
+    const {
+      email,
+      firstName,
+      lastName,
+      username,
+      profileImage,
+      accessToken,
+      refreshToken,
+      id,
+    } = profile;
+
     // First, try to find existing account
     const existingAccount = await this.prisma.account.findUnique({
       where: {
@@ -209,6 +226,7 @@ export class AuthService {
         data: {
           access_token: accessToken,
           refresh_token: refreshToken,
+          username,
         },
       });
 
@@ -231,6 +249,7 @@ export class AuthService {
             providerAccountId: id,
             access_token: accessToken,
             refresh_token: refreshToken,
+            username: username,
           },
         },
       },

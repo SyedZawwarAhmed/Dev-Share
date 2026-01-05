@@ -39,7 +39,7 @@ function RouteComponent() {
         false,
       username:
         user?.accounts?.find((account) => account.provider === "LINKEDIN")
-          ?.providerAccountId || "",
+          ?.username || "",
     },
     {
       id: "TWITTER" as Platform,
@@ -51,7 +51,7 @@ function RouteComponent() {
         false,
       username:
         user?.accounts?.find((account) => account.provider === "TWITTER")
-          ?.providerAccountId || "",
+          ?.username || "",
     },
   ];
 
@@ -87,7 +87,8 @@ function RouteComponent() {
                 No platforms connected
               </h3>
               <p className="text-sm text-muted-foreground">
-                Connect at least one social media platform to start sharing your learning posts.
+                Connect at least one social media platform to start sharing your
+                learning posts.
               </p>
             </div>
           </div>
@@ -104,7 +105,10 @@ function RouteComponent() {
         <Divider />
         <div className="divide-y">
           {platforms.map((platform) => (
-            <div key={platform.id} className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              key={platform.id}
+              className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
+            >
               <div className="flex items-start gap-3">
                 <div className={`p-2 rounded-xl border ${platform.color}`}>
                   {platform.icon}
@@ -113,7 +117,10 @@ function RouteComponent() {
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{platform.name}</p>
                     {platform.isConnected ? (
-                      <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 border-green-200 text-green-700"
+                      >
                         <CheckCircle2 className="mr-1 h-3 w-3" />
                         Connected
                       </Badge>
@@ -133,8 +140,12 @@ function RouteComponent() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium">{platform.username}</p>
-                        <p className="text-xs text-muted-foreground">Connected account</p>
+                        <p className="text-sm font-medium">
+                          {platform.username}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Connected account
+                        </p>
                       </div>
                     </div>
                   ) : (
@@ -150,7 +161,9 @@ function RouteComponent() {
                   onClick={() => handleConnectPlatform(platform.id)}
                   variant={platform.isConnected ? "outline" : "gradient"}
                 >
-                  {platform.isConnected ? "Reconnect" : `Connect ${platform.name}`}
+                  {platform.isConnected
+                    ? "Reconnect"
+                    : `Connect ${platform.name}`}
                 </Button>
               </div>
             </div>

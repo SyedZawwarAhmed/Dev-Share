@@ -24,7 +24,6 @@ export default function PlatformAuthModal({
   isOpen,
   onClose,
   platform,
-  onAuthComplete,
 }: PlatformAuthModalProps) {
   const { user } = useAuthStore();
 
@@ -65,11 +64,6 @@ export default function PlatformAuthModal({
   const handleAuth = () => {
     const userId = platform === "TWITTER" ? user?.id : undefined;
     window.location.href = getAuthUrl(platform, userId);
-  };
-
-  const handleContinue = () => {
-    onAuthComplete();
-    onClose();
   };
 
   return (
@@ -140,29 +134,14 @@ export default function PlatformAuthModal({
             Cancel
           </Button>
           {isAuthenticated ? (
-            <Button
-              onClick={handleContinue}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Continue
+            <Button onClick={handleAuth} variant="gradient">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Reconnect {config.name}
             </Button>
           ) : (
-            <Button
-              onClick={handleAuth}
-              // disabled={isAuthenticating}
-              variant="gradient"
-            >
-              {/* {isAuthenticating ? ( */}
-              {/*   <> */}
-              {/*     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
-              {/*     Connecting... */}
-              {/*   </> */}
-              {/* ) : ( */}
-              <>
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Connect {config.name}
-              </>
-              {/* )} */}
+            <Button onClick={handleAuth} variant="gradient">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Connect {config.name}
             </Button>
           )}
         </DialogFooter>
