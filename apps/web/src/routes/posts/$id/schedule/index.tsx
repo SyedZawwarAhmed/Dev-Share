@@ -15,6 +15,7 @@ import { fromZodError } from "zod-validation-error";
 import { ZodError } from "zod";
 import { Page } from "@/components/layout/Page";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { getPlatformName } from "@/lib/utils";
 import { Divider } from "@/components/layout/Divider";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
@@ -86,17 +87,6 @@ function RouteComponent() {
     }
   };
 
-  const getPlatformLabel = (platform?: string) => {
-    switch (platform) {
-      case "linkedin":
-        return "LinkedIn";
-      case "twitter":
-        return "X (Twitter)";
-      default:
-        return "Unsupported platform";
-    }
-  };
-
   // Get today's date in YYYY-MM-DD format for min attribute
   const today = new Date().toISOString().split("T")[0];
 
@@ -114,20 +104,29 @@ function RouteComponent() {
 
       <PageHeader
         title="Schedule post"
-        description={`Schedule your ${getPlatformLabel(post?.platform)} post for note: ${post?.note?.title ?? ""}`}
+        description={`Schedule your ${getPlatformName(post?.platform)} post for note: ${post?.note?.title ?? ""}`}
       />
 
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <div className="rounded-2xl border bg-card">
             <div className="px-6 py-5">
-              <SectionHeader title="Preview" description="Double-check the content before scheduling." />
+              <SectionHeader
+                title="Preview"
+                description="Double-check the content before scheduling."
+              />
             </div>
             <Divider />
             <div className="px-6 py-5 space-y-4">
-              {post ? <div className="flex items-center gap-2">{getPlatformIcon(post.platform)}</div> : null}
+              {post ? (
+                <div className="flex items-center gap-2">
+                  {getPlatformIcon(post.platform)}
+                </div>
+              ) : null}
               <div className="rounded-xl border bg-muted/20 p-4">
-                <p className="whitespace-pre-line text-sm text-foreground">{post?.content}</p>
+                <p className="whitespace-pre-line text-sm text-foreground">
+                  {post?.content}
+                </p>
               </div>
             </div>
           </div>
@@ -136,7 +135,10 @@ function RouteComponent() {
         <div className="lg:col-span-5">
           <div className="rounded-2xl border bg-card">
             <div className="px-6 py-5">
-              <SectionHeader title="Schedule" description="Pick a date and time." />
+              <SectionHeader
+                title="Schedule"
+                description="Pick a date and time."
+              />
             </div>
             <Divider />
             <div className="px-6 py-5 space-y-4">
@@ -171,7 +173,8 @@ function RouteComponent() {
 
               <div className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground">
                 <p>
-                  <strong>Tip:</strong> Weekdays during working hours tend to perform well for professional content.
+                  <strong>Tip:</strong> Weekdays during working hours tend to
+                  perform well for professional content.
                 </p>
               </div>
             </div>
@@ -180,7 +183,11 @@ function RouteComponent() {
               <Link to="/posts">
                 <Button variant="outline">Cancel</Button>
               </Link>
-              <Button onClick={() => schedulePost()} variant="gradient" disabled={isScheduling}>
+              <Button
+                onClick={() => schedulePost()}
+                variant="gradient"
+                disabled={isScheduling}
+              >
                 {isScheduling ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -19,6 +19,7 @@ import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { disconnectAccountService } from "@/api/auth.service";
 import { getAuthUrl } from "@/lib/auth";
+import { getPlatformName } from "@/lib/utils";
 import { Page } from "@/components/layout/Page";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Divider } from "@/components/layout/Divider";
@@ -75,12 +76,6 @@ function RouteComponent() {
       const userId = actionPlatform === "TWITTER" ? user?.id : undefined;
       window.location.href = getAuthUrl(actionPlatform, userId);
     }
-  };
-
-  const getPlatformName = (platform: Platform | null) => {
-    if (platform === "LINKEDIN") return "LinkedIn";
-    if (platform === "TWITTER") return "X (Twitter)";
-    return "";
   };
 
   const platforms = [

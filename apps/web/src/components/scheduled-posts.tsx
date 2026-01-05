@@ -25,6 +25,7 @@ import { formatDate } from "@/lib/date-time";
 import { POST_STATUSES } from "@/constants/post";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { Divider } from "@/components/layout/Divider";
+import { getPlatformName } from "@/lib/utils";
 
 export default function ScheduledPosts() {
   const [, setActiveTab] = useState("upcoming");
@@ -67,17 +68,6 @@ export default function ScheduledPosts() {
         return <XIcon className="h-3 w-3 mr-1 text-slate-900" />;
       default:
         return null;
-    }
-  };
-
-  const getPlatformLabel = (platform: string) => {
-    switch (platform) {
-      case "LINKEDIN":
-        return "LinkedIn";
-      case "TWITTER":
-        return "X";
-      default:
-        return "Unsupported platform";
     }
   };
 
@@ -195,7 +185,7 @@ export default function ScheduledPosts() {
                         className="bg-muted/40"
                       >
                         {getPlatformIcon(post.platform)}
-                        {getPlatformLabel(post.platform)}
+                        {getPlatformName(post.platform)}
                       </Badge>
                     </div>
                   </div>
@@ -239,7 +229,7 @@ export default function ScheduledPosts() {
                         className="bg-muted/40"
                       >
                         {getPlatformIcon(post.platform)}
-                        {getPlatformLabel(post.platform)}
+                        {getPlatformName(post.platform)}
                       </Badge>
                     </div>
                     <div className="flex gap-2">

@@ -19,7 +19,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { LinkedInReauthDialog } from "@/components/linkedin-reauth-dialog";
 import {
@@ -32,9 +39,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Linkedin } from "lucide-react";
 import { XIcon } from "@/components/ui/x-icon";
-import { getPostsService, publishPostService, deletePostService, markAsPublishedService } from "@/api/post.service";
+import {
+  getPostsService,
+  publishPostService,
+  deletePostService,
+  markAsPublishedService,
+} from "@/api/post.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStatusBadge } from "@/components/status-badge";
+import { getPlatformName } from "@/lib/utils";
 import { toast } from "sonner";
 import { useConfigStore } from "@/stores/config.store";
 import { useDebounce } from "@/lib/hooks";
@@ -48,11 +61,11 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/posts/")({
   component: RouteComponent,
-  validateSearch: (search?: { 
-    search?: string; 
-    status?: string; 
-    platform?: string; 
-    sortBy?: string; 
+  validateSearch: (search?: {
+    search?: string;
+    status?: string;
+    platform?: string;
+    sortBy?: string;
   }) => {
     const result: {
       search?: string;
@@ -90,9 +103,11 @@ function RouteComponent() {
     },
     onError: (error: any) => {
       // Check if it's a LinkedIn authentication error based on 400 status + LinkedIn message
-      const isLinkedInAuthError = error?.response?.status === 400 && 
-        (error?.message?.includes('LinkedIn') || error?.response?.data?.message?.includes('LinkedIn'));
-      
+      const isLinkedInAuthError =
+        error?.response?.status === 400 &&
+        (error?.message?.includes("LinkedIn") ||
+          error?.response?.data?.message?.includes("LinkedIn"));
+
       if (isLinkedInAuthError) {
         setShowLinkedInReauthDialog(true);
       } else {
@@ -125,27 +140,32 @@ function RouteComponent() {
     },
   });
 
-  const { mutate: markAsPublished, isPending: isMarkingAsPublished } = useMutation({
-    mutationFn: markAsPublishedService,
-    onSuccess: () => {
-      toast.success("Post marked as published!");
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-    },
-    onError: (error) => {
-      console.error("Error marking post as published:", error);
-      toast.error("Failed to mark post as published. Please try again.");
-    },
-    onSettled: (_, __, variables) => {
-      setMarkPublishedDialogs((prev) => ({
-        ...prev,
-        [variables]: false,
-      }));
-    },
-  });
+  const { mutate: markAsPublished, isPending: isMarkingAsPublished } =
+    useMutation({
+      mutationFn: markAsPublishedService,
+      onSuccess: () => {
+        toast.success("Post marked as published!");
+        queryClient.invalidateQueries({ queryKey: ["posts"] });
+      },
+      onError: (error) => {
+        console.error("Error marking post as published:", error);
+        toast.error("Failed to mark post as published. Please try again.");
+      },
+      onSettled: (_, __, variables) => {
+        setMarkPublishedDialogs((prev) => ({
+          ...prev,
+          [variables]: false,
+        }));
+      },
+    });
 
   const [searchInput, setSearchInput] = useState(searchParams?.search || "");
-  const [statusFilter, setStatusFilter] = useState(searchParams?.status || "all");
-  const [platformFilter, setPlatformFilter] = useState(searchParams?.platform || "all");
+  const [statusFilter, setStatusFilter] = useState(
+    searchParams?.status || "all"
+  );
+  const [platformFilter, setPlatformFilter] = useState(
+    searchParams?.platform || "all"
+  );
   const [sortBy, setSortBy] = useState(searchParams?.sortBy || "newest");
 
   const debouncedSearch = useDebounce(searchInput, 300);
@@ -159,7 +179,8 @@ function RouteComponent() {
     [key: string]: boolean;
   }>({});
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [showLinkedInReauthDialog, setShowLinkedInReauthDialog] = useState(false);
+  const [showLinkedInReauthDialog, setShowLinkedInReauthDialog] =
+    useState(false);
 
   useEffect(() => {
     const newSearch: {
@@ -168,17 +189,19 @@ function RouteComponent() {
       platform?: string;
       sortBy?: string;
     } = {};
-    
+
     if (debouncedSearch) newSearch.search = debouncedSearch;
     if (statusFilter !== "all") newSearch.status = statusFilter;
     if (platformFilter !== "all") newSearch.platform = platformFilter;
     if (sortBy !== "newest") newSearch.sortBy = sortBy;
 
     const currentSearch = searchParams || {};
-    const hasChanged = 
+    const hasChanged =
       currentSearch.search !== (debouncedSearch || undefined) ||
-      currentSearch.status !== (statusFilter !== "all" ? statusFilter : undefined) ||
-      currentSearch.platform !== (platformFilter !== "all" ? platformFilter : undefined) ||
+      currentSearch.status !==
+        (statusFilter !== "all" ? statusFilter : undefined) ||
+      currentSearch.platform !==
+        (platformFilter !== "all" ? platformFilter : undefined) ||
       currentSearch.sortBy !== (sortBy !== "newest" ? sortBy : undefined);
 
     if (hasChanged) {
@@ -188,7 +211,14 @@ function RouteComponent() {
         replace: true,
       });
     }
-  }, [debouncedSearch, statusFilter, platformFilter, sortBy, searchParams, navigate]);
+  }, [
+    debouncedSearch,
+    statusFilter,
+    platformFilter,
+    sortBy,
+    searchParams,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (searchParams?.search !== searchInput) {
@@ -217,11 +247,15 @@ function RouteComponent() {
       }
 
       if (statusFilter !== "all") {
-        filters.status = statusFilter as z.infer<typeof getPostsFiltersSchema>["status"];
+        filters.status = statusFilter as z.infer<
+          typeof getPostsFiltersSchema
+        >["status"];
       }
 
       if (platformFilter !== "all") {
-        filters.platform = platformFilter as z.infer<typeof getPostsFiltersSchema>["platform"];
+        filters.platform = platformFilter as z.infer<
+          typeof getPostsFiltersSchema
+        >["platform"];
       }
 
       return getPostsService(filters);
@@ -267,17 +301,6 @@ function RouteComponent() {
     }
   };
 
-  const getPlatformName = (platform: string) => {
-    switch (platform) {
-      case "linkedin":
-        return "LinkedIn";
-      case "twitter":
-        return "X (Twitter)";
-      default:
-        return "Unsupported platform";
-    }
-  };
-
   const handlePostNow = (postId: string) => {
     publishPost(postId);
   };
@@ -311,7 +334,7 @@ function RouteComponent() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchInput(e.target.value);
     },
-    [],
+    []
   );
 
   return (
@@ -369,7 +392,9 @@ function RouteComponent() {
 
               <Tabs
                 defaultValue={postsView}
-                onValueChange={(value) => setPostsView(value as ConfigState["postsView"])}
+                onValueChange={(value) =>
+                  setPostsView(value as ConfigState["postsView"])
+                }
               >
                 <TabsList>
                   <TabsTrigger value="list">List</TabsTrigger>
@@ -390,7 +415,9 @@ function RouteComponent() {
         <Tabs
           defaultValue={postsView}
           className="pb-8"
-          onValueChange={(value) => setPostsView(value as ConfigState["postsView"])}
+          onValueChange={(value) =>
+            setPostsView(value as ConfigState["postsView"])
+          }
         >
           <TabsContent value="list" className="m-0">
             <div className="space-y-4">
@@ -494,7 +521,9 @@ function RouteComponent() {
                               )}
                               {post?.status === "DRAFT" && (
                                 <DropdownMenuItem
-                                  onClick={() => handlePostConfirmationDialog(post.id, true)}
+                                  onClick={() =>
+                                    handlePostConfirmationDialog(post.id, true)
+                                  }
                                 >
                                   <Send className="h-4 w-4 mr-2" />
                                   Post Now
@@ -502,43 +531,53 @@ function RouteComponent() {
                               )}
                               {post?.status !== "PUBLISHED" && (
                                 <DropdownMenuItem
-                                  onClick={() => handleMarkPublishedDialog(post.id, true)}
+                                  onClick={() =>
+                                    handleMarkPublishedDialog(post.id, true)
+                                  }
                                 >
                                   <CheckCircle2 className="h-4 w-4 mr-2" />
                                   Mark as Published
                                 </DropdownMenuItem>
                               )}
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 className="text-red-600"
-                                onClick={() => handleDeleteDialog(post.id, true)}
+                                onClick={() =>
+                                  handleDeleteDialog(post.id, true)
+                                }
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete Post
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
-                          
+
                           <ConfirmationDialog
                             open={postConfirmationDialogs[post.id] || false}
-                            onOpenChange={(isOpen) => handlePostConfirmationDialog(post.id, isOpen)}
+                            onOpenChange={(isOpen) =>
+                              handlePostConfirmationDialog(post.id, isOpen)
+                            }
                             title="Are you absolutely sure?"
                             description="This action cannot be undone. Are you sure you want to publish this post?"
                             onConfirm={() => handlePostNow(post.id)}
                             loading={isPublishing}
                           />
-                          
+
                           <ConfirmationDialog
                             open={markPublishedDialogs[post.id] || false}
-                            onOpenChange={(isOpen) => handleMarkPublishedDialog(post.id, isOpen)}
+                            onOpenChange={(isOpen) =>
+                              handleMarkPublishedDialog(post.id, isOpen)
+                            }
                             title="Mark as Published"
                             description="This will mark the post as published without actually posting it to social media. Are you sure you want to continue?"
                             onConfirm={() => markAsPublished(post.id)}
                             loading={isMarkingAsPublished}
                           />
-                          
+
                           <ConfirmationDialog
                             open={deleteDialogs[post.id] || false}
-                            onOpenChange={(isOpen) => handleDeleteDialog(post.id, isOpen)}
+                            onOpenChange={(isOpen) =>
+                              handleDeleteDialog(post.id, isOpen)
+                            }
                             title="Are you absolutely sure?"
                             description="This action cannot be undone. Are you sure you want to delete this post?"
                             confirmVariant="destructive"
@@ -614,7 +653,9 @@ function RouteComponent() {
                             )}
                             {post?.status === "DRAFT" && (
                               <DropdownMenuItem
-                                onClick={() => handlePostConfirmationDialog(post.id, true)}
+                                onClick={() =>
+                                  handlePostConfirmationDialog(post.id, true)
+                                }
                               >
                                 <Send className="h-4 w-4 mr-2" />
                                 Post Now
@@ -622,13 +663,15 @@ function RouteComponent() {
                             )}
                             {post?.status !== "PUBLISHED" && (
                               <DropdownMenuItem
-                                onClick={() => handleMarkPublishedDialog(post.id, true)}
+                                onClick={() =>
+                                  handleMarkPublishedDialog(post.id, true)
+                                }
                               >
                                 <CheckCircle2 className="h-4 w-4 mr-2" />
                                 Mark as Published
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               className="text-red-600"
                               onClick={() => handleDeleteDialog(post.id, true)}
                             >
@@ -650,28 +693,34 @@ function RouteComponent() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <ConfirmationDialog
                       open={postConfirmationDialogs[post.id] || false}
-                      onOpenChange={(isOpen) => handlePostConfirmationDialog(post.id, isOpen)}
+                      onOpenChange={(isOpen) =>
+                        handlePostConfirmationDialog(post.id, isOpen)
+                      }
                       title="Are you absolutely sure?"
                       description="This action cannot be undone. Are you sure you want to publish this post?"
                       onConfirm={() => handlePostNow(post.id)}
                       loading={isPublishing}
                     />
-                    
+
                     <ConfirmationDialog
                       open={markPublishedDialogs[post.id] || false}
-                      onOpenChange={(isOpen) => handleMarkPublishedDialog(post.id, isOpen)}
+                      onOpenChange={(isOpen) =>
+                        handleMarkPublishedDialog(post.id, isOpen)
+                      }
                       title="Mark as Published"
                       description="This will mark the post as published without actually posting it to social media. Are you sure you want to continue?"
                       onConfirm={() => markAsPublished(post.id)}
                       loading={isMarkingAsPublished}
                     />
-                    
+
                     <ConfirmationDialog
                       open={deleteDialogs[post.id] || false}
-                      onOpenChange={(isOpen) => handleDeleteDialog(post.id, isOpen)}
+                      onOpenChange={(isOpen) =>
+                        handleDeleteDialog(post.id, isOpen)
+                      }
                       title="Are you absolutely sure?"
                       description="This action cannot be undone. Are you sure you want to delete this post?"
                       confirmVariant="destructive"

@@ -26,6 +26,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNoteService } from "@/api/note.service";
 import { getPostsService, publishPostService } from "@/api/post.service";
 import { getStatusBadge } from "@/components/status-badge";
+import { getPlatformName } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { LinkedInReauthDialog } from "@/components/linkedin-reauth-dialog";
@@ -226,17 +227,6 @@ function RouteComponent() {
         );
       default:
         return null;
-    }
-  };
-
-  const getPlatformName = (platform: string) => {
-    switch (platform) {
-      case "linkedin":
-        return "LinkedIn";
-      case "twitter":
-        return "X (Twitter)";
-      default:
-        return "Unsupported platform";
     }
   };
 
