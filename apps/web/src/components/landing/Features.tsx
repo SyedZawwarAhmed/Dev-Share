@@ -8,6 +8,7 @@ import {
   Sparkles,
   Wand2,
 } from "lucide-react";
+import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "./Container";
 import { landingTheme } from "./landing-theme";
 
@@ -55,36 +56,44 @@ export function Features() {
     <section id="features" className="py-14 sm:py-18">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
-          <p className={cn("text-xs font-medium tracking-wide", landingTheme.accentText)}>
-            Features
-          </p>
-          <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            Everything you need to ship your learning in public
-          </h2>
-          <p className="mt-4 text-pretty text-base text-muted-foreground sm:text-lg">
-            DevShare helps you turn daily progress into consistent posts without
-            losing depth or authenticity.
-          </p>
+          <Reveal>
+            <p className={cn("text-xs font-medium tracking-wide", landingTheme.accentText)}>
+              Features
+            </p>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+              Everything you need to ship your learning in public
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="mt-4 text-pretty text-base text-muted-foreground sm:text-lg">
+              DevShare helps you turn daily progress into consistent posts without
+              losing depth or authenticity.
+            </p>
+          </Reveal>
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map(({ title, description, icon: Icon }) => (
-            <Card key={title} className="border-zinc-200">
-              <CardContent className="pt-6">
-                <div
-                  className={cn(
-                    "inline-flex h-10 w-10 items-center justify-center rounded-lg border bg-background",
-                    landingTheme.accentBorder
-                  )}
-                >
-                  <Icon className={cn("h-5 w-5", landingTheme.accentText)} />
-                </div>
-                <h3 className="mt-4 text-base font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
-              </CardContent>
-            </Card>
+          {features.map(({ title, description, icon: Icon }, idx) => (
+            <Reveal key={title} delay={0.05 * idx}>
+              <Card className="border-zinc-200">
+                <CardContent className="pt-6">
+                  <div
+                    className={cn(
+                      "inline-flex h-10 w-10 items-center justify-center rounded-lg border bg-background",
+                      landingTheme.accentBorder
+                    )}
+                  >
+                    <Icon className={cn("h-5 w-5", landingTheme.accentText)} />
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {description}
+                  </p>
+                </CardContent>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </Container>
