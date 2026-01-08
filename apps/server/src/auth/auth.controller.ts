@@ -14,13 +14,14 @@ import { Response } from 'express';
 import { LocalOAuthGuard } from './local/local.oauth.guard';
 import { GoogleOAuthGuard } from './google/google.ouath.guard';
 import { JwtOAuthGuard } from './jwt/jwt.oauth.guard';
-import { LinkedinOAuthGuard } from './linkedin/linkedin.oauth.guard';
+import { LinkedinStrategy } from './linkedin/linkedin.strategy';
 import { TwitterStrategy } from './twitter/twitter.strategy';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private linkedinStrategy: LinkedinStrategy,
     private twitterStrategy: TwitterStrategy,
   ) {}
 
@@ -83,23 +84,37 @@ export class AuthController {
   }
 
   @Get('linkedin')
-  @UseGuards(LinkedinOAuthGuard)
-  async linkedinAuth() {
-    // This will redirect to LinkedIn
+  async linkedinAuth(@Res() res: Response) {
+    const authUrl = this.linkedinStrategy.getAuthUrl();
+    res.redirect(authUrl);
   }
 
   @Get('linkedin/callback')
-  @UseGuards(LinkedinOAuthGuard)
   async linkedinAuthCallback(@Req() req, @Res() res: Response) {
     try {
-      const { token } = await this.authService.linkedinLogin(req.user);
+      const { code, state, error } = req.query;
+
+      if (error) {
+        throw new Error(`LinkedIn OAuth error: ${error}`);
+      }
+
+      if (!code || !state) {
+        throw new Error('Missing code or state parameter');
+      }
+
+      const linkedinProfile = await this.linkedinStrategy.exchangeCodeForToken(
+        code as string,
+        state as string,
+      );
+
+      const { token } = await this.authService.linkedinLogin(linkedinProfile);
       const redirectUrl = new URL('/callback', process.env.FRONTEND_URL);
       redirectUrl.searchParams.append('token', encodeURIComponent(token));
       res.redirect(redirectUrl.toString());
     } catch (error) {
       console.error('LinkedIn OAuth callback error:', error);
       res.redirect(
-        `${process.env.FRONTEND_URL}/login?error=Authentication failed`,
+        `${process.env.FRONTEND_URL}/login?error=LinkedIn authentication failed`,
       );
     }
   }
