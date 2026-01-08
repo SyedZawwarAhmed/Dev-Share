@@ -37,7 +37,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
-    "passport-linkedin-oauth2": "git+https://github.com/auth0/passport-linkedin-oauth2",
+    "passport-linkedin-oauth2": "git+https://github.com/auth0/passport-linkedin-oauth2#v3.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.8.0",
     "reflect-metadata": "^0.2.2",

@@ -66,8 +66,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       passport-linkedin-oauth2:
-        specifier: git+https://github.com/auth0/passport-linkedin-oauth2
-        version: https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23
+        specifier: git+https://github.com/auth0/passport-linkedin-oauth2#v3.0.0
+        version: https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/8fe01d1c50124b25b6eaca3950151e6aceb800fe
       passport-local:
         specifier: ^1.0.0
         version: 1.0.0
@@ -4892,8 +4892,8 @@ packages:
   passport-jwt@4.0.1:
     resolution: {integrity: sha512-UCKMDYhNuGOBE9/9Ycuoyh7vP6jpeTp/+sfMJl7nLff/t6dps+iaeE0hhNkKN8/HZHcJ7lCdOyDxHdDoxoSvdQ==}
 
-  passport-linkedin-oauth2@https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23:
-    resolution: {tarball: https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23}
+  passport-linkedin-oauth2@https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/8fe01d1c50124b25b6eaca3950151e6aceb800fe:
+    resolution: {tarball: https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/8fe01d1c50124b25b6eaca3950151e6aceb800fe}
     version: 3.0.0
     engines: {node: '>= 16'}
 
@@ -11305,7 +11305,7 @@ snapshots:
       jsonwebtoken: 9.0.2
       passport-strategy: 1.0.0
 
-  passport-linkedin-oauth2@https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/87bd3076edb262933ebd460d367e8cd3aa941b23:
+  passport-linkedin-oauth2@https://codeload.github.com/auth0/passport-linkedin-oauth2/tar.gz/8fe01d1c50124b25b6eaca3950151e6aceb800fe:
     dependencies:
       passport-oauth2: 1.8.0
 
